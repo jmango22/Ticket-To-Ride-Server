@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerPlayer implements Player, Serializable {
+public class ServerPlayer implements Player {
     public ServerPlayer(String id, String username, String password, String accessToken) {
         this.id = id;
         this.username = username;
