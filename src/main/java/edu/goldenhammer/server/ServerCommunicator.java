@@ -2,7 +2,13 @@ package edu.goldenhammer.server;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import com.sun.net.httpserver.*;
+import edu.goldenhammer.model.DatabaseConnnectionFactory;
+
 /**
  * Created by devonkinghorn on 1/19/17.
  */
@@ -34,6 +40,16 @@ public class ServerCommunicator {
 
     public static void main(String[] args) {
         String portNumber = "8080";//args[0];
-        new ServerCommunicator().run(portNumber);
+//        new ServerCommunicator().run(portNumber);
+        DatabaseConnnectionFactory factory = DatabaseConnnectionFactory.getInstance();
+        Connection conn = factory.getConnection();
+        String sqlString = "select * from advisor";//String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", "*", "students");
+        try {
+            PreparedStatement statement = conn.prepareStatement(sqlString);
+            ResultSet resultSet = statement.executeQuery();
+            System.out.println(resultSet.toString());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
