@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IGameListItem;
 import edu.goldenhammer.data_types.IServerPlayer;
-import edu.goldenhammer.data_types.ServerGameListItem;
 import edu.goldenhammer.database.DatabaseController;
 
 import java.io.IOException;
@@ -51,7 +50,6 @@ public class ListGamesHandler extends HandlerBase {
                         }
                         item.setPlayers(playerUsernames);
                     }
-
                     results.setResponseCode(200);
                     results.setMessage(Serializer.serialize(gameList));
                 }

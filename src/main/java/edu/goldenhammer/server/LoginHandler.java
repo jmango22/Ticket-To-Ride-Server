@@ -21,8 +21,15 @@ public class LoginHandler extends HandlerBase {
             Results result = new Results();
             if(success) {
                 String access_token = dbc.getPlayerInfo(username).getAccessToken();
-                result.setResponseCode(200);
-                result.setMessage(access_token);
+
+                if(!access_token.isEmpty()) {
+                    result.setResponseCode(200);
+                    result.setMessage(access_token);
+                }
+                else {
+                    result.setResponseCode(500);
+                    result.setMessage("Error: something went wrong. There is no access token for this user.");
+                }
             }
             else {
                 result.setResponseCode(500);

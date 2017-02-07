@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 
+import java.io.IOException;
+
 public class RegisterHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
         try {
@@ -26,7 +28,7 @@ public class RegisterHandler extends HandlerBase {
                 result.setMessage("Error: bad credentials");
             }
             sendResponse(exchange, result);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
