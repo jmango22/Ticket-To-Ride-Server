@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.sun.net.httpserver.*;
-import edu.goldenhammer.model.DatabaseConnnectionFactory;
+import edu.goldenhammer.model.DatabaseConnectionFactory;
 
 /**
  * Created by devonkinghorn on 1/19/17.
@@ -41,7 +41,7 @@ public class ServerCommunicator {
     public static void main(String[] args) {
         String portNumber = "8080";//args[0];
 //        new ServerCommunicator().run(portNumber);
-        DatabaseConnnectionFactory factory = DatabaseConnnectionFactory.getInstance();
+        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
         Connection conn = factory.getConnection();
         String sqlString = "select * from advisor";//String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", "*", "students");
         try {

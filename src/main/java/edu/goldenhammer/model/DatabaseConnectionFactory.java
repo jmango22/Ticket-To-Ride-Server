@@ -7,15 +7,15 @@ import java.sql.*;
 /**
  * Created by devonkinghorn on 2/1/17.
  */
-public class DatabaseConnnectionFactory {
+public class DatabaseConnectionFactory {
 //    private static final String POSTGRESQL_DRIVER_NAME = "org.postgresql.Driver";
 //
 //    private DataSource dataSource;
 //    private String schema;
 //    private String databaseName;
 
-    private static DatabaseConnnectionFactory singleton;
-    public static DatabaseConnnectionFactory getInstance() {
+    private static DatabaseConnectionFactory singleton;
+    public static DatabaseConnectionFactory getInstance() {
         if (singleton == null) {
             String host = "ec2-35-167-43-52.us-west-2.compute.amazonaws.com";
             String database = "postgres";
@@ -23,12 +23,12 @@ public class DatabaseConnnectionFactory {
             int maxConnections = 10;
             String userName = "postgres";
             String password = "goldenhammerteam";
-            singleton = new DatabaseConnnectionFactory(host, database, schema, maxConnections, userName, password);
+            singleton = new DatabaseConnectionFactory(host, database, schema, maxConnections, userName, password);
         }
         return singleton;
     }
 
-    DatabaseConnnectionFactory(String host, String database, String schema, int maxConnections, String userName, String password) {
+    DatabaseConnectionFactory(String host, String database, String schema, int maxConnections, String userName, String password) {
         this.databaseName = database;
         this.dataSource = configureDataSource(host, database, maxConnections, userName, password);
         if (schema != null) {
