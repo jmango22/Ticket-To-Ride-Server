@@ -1,4 +1,4 @@
-package edu.goldenhammer.model;
+package edu.goldenhammer.database;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import javax.sql.DataSource;

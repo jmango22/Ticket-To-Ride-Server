@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.sun.net.httpserver.*;
-import edu.goldenhammer.model.DatabaseConnectionFactory;
+import edu.goldenhammer.database.DatabaseConnectionFactory;
 
 /**
  * Created by devonkinghorn on 1/19/17.

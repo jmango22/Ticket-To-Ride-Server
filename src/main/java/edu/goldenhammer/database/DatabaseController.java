@@ -1,14 +1,13 @@
-package edu.goldenhammer.model;
+package edu.goldenhammer.database;
 
-import edu.goldenhammer.data_types.GameList;
-import edu.goldenhammer.data_types.Player;
+import edu.goldenhammer.model.GameList;
+import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.data_types.ServerPlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.AbstractCollection;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public Player getPlayerInfo(String player_user_name) {
+    public IServerPlayer getPlayerInfo(String player_user_name) {
         try (Connection connection = session.getConnection()){
             String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s=%4$s", ServerPlayer.columnNames(), ServerPlayer.TABLE_NAME, ServerPlayer.USERNAME, player_user_name);
             PreparedStatement statement = connection.prepareStatement(sqlString);
@@ -97,7 +96,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public List<Player> getPlayers(String gameID) {
+    public List<IServerPlayer> getPlayers(String gameID) {
         return null;
     }
 

@@ -6,30 +6,44 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerGame implements Game, Serializable {
-    public ServerGame(String id, String name, List<String> players){
+public class ServerGame implements IServerGame, Serializable {
+
+    public static final String ID = "game_id";
+    public static final String GAME_NAME = "name";
+    public static final String STARTED = "started";
+    public static final String TABLE_NAME = "game";
+    public static final String CREATE_STMT = String.format(
+            "CREATE TABLE %1$s if not exists (\n" +
+                    "    game_id SERIAL INTEGER NOT NULL,\n" +
+                    "    name VARCHAR(20) NOT NULL,\n" +
+                    "    started BOOLEAN NOT NULL,\n" +
+                    "    PRIMARY KEY(game_id)" +
+                    ")"
+            , TABLE_NAME);
+
+    public ServerGame(String id, String name, Boolean started){
         this.id = id;
         this.name = name;
-        this.players = players;
+        this.started = started;
     }
 
-    @Override
+
     public String getID() {
         return id;
     }
 
-    @Override
+
     public String getName() {
         return name;
     }
 
-    @Override
-    public List<String> getPlayers() {
-        return players;
+
+    public Boolean getStarted() {
+        return started;
     }
 
     private String id;
     private String name;
-    private List<String> players;
+    private Boolean started;
 
 }

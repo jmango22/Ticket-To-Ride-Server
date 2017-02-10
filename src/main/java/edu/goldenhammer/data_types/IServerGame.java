@@ -5,8 +5,8 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public interface Game {
+public interface IServerGame {
     String getID();
     String getName();
-    List<String> getPlayers();
+    Boolean getStarted();
 }

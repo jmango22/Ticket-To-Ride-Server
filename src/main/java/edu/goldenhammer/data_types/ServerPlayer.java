@@ -1,11 +1,9 @@
 package edu.goldenhammer.data_types;
 
-import java.io.Serializable;
-
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerPlayer implements Player {
+public class ServerPlayer implements IServerPlayer {
     public static final String ID = "user_id";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";

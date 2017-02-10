@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public interface GameListItem {
+public interface IGameListItem {
     String getID();
     String getName();
     boolean isStarted();
