@@ -2,6 +2,7 @@ package edu.goldenhammer.server;
 
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
+import edu.goldenhammer.database.DatabaseController;
 
 /**
  * Created by seanjib on 2/5/2017.
@@ -15,10 +16,11 @@ public class LoginHandler extends HandlerBase {
             String password = credentials.get("password").getAsString();
 
             DatabaseController dbc = DatabaseController.getInstance();
-            String access_token = dbc.login(username, password);
+            boolean success = dbc.login(username, password);
 
             Results result = new Results();
-            if(!access_token.isEmpty()) {
+            if(success) {
+                String access_token = dbc.getPlayerInfo(username).getAccessToken();
                 result.setResponseCode(200);
                 result.setMessage(access_token);
             }

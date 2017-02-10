@@ -2,6 +2,7 @@ package edu.goldenhammer.server;
 
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
+import edu.goldenhammer.database.DatabaseController;
 
 public class RegisterHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
@@ -12,10 +13,11 @@ public class RegisterHandler extends HandlerBase {
             String password = credentials.get("password").getAsString();
 
             DatabaseController dbc = DatabaseController.getInstance();
-            String access_token = dbc.registerNewPlayer(username, password);
+            boolean success = dbc.createUser(username, password);
 
             Results result = new Results();
-            if(!access_token.isEmpty()) {
+            if(success) {
+                String access_token = dbc.getPlayerInfo(username).getAccessToken();
                 result.setResponseCode(200);
                 result.setMessage(access_token);
             }

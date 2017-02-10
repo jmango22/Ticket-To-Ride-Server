@@ -1,5 +1,6 @@
 package edu.goldenhammer.database;
 
+import edu.goldenhammer.data_types.IServerGame;
 import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IServerPlayer;
 
@@ -14,5 +15,7 @@ public interface IDatabaseController {
     Boolean createGame(String name);
     Boolean joinGame(String player, String gameID);
     List<IServerPlayer> getPlayers(String gameID);
+    Boolean leaveGame(String player, String gameID);
+    IServerGame playGame(String player, String gameID);
     void setAccessToken(String userID, String accessToken);
 }

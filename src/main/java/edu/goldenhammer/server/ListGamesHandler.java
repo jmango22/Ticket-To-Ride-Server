@@ -1,9 +1,15 @@
 package edu.goldenhammer.server;
 
 import com.sun.net.httpserver.HttpExchange;
-import edu.goldenhammer.data_types.GameList;
+import edu.goldenhammer.model.GameList;
+import edu.goldenhammer.data_types.IGameListItem;
+import edu.goldenhammer.data_types.IServerPlayer;
+import edu.goldenhammer.data_types.ServerGameListItem;
+import edu.goldenhammer.database.DatabaseController;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +23,7 @@ public class ListGamesHandler extends HandlerBase {
                 results = getInvalidAuthorizationResults();
             }
             else {
-                DatabaseConnection dbc = DatabaseConnection.getInstance();
+                DatabaseController dbc = DatabaseController.getInstance();
                 GameList gameList;
 
                 Map<String, String> parameters = queryToMap(exchange.getRequestURI().getQuery());
@@ -37,6 +43,15 @@ public class ListGamesHandler extends HandlerBase {
                     results.setMessage("ERROR: invalid username in URL");
                 }
                 else {
+                    for(IGameListItem item : gameList.getGameList()) {
+                        List<IServerPlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
+                        List<String> playerUsernames = new ArrayList<>();
+                        for(IServerPlayer player : players) {                       //converts the list of players to a list of usernames
+                            playerUsernames.add(player.getUsername());
+                        }
+                        item.setPlayers(playerUsernames);
+                    }
+
                     results.setResponseCode(200);
                     results.setMessage(Serializer.serialize(gameList));
                 }

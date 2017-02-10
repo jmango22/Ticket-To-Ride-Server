@@ -2,6 +2,7 @@ package edu.goldenhammer.server;
 
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
+import edu.goldenhammer.database.DatabaseController;
 
 /**
  * Created by seanjib on 2/5/2017.
@@ -25,6 +26,8 @@ public class CreateGameHandler extends HandlerBase {
                 boolean success = dbc.createGame(gameName);
 
                 if (success) {
+                    String username = exchange.getRequestHeaders().get("username").get(0);
+                    dbc.joinGame(username, gameName);
                     results.setResponseCode(200);
                     results.setMessage("Game successfully created!");
                 } else {
