@@ -1,4 +1,6 @@
-package edu.goldenhammer.data_types;
+package edu.goldenhammer.model;
+
+import edu.goldenhammer.data_types.IGameListItem;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,13 +14,13 @@ public class GameList implements Serializable {
         gameList = new ArrayList<>();
     }
 
-    public List<GameListItem> getGameList() {
+    public List<IGameListItem> getGameList() {
         return gameList;
     }
 
-    public void add(GameListItem g) {
+    public void add(IGameListItem g) {
         gameList.add(g);
     }
 
-    private List<GameListItem> gameList;
+    private List<IGameListItem> gameList;
 }

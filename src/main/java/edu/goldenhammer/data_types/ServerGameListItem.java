@@ -6,7 +6,26 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerGameListItem implements GameListItem, Serializable {
+public class ServerGameListItem implements IGameListItem, Serializable {
+    public static final String TABLE_NAME = "participants";
+    public static final String USER_ID = "user_id";
+    public static final String GAME_ID = "game_id";
+    public static final String PLAYER_NUMBER = "player_number";
+
+    public static final String CREATE_STMT = String.format(
+                    "CREATE TABLE 1$s if not exists (\n" +
+                    "    user_id INTEGER NOT NULL,\n" +
+                    "    game_id INTEGER NOT NULL,\n" +
+                    "    player_number INTEGER NOT NULL,\n" +
+                    "    PRIMARY Key(user_id, game_id),\n" +
+                    "    FOREIGN KEY(user_id)\n" +
+                    "      references player\n" +
+                    "      on delete CASCADE,\n" +
+                    "    FOREIGN KEY(game_id)\n" +
+                    "      references game\n" +
+                    "      on delete CASCADE\n" +
+                    ")"
+            , TABLE_NAME);
 
     public ServerGameListItem(String id, String name, boolean started, List<String> players) {
         this.id = id;
