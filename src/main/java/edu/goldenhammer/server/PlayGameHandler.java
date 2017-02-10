@@ -1,7 +1,9 @@
 package edu.goldenhammer.server;
 
 import com.sun.net.httpserver.HttpExchange;
+import edu.goldenhammer.data_types.Game;
 import edu.goldenhammer.data_types.ServerGame;
+import edu.goldenhammer.model.DatabaseController;
 
 /**
  * Created by seanjib on 2/5/2017.
@@ -23,7 +25,7 @@ public class PlayGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
-                    ServerGame game = dbc.playGame(username, gamename);
+                    Game game = dbc.playGame(username, gamename);
 
                     if (game != null) {
                         results.setResponseCode(200);
