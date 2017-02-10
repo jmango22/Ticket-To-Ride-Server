@@ -39,6 +39,7 @@ public class ServerCommunicator {
     }
 
     public static void main(String[] args) {
+
         String portNumber = "8080";//args[0];
 //        new ServerCommunicator().run(portNumber);
         DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();

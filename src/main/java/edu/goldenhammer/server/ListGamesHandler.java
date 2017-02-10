@@ -1,10 +1,12 @@
 package edu.goldenhammer.server;
 
 import com.sun.net.httpserver.HttpExchange;
+
 import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IGameListItem;
 import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.database.DatabaseController;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

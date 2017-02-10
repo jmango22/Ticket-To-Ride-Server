@@ -2,7 +2,6 @@ package edu.goldenhammer.database;
 
 import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.data_types.IServerGame;
-
 import edu.goldenhammer.data_types.ServerPlayer;
 import java.util.List;
 import edu.goldenhammer.model.GameList;
