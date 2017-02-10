@@ -54,6 +54,10 @@ public class ServerGameListItem implements IGameListItem, Serializable {
         return players;
     }
 
+    public static String columnNames() {
+        return String.join(",", USER_ID, GAME_ID, PLAYER_NUMBER);
+    }
+
     private String id;
     private String name;
     private boolean started;
