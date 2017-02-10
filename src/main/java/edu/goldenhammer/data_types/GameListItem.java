@@ -10,4 +10,5 @@ public interface GameListItem {
     String getName();
     boolean isStarted();
     List<String> getPlayers();
+    void setPlayers(List<String> players);
 }

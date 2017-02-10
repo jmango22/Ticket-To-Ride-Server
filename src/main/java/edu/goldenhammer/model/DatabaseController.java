@@ -1,5 +1,6 @@
 package edu.goldenhammer.model;
 
+import edu.goldenhammer.data_types.Game;
 import edu.goldenhammer.data_types.GameList;
 import edu.goldenhammer.data_types.Player;
 import edu.goldenhammer.data_types.ServerPlayer;
@@ -93,6 +94,16 @@ public class DatabaseController implements IDatabaseController {
 
     @Override
     public Boolean joinGame(String player, String gameID) {
+        return null;
+    }
+
+    @Override
+    public Boolean leaveGame(String player, String gameID) {
+        return null;
+    }
+
+    @Override
+    public Game playGame(String player, String gameID) {
         return null;
     }
 

@@ -14,6 +14,8 @@ public interface IDatabaseController {
     Boolean createUser(String username, String password);
     Boolean createGame(String name);
     Boolean joinGame(String player, String gameID);
+    Boolean leaveGame(String player, String gameID);
+    Game playGame(String player, String gameID);
     List<Player> getPlayers(String gameID);
     void setAccessToken(String userID, String accessToken);
 }
