@@ -3,7 +3,6 @@ package edu.goldenhammer.server;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.data_types.IServerGame;
 import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.data_types.ServerGame;
 
 /**
  * Created by seanjib on 2/5/2017.

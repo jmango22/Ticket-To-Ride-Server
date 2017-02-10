@@ -2,7 +2,6 @@ package edu.goldenhammer.server;
 
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
-
 /**
  * Created by seanjib on 2/5/2017.
  *

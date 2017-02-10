@@ -1,15 +1,16 @@
 package edu.goldenhammer.database;
 
-import edu.goldenhammer.data_types.ServerPlayer;
-import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.data_types.IServerGame;
+
+import edu.goldenhammer.data_types.ServerPlayer;
+import java.util.List;
+import edu.goldenhammer.model.GameList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Created by devonkinghorn on 2/4/17.
