@@ -54,20 +54,16 @@ public class ServerGameListItem implements IGameListItem, Serializable {
         return players;
     }
 
-<<<<<<< HEAD
+
     @Override
     public void setPlayers(List<String> players) { this.players = players; }
 
-=======
->>>>>>> 3d623cf9d414fc17b4fd066a8ffb74b42d094ee9
+
     public static String columnNames() {
         return String.join(",", USER_ID, GAME_ID, PLAYER_NUMBER);
     }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3d623cf9d414fc17b4fd066a8ffb74b42d094ee9
     private String id;
     private String name;
     private boolean started;
