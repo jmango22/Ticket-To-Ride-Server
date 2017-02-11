@@ -10,8 +10,8 @@ public class ServerPlayer implements IServerPlayer {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String TABLE_NAME = "player";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE %1$s if not exists (\n" +
-                    "    user_id SERIAL INTEGER not null,\n" +
+            "CREATE TABLE if not exists %1$s (\n" +
+                    "    user_id SERIAL unique,\n" +
                     "    username VARCHAR(20) UNIQUE NOT NULL,\n" +
                     "    password VARCHAR(20) NOT NULL,\n" +
                     "    access_token VARCHAR(20) UNIQUE,\n" +
