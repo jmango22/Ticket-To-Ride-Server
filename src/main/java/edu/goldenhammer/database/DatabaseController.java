@@ -3,7 +3,7 @@ package edu.goldenhammer.database;
 
 
 import edu.goldenhammer.database.data_types.DatabaseParticipants;
-import edu.goldenhammer.model.Game;
+import edu.goldenhammer.model.GameOverview;
 import edu.goldenhammer.model.GameList;
 
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
@@ -83,14 +83,14 @@ public class DatabaseController implements IDatabaseController {
 
     private GameList getGameListFromResultSet (ResultSet resultSet) throws SQLException{
         GameList gameList = new GameList();
-        Game game = null;
+        GameOverview game = null;
         while(resultSet.next()){
             String user_id = resultSet.getString((DatabaseParticipants.USER_ID));
             String game_id = resultSet.getString(DatabaseParticipants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
                 String name = resultSet.getString("name");
-                game = new Game(game_id, name, new ArrayList<>());
+                game = new GameOverview(game_id, name, new ArrayList<>());
                 gameList.add(game);
             }
             game.getPlayers().add(user_id);

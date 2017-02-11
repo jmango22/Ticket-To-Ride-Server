@@ -31,7 +31,7 @@ public class JoinGameHandler extends HandlerBase {
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("Game successfully joined!");
+                        results.setMessage("GameOverview successfully joined!");
                     } else {
                         results.setResponseCode(500);
                         results.setMessage("Error: cannot join game");
