@@ -1,4 +1,4 @@
-package edu.goldenhammer.commands;
+package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.server.Results;
 

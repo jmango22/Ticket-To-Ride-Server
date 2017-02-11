@@ -2,14 +2,14 @@ package edu.goldenhammer.database;
 
 
 
-import edu.goldenhammer.database.data_types.Participants;
+import edu.goldenhammer.database.data_types.DatabaseParticipants;
 import edu.goldenhammer.model.Game;
 import edu.goldenhammer.model.GameList;
 
-import edu.goldenhammer.database.data_types.IServerPlayer;
-import edu.goldenhammer.database.data_types.IServerGame;
-import edu.goldenhammer.database.data_types.ServerPlayer;
-import edu.goldenhammer.database.data_types.ServerGame;
+import edu.goldenhammer.database.data_types.IDatabasePlayer;
+import edu.goldenhammer.database.data_types.IDatabaseGame;
+import edu.goldenhammer.database.data_types.DatabasePlayer;
+import edu.goldenhammer.database.data_types.DatabaseGame;
 
 import java.util.List;
 
@@ -47,9 +47,9 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void ensureTablesCreated() {
-        createTable(ServerPlayer.CREATE_STMT);
-        createTable(ServerGame.CREATE_STMT);
-        createTable(Participants.CREATE_STMT);
+        createTable(DatabasePlayer.CREATE_STMT);
+        createTable(DatabaseGame.CREATE_STMT);
+        createTable(DatabaseParticipants.CREATE_STMT);
     }
     private void createTable(String sqlStatementString) {
         try (Connection connection = session.getConnection()) {
@@ -61,18 +61,18 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public IServerPlayer getPlayerInfo(String player_user_name) {
+    public IDatabasePlayer getPlayerInfo(String player_user_name) {
         try (Connection connection = session.getConnection()){
-            String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s=?", ServerPlayer.columnNames(), ServerPlayer.TABLE_NAME, ServerPlayer.USERNAME);
+            String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s=?", DatabasePlayer.columnNames(), DatabasePlayer.TABLE_NAME, DatabasePlayer.USERNAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, player_user_name);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
-                return new ServerPlayer(
-                        resultSet.getString(ServerPlayer.ID),
-                        resultSet.getString(ServerPlayer.USERNAME),
-                        resultSet.getString(ServerPlayer.PASSWORD),
-                        resultSet.getString(ServerPlayer.ACCESS_TOKEN)
+                return new DatabasePlayer(
+                        resultSet.getString(DatabasePlayer.ID),
+                        resultSet.getString(DatabasePlayer.USERNAME),
+                        resultSet.getString(DatabasePlayer.PASSWORD),
+                        resultSet.getString(DatabasePlayer.ACCESS_TOKEN)
                 );
             }
         } catch(SQLException e){
@@ -85,8 +85,8 @@ public class DatabaseController implements IDatabaseController {
         GameList gameList = new GameList();
         Game game = null;
         while(resultSet.next()){
-            String user_id = resultSet.getString((Participants.USER_ID));
-            String game_id = resultSet.getString(Participants.GAME_ID);
+            String user_id = resultSet.getString((DatabaseParticipants.USER_ID));
+            String game_id = resultSet.getString(DatabaseParticipants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
                 String name = resultSet.getString("name");
@@ -107,9 +107,9 @@ public class DatabaseController implements IDatabaseController {
 
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where started=false order by game_id",
-                    Participants.columnNames() + ", name",
-                    Participants.TABLE_NAME,
-                    Participants.USER_ID);
+                    DatabaseParticipants.columnNames() + ", name",
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.USER_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             ResultSet resultSet = statement.executeQuery();
             return getGameListFromResultSet(resultSet);
@@ -128,12 +128,12 @@ public class DatabaseController implements IDatabaseController {
 
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where %3$s in (select %4$s from %5$s where %6$s=?) order by game_id",
-                    Participants.columnNames() + ", name",
-                    Participants.TABLE_NAME,
-                    Participants.USER_ID,
-                    ServerPlayer.ID,
-                    ServerPlayer.TABLE_NAME,
-                    ServerPlayer.USERNAME);
+                    DatabaseParticipants.columnNames() + ", name",
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.USER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_user_name);
             ResultSet resultSet = statement.executeQuery();
@@ -154,10 +154,10 @@ public class DatabaseController implements IDatabaseController {
     public Boolean login(String username, String password) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s=? and %4$s=?",
-                    ServerPlayer.columnNames(),
-                    ServerPlayer.TABLE_NAME,
-                    ServerPlayer.USERNAME,
-                    ServerPlayer.PASSWORD);
+                    DatabasePlayer.columnNames(),
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+                    DatabasePlayer.PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,username);
             statement.setString(2,password);
@@ -180,9 +180,9 @@ public class DatabaseController implements IDatabaseController {
     public Boolean createUser(String username, String password) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("INSERT INTO %1$s(%2$s,%2$s) VALUES (?,?)",
-                    ServerPlayer.TABLE_NAME,
-                    ServerPlayer.USERNAME,
-                    ServerPlayer.PASSWORD);
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+                    DatabasePlayer.PASSWORD);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,username);
             statement.setString(2,password);
@@ -220,7 +220,7 @@ public class DatabaseController implements IDatabaseController {
      * @return the list of players that are a member of the game
      */
     @Override
-    public List<IServerPlayer> getPlayers(String game_name) {
+    public List<IDatabasePlayer> getPlayers(String game_name) {
         return null;
     }
 
@@ -242,7 +242,7 @@ public class DatabaseController implements IDatabaseController {
      * @return
      */
     @Override
-    public IServerGame playGame(String player, String gameID) {
+    public IDatabaseGame playGame(String player, String gameID) {
         return null;
     }
 

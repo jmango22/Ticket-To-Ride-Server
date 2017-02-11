@@ -3,7 +3,7 @@ package edu.goldenhammer.database.data_types;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerPlayer implements IServerPlayer {
+public class DatabasePlayer implements IDatabasePlayer {
     public static final String ID = "user_id";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -20,7 +20,7 @@ public class ServerPlayer implements IServerPlayer {
             , TABLE_NAME);
 
 
-    public ServerPlayer(String id, String username, String password, String accessToken) {
+    public DatabasePlayer(String id, String username, String password, String accessToken) {
         this.id = id;
         this.username = username;
         this.password = password;

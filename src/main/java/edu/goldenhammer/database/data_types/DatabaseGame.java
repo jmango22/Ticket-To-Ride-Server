@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class ServerGame implements IServerGame, Serializable {
+public class DatabaseGame implements IDatabaseGame, Serializable {
 
     public static final String ID = "game_id";
     public static final String GAME_NAME = "name";
@@ -20,7 +20,7 @@ public class ServerGame implements IServerGame, Serializable {
                     ")"
             , TABLE_NAME);
 
-    public ServerGame(String id, String name, Boolean started){
+    public DatabaseGame(String id, String name, Boolean started){
         this.id = id;
         this.name = name;
         this.started = started;

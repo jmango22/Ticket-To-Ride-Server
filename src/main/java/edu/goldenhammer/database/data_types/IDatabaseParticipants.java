@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public interface IParticipants {
+public interface IDatabaseParticipants {
     String getID();
     String getName();
     boolean isStarted();

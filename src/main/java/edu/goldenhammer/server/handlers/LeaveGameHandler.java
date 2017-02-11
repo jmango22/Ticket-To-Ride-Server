@@ -1,13 +1,15 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import edu.goldenhammer.database.data_types.IServerGame;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.server.Results;
 
 /**
  * Created by seanjib on 2/5/2017.
+ *
+ * Response code indicates success
  */
-public class PlayGameHandler extends HandlerBase {
+public class LeaveGameHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
         try {
             DatabaseController dbc = DatabaseController.getInstance();
@@ -24,13 +26,14 @@ public class PlayGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
-                    IServerGame game = dbc.playGame(username, gamename);
-                    if (game != null) {
+                    boolean success = dbc.leaveGame(username, gamename);
+
+                    if (success) {
                         results.setResponseCode(200);
-                        results.setMessage(Serializer.serialize(game));
+                        results.setMessage("Game successfully left!");
                     } else {
                         results.setResponseCode(500);
-                        results.setMessage("Error: cannot open game");
+                        results.setMessage("Error: cannot leave game");
                     }
                 }
                 else {
@@ -42,6 +45,5 @@ public class PlayGameHandler extends HandlerBase {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
     }
 }

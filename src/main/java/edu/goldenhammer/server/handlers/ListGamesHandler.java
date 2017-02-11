@@ -1,11 +1,13 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 
 import edu.goldenhammer.model.GameList;
-import edu.goldenhammer.database.data_types.IServerPlayer;
+import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.model.IGame;
+import edu.goldenhammer.server.Results;
+import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,9 +46,9 @@ public class ListGamesHandler extends HandlerBase {
                 }
                 else {
                     for(IGame item : gameList.getGameList()) {
-                        List<IServerPlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
+                        List<IDatabasePlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
                         List<String> playerUsernames = new ArrayList<>();
-                        for(IServerPlayer player : players) {                       //converts the list of players to a list of usernames
+                        for(IDatabasePlayer player : players) {                       //converts the list of players to a list of usernames
                             playerUsernames.add(player.getUsername());
                         }
                         item.setPlayers(playerUsernames);
