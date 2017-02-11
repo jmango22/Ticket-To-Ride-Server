@@ -13,8 +13,8 @@ public class ServerGame implements IServerGame, Serializable {
     public static final String STARTED = "started";
     public static final String TABLE_NAME = "game";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE %1$s if not exists (\n" +
-                    "    game_id SERIAL INTEGER NOT NULL,\n" +
+            "CREATE TABLE if not exists %1$s (\n" +
+                    "    game_id SERIAL unique,\n" +
                     "    name VARCHAR(20) NOT NULL,\n" +
                     "    started BOOLEAN NOT NULL,\n" +
                     "    PRIMARY KEY(game_id)" +
