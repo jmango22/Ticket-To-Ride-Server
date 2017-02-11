@@ -1,13 +1,16 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.server.Results;
+
 /**
  * Created by seanjib on 2/5/2017.
  *
- * Response code indicates success
+ * Header includes authorization token, username, and game name
+ * Response indicates success
  */
-public class LeaveGameHandler extends HandlerBase {
+public class JoinGameHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
         try {
             DatabaseController dbc = DatabaseController.getInstance();
@@ -24,14 +27,14 @@ public class LeaveGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
-                    boolean success = dbc.leaveGame(username, gamename);
+                    boolean success = dbc.joinGame(username, gamename);
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("Game successfully left!");
+                        results.setMessage("Game successfully joined!");
                     } else {
                         results.setResponseCode(500);
-                        results.setMessage("Error: cannot leave game");
+                        results.setMessage("Error: cannot join game");
                     }
                 }
                 else {

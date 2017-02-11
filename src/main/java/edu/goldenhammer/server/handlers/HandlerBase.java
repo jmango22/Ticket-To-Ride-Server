@@ -1,8 +1,10 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.server.Results;
+import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

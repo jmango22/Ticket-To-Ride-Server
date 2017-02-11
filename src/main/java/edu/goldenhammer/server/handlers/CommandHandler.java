@@ -1,7 +1,9 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import edu.goldenhammer.commands.BaseCommand;
+import edu.goldenhammer.server.Results;
+import edu.goldenhammer.server.Serializer;
+import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.io.IOException;
 

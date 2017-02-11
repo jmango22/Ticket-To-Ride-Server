@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class Participants implements IParticipants, Serializable {
+public class DatabaseParticipants implements IDatabaseParticipants, Serializable {
     public static final String TABLE_NAME = "participants";
     public static final String USER_ID = "user_id";
     public static final String GAME_ID = "game_id";
@@ -27,7 +27,7 @@ public class Participants implements IParticipants, Serializable {
                     ")"
             , TABLE_NAME);
 
-    public Participants(String id, String name, boolean started, List<String> players) {
+    public DatabaseParticipants(String id, String name, boolean started, List<String> players) {
         this.id = id;
         this.name = name;
         this.started = started;

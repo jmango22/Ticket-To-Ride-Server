@@ -1,12 +1,14 @@
-package edu.goldenhammer.server;
+package edu.goldenhammer.server.handlers;
 
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
-/**
- * Created by seanjib on 2/5/2017.
- */
-public class LoginHandler extends HandlerBase {
+import edu.goldenhammer.server.Results;
+import edu.goldenhammer.server.Serializer;
+
+import java.io.IOException;
+
+public class RegisterHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
         try {
             String requestBody = readRequestBody(exchange);
@@ -15,27 +17,20 @@ public class LoginHandler extends HandlerBase {
             String password = credentials.get("password").getAsString();
 
             DatabaseController dbc = DatabaseController.getInstance();
-            boolean success = dbc.login(username, password);
+            boolean success = dbc.createUser(username, password);
 
             Results result = new Results();
             if(success) {
                 String access_token = dbc.getPlayerInfo(username).getAccessToken();
-
-                if(!access_token.isEmpty()) {
-                    result.setResponseCode(200);
-                    result.setMessage(access_token);
-                }
-                else {
-                    result.setResponseCode(500);
-                    result.setMessage("Error: something went wrong. There is no access token for this user.");
-                }
+                result.setResponseCode(200);
+                result.setMessage(access_token);
             }
             else {
                 result.setResponseCode(500);
                 result.setMessage("Error: bad credentials");
             }
             sendResponse(exchange, result);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
