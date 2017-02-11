@@ -1,7 +1,6 @@
-package edu.goldenhammer.data_types;
+package edu.goldenhammer.database.data_types;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by seanjib on 2/3/2017.

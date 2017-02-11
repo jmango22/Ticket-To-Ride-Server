@@ -1,7 +1,5 @@
 package edu.goldenhammer.model;
 
-import edu.goldenhammer.data_types.IGameListItem;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

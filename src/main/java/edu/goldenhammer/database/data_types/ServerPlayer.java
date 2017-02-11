@@ -1,4 +1,4 @@
-package edu.goldenhammer.data_types;
+package edu.goldenhammer.database.data_types;
 
 /**
  * Created by seanjib on 2/3/2017.
