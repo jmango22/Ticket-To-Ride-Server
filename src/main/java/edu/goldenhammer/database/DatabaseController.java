@@ -12,9 +12,6 @@ import edu.goldenhammer.data_types.ServerPlayer;
 import edu.goldenhammer.data_types.ServerGame;
 
 import java.util.List;
-import edu.goldenhammer.model.GameList;
-
-import edu.goldenhammer.data_types.ServerGame;
 
 
 import java.sql.Connection;
@@ -24,7 +21,6 @@ import java.sql.SQLException;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -77,7 +73,7 @@ public class DatabaseController implements IDatabaseController {
                         resultSet.getString(ServerPlayer.USERNAME),
                         resultSet.getString(ServerPlayer.PASSWORD),
                         resultSet.getString(ServerPlayer.ACCESS_TOKEN)
-                        );
+                );
             }
         } catch(SQLException e){
             e.printStackTrace();
@@ -102,11 +98,15 @@ public class DatabaseController implements IDatabaseController {
         return gameList;
     }
 
+    /**
+     *
+     * @return all games that have not been started
+     */
     @Override
     public GameList getGames() {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game order by game_id",
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where started=false order by game_id",
                     ServerGameListItem.columnNames() + ", name",
                     ServerGameListItem.TABLE_NAME,
                     ServerGameListItem.USER_ID);
@@ -118,7 +118,11 @@ public class DatabaseController implements IDatabaseController {
         }
         return null;
     }
-
+    /**
+     *
+     * @param player_user_name
+     * @return all games in which the player is a participant
+     */
     @Override
     public GameList getGames(String player_user_name) {
 
@@ -137,36 +141,76 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    /**
+     *
+     * @param username users username
+     * @param password the password
+     * @return if the player exists
+     */
     @Override
     public Boolean login(String username, String password) {
         return null;
     }
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @return if the new user was created
+     */
     @Override
     public Boolean createUser(String username, String password) {
         return null;
     }
 
+    /**
+     *
+     * @param name
+     * @return if a game with that name was created
+     */
     @Override
     public Boolean createGame(String name) {
         return null;
     }
 
+    /**
+     *
+     * @param player_name
+     * @param game_name
+     * @return if the player was added to the game.
+     */
     @Override
-    public Boolean joinGame(String player, String gameID) {
+    public Boolean joinGame(String player_name, String game_name) {
         return null;
     }
 
+    /**
+     *
+     * @param game_name
+     * @return the list of players that are a member of the game
+     */
     @Override
-    public List<IServerPlayer> getPlayers(String gameID) {
+    public List<IServerPlayer> getPlayers(String game_name) {
         return null;
     }
 
+    /**
+     *
+     * @param player_name
+     * @param game_name
+     * @return if the player left the game
+     */
     @Override
-    public Boolean leaveGame(String player, String gameID) {
+    public Boolean leaveGame(String player_name, String game_name) {
         return null;
     }
 
+    /**
+     *
+     * @param player
+     * @param gameID
+     * @return
+     */
     @Override
     public IServerGame playGame(String player, String gameID) {
         return null;
