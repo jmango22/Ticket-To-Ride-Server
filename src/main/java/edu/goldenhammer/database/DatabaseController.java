@@ -82,8 +82,37 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    private GameList getGameListFromResultSet (ResultSet resultSet) throws SQLException{
+        GameList gameList = new GameList();
+        Game game = null;
+        while(resultSet.next()){
+            String user_id = resultSet.getString((ServerGameListItem.USER_ID));
+            String game_id = resultSet.getString(ServerGameListItem.GAME_ID);
+            if(game == null || !game_id.equals(game.getID())){
+
+                String name = resultSet.getString("name");
+                game = new Game(game_id, name, new ArrayList<>());
+                gameList.add(game);
+            }
+            game.getPlayers().add(user_id);
+        }
+        return gameList;
+    }
+
     @Override
     public GameList getGames() {
+
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game order by game_id",
+                    ServerGameListItem.columnNames() + ", name",
+                    ServerGameListItem.TABLE_NAME,
+                    ServerGameListItem.USER_ID);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            ResultSet resultSet = statement.executeQuery();
+            return getGameListFromResultSet(resultSet);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -97,21 +126,8 @@ public class DatabaseController implements IDatabaseController {
                     ServerGameListItem.USER_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_user_name);
-            GameList gameList = new GameList();
             ResultSet resultSet = statement.executeQuery();
-            Game game = null;
-            while(resultSet.next()){
-                String user_id = resultSet.getString((ServerGameListItem.USER_ID));
-                String game_id = resultSet.getString(ServerGameListItem.GAME_ID);
-                if(game == null || !game_id.equals(game.getID())){
-
-                    String name = resultSet.getString("name");
-                    game = new Game(game_id, name, new ArrayList<>());
-                    gameList.add(game);
-                }
-                game.getPlayers().add(user_id);
-            }
-            return gameList;
+            return getGameListFromResultSet(resultSet);
         } catch(SQLException e){
             e.printStackTrace();
         }
