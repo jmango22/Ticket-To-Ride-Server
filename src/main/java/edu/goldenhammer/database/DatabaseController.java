@@ -167,7 +167,7 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException e){
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 
     /**
@@ -178,7 +178,19 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean createUser(String username, String password) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%2$s) VALUES (?,?)",
+                    ServerPlayer.TABLE_NAME,
+                    ServerPlayer.USERNAME,
+                    ServerPlayer.PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,username);
+            statement.setString(2,password);
+            return  statement.executeUpdate() > 0;
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
