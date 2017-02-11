@@ -6,6 +6,7 @@ import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IGameListItem;
 import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.model.IGame;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class ListGamesHandler extends HandlerBase {
                     results.setMessage("ERROR: invalid username in URL");
                 }
                 else {
-                    for(IGameListItem item : gameList.getGameList()) {
+                    for(IGame item : gameList.getGameList()) {
                         List<IServerPlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
                         List<String> playerUsernames = new ArrayList<>();
                         for(IServerPlayer player : players) {                       //converts the list of players to a list of usernames

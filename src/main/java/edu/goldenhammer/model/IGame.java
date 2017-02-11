@@ -9,4 +9,5 @@ public interface IGame {
     String getID();
     String getName();
     List<String> getPlayers();
+    void setPlayers(List<String> players);
 }

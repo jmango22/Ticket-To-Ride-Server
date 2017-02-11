@@ -127,10 +127,13 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames(String player_user_name) {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where %3$s=? order by game_id",
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where %3$s in (select %4$s from %5$s where %6$s=?) order by game_id",
                     ServerGameListItem.columnNames() + ", name",
                     ServerGameListItem.TABLE_NAME,
-                    ServerGameListItem.USER_ID);
+                    ServerGameListItem.USER_ID,
+                    ServerPlayer.ID,
+                    ServerPlayer.TABLE_NAME,
+                    ServerPlayer.USERNAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_user_name);
             ResultSet resultSet = statement.executeQuery();
