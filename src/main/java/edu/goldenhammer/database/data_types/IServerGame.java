@@ -1,4 +1,4 @@
-package edu.goldenhammer.data_types;
+package edu.goldenhammer.database.data_types;
 
 import java.util.List;
 

@@ -3,8 +3,7 @@ package edu.goldenhammer.server;
 import com.sun.net.httpserver.HttpExchange;
 
 import edu.goldenhammer.model.GameList;
-import edu.goldenhammer.data_types.IGameListItem;
-import edu.goldenhammer.data_types.IServerPlayer;
+import edu.goldenhammer.database.data_types.IServerPlayer;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.model.IGame;
 

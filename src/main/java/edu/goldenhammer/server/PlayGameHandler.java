@@ -1,7 +1,7 @@
 package edu.goldenhammer.server;
 
 import com.sun.net.httpserver.HttpExchange;
-import edu.goldenhammer.data_types.IServerGame;
+import edu.goldenhammer.database.data_types.IServerGame;
 import edu.goldenhammer.database.DatabaseController;
 
 /**

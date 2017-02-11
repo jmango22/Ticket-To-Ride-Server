@@ -2,14 +2,14 @@ package edu.goldenhammer.database;
 
 
 
-import edu.goldenhammer.data_types.ServerGameListItem;
+import edu.goldenhammer.database.data_types.Participants;
 import edu.goldenhammer.model.Game;
 import edu.goldenhammer.model.GameList;
 
-import edu.goldenhammer.data_types.IServerPlayer;
-import edu.goldenhammer.data_types.IServerGame;
-import edu.goldenhammer.data_types.ServerPlayer;
-import edu.goldenhammer.data_types.ServerGame;
+import edu.goldenhammer.database.data_types.IServerPlayer;
+import edu.goldenhammer.database.data_types.IServerGame;
+import edu.goldenhammer.database.data_types.ServerPlayer;
+import edu.goldenhammer.database.data_types.ServerGame;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class DatabaseController implements IDatabaseController {
     private void ensureTablesCreated() {
         createTable(ServerPlayer.CREATE_STMT);
         createTable(ServerGame.CREATE_STMT);
-        createTable(ServerGameListItem.CREATE_STMT);
+        createTable(Participants.CREATE_STMT);
     }
     private void createTable(String sqlStatementString) {
         try (Connection connection = session.getConnection()) {
@@ -85,8 +85,8 @@ public class DatabaseController implements IDatabaseController {
         GameList gameList = new GameList();
         Game game = null;
         while(resultSet.next()){
-            String user_id = resultSet.getString((ServerGameListItem.USER_ID));
-            String game_id = resultSet.getString(ServerGameListItem.GAME_ID);
+            String user_id = resultSet.getString((Participants.USER_ID));
+            String game_id = resultSet.getString(Participants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
                 String name = resultSet.getString("name");
@@ -107,9 +107,9 @@ public class DatabaseController implements IDatabaseController {
 
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where started=false order by game_id",
-                    ServerGameListItem.columnNames() + ", name",
-                    ServerGameListItem.TABLE_NAME,
-                    ServerGameListItem.USER_ID);
+                    Participants.columnNames() + ", name",
+                    Participants.TABLE_NAME,
+                    Participants.USER_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             ResultSet resultSet = statement.executeQuery();
             return getGameListFromResultSet(resultSet);
@@ -128,9 +128,9 @@ public class DatabaseController implements IDatabaseController {
 
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where %3$s in (select %4$s from %5$s where %6$s=?) order by game_id",
-                    ServerGameListItem.columnNames() + ", name",
-                    ServerGameListItem.TABLE_NAME,
-                    ServerGameListItem.USER_ID,
+                    Participants.columnNames() + ", name",
+                    Participants.TABLE_NAME,
+                    Participants.USER_ID,
                     ServerPlayer.ID,
                     ServerPlayer.TABLE_NAME,
                     ServerPlayer.USERNAME);
