@@ -1,6 +1,9 @@
 package edu.goldenhammer.database;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3d623cf9d414fc17b4fd066a8ffb74b42d094ee9
 import edu.goldenhammer.data_types.ServerGameListItem;
 import edu.goldenhammer.model.Game;
 import edu.goldenhammer.model.GameList;
@@ -8,6 +11,7 @@ import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IServerPlayer;
 import edu.goldenhammer.data_types.IServerGame;
 import edu.goldenhammer.data_types.ServerPlayer;
+import edu.goldenhammer.data_types.ServerGame;
 
 import java.util.List;
 import edu.goldenhammer.model.GameList;
@@ -19,7 +23,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3d623cf9d414fc17b4fd066a8ffb74b42d094ee9
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,8 +133,26 @@ public class DatabaseController implements IDatabaseController {
                     ServerGameListItem.USER_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_user_name);
+<<<<<<< HEAD
             ResultSet resultSet = statement.executeQuery();
             return getGameListFromResultSet(resultSet);
+=======
+            GameList gameList = new GameList();
+            ResultSet resultSet = statement.executeQuery();
+            Game game = null;
+            while(resultSet.next()){
+                String user_id = resultSet.getString((ServerGameListItem.USER_ID));
+                String game_id = resultSet.getString(ServerGameListItem.GAME_ID);
+                if(game == null || !game_id.equals(game.getID())){
+
+                    String name = resultSet.getString("name");
+                    game = new Game(game_id, name, new ArrayList<>());
+                    gameList.add(game);
+                }
+                game.getPlayers().add(user_id);
+            }
+            return gameList;
+>>>>>>> 3d623cf9d414fc17b4fd066a8ffb74b42d094ee9
         } catch(SQLException e){
             e.printStackTrace();
         }
