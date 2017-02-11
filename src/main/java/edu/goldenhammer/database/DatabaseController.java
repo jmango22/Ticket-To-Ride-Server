@@ -1,14 +1,15 @@
 package edu.goldenhammer.database;
 
-import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.data_types.IServerPlayer;
+import edu.goldenhammer.data_types.IServerGame;
 import edu.goldenhammer.data_types.ServerPlayer;
+import java.util.List;
+import edu.goldenhammer.model.GameList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Created by devonkinghorn on 2/4/17.
@@ -16,7 +17,7 @@ import java.util.List;
 public class DatabaseController implements IDatabaseController {
 
     private static DatabaseController singleton;
-    private DatabaseConnnectionFactory session;
+    private DatabaseConnectionFactory session;
 
     public static DatabaseController getInstance(){
         if(singleton == null)
@@ -29,7 +30,7 @@ public class DatabaseController implements IDatabaseController {
         initializeDatabase();
     }
     private void initializeDatabase() {
-        this.session = DatabaseConnnectionFactory.getInstance();
+        this.session = DatabaseConnectionFactory.getInstance();
         ensureTablesCreated();
     }
 
@@ -97,6 +98,16 @@ public class DatabaseController implements IDatabaseController {
 
     @Override
     public List<IServerPlayer> getPlayers(String gameID) {
+        return null;
+    }
+
+    @Override
+    public Boolean leaveGame(String player, String gameID) {
+        return null;
+    }
+
+    @Override
+    public IServerGame playGame(String player, String gameID) {
         return null;
     }
 

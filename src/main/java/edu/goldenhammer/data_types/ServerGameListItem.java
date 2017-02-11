@@ -54,6 +54,9 @@ public class ServerGameListItem implements IGameListItem, Serializable {
         return players;
     }
 
+    @Override
+    public void setPlayers(List<String> players) { this.players = players; }
+
     private String id;
     private String name;
     private boolean started;

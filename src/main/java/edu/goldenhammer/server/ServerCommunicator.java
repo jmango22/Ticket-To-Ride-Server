@@ -32,13 +32,14 @@ public class ServerCommunicator {
         server.setExecutor(null); // use the default executor
 
         System.out.println("Creating contexts");
-//        server.createContext("/commands", new CommandHandler());
+        createContexts(server);
 
         System.out.println("Starting server");
         server.start();
     }
 
     public static void main(String[] args) {
+
         String portNumber = "8080";//args[0];
 //        new ServerCommunicator().run(portNumber);
         DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
@@ -51,5 +52,16 @@ public class ServerCommunicator {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private static void createContexts(HttpServer server) {
+        server.createContext("/commands", new CommandHandler());
+        server.createContext("/creategame", new CreateGameHandler());
+        server.createContext("/joingame", new JoinGameHandler());
+        server.createContext("/leavegame", new LeaveGameHandler());
+        server.createContext("/listofgames", new ListGamesHandler());
+        server.createContext("/login", new LoginHandler());
+        server.createContext("/playgame", new PlayGameHandler());
+        server.createContext("/register", new RegisterHandler());
     }
 }
