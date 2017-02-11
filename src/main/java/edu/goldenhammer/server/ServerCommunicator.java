@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 
 import com.sun.net.httpserver.*;
 import edu.goldenhammer.database.DatabaseConnectionFactory;
+import edu.goldenhammer.database.DatabaseController;
 
 /**
  * Created by devonkinghorn on 1/19/17.
@@ -40,18 +41,20 @@ public class ServerCommunicator {
 
     public static void main(String[] args) {
 
+        DatabaseController c = DatabaseController.getInstance();
+        c.getGames("dk");
         String portNumber = "8080";//args[0];
 //        new ServerCommunicator().run(portNumber);
-        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
-        Connection conn = factory.getConnection();
-        String sqlString = "select * from advisor";//String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", "*", "students");
-        try {
-            PreparedStatement statement = conn.prepareStatement(sqlString);
-            ResultSet resultSet = statement.executeQuery();
-            System.out.println(resultSet.toString());
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+//        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
+//        Connection conn = factory.getConnection();
+//        String sqlString = "select * from advisor";//String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", "*", "students");
+//        try {
+//            PreparedStatement statement = conn.prepareStatement(sqlString);
+//            ResultSet resultSet = statement.executeQuery();
+//            System.out.println(resultSet.toString());
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
     }
 
     private static void createContexts(HttpServer server) {
