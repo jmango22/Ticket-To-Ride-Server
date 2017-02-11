@@ -28,10 +28,10 @@ public class LeaveGameHandler extends HandlerBase {
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("Game successfully joined!");
+                        results.setMessage("Game successfully left!");
                     } else {
                         results.setResponseCode(500);
-                        results.setMessage("Error: cannot join game");
+                        results.setMessage("Error: cannot leave game");
                     }
                 }
                 else {

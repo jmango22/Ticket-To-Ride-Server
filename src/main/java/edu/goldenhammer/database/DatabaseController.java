@@ -152,7 +152,22 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean login(String username, String password) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s=? and %4$s=?",
+                    ServerPlayer.columnNames(),
+                    ServerPlayer.TABLE_NAME,
+                    ServerPlayer.USERNAME,
+                    ServerPlayer.PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,username);
+            statement.setString(2,password);
+            ResultSet resultSet = statement.executeQuery();
+
+            return !resultSet.next(); //if there is one result for the username and password input, it is a valid login
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -163,7 +178,19 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean createUser(String username, String password) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%2$s) VALUES (?,?)",
+                    ServerPlayer.TABLE_NAME,
+                    ServerPlayer.USERNAME,
+                    ServerPlayer.PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,username);
+            statement.setString(2,password);
+            return  statement.executeUpdate() > 0;
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
