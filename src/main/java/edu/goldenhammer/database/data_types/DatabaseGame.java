@@ -41,6 +41,10 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
         return started;
     }
 
+    public static String columnNames() {
+        return String.join(",", ID, GAME_NAME, STARTED);
+    }
+
     private String id;
     private String name;
     private Boolean started;
