@@ -41,18 +41,10 @@ public class ListGamesHandler extends HandlerBase {
 
                 //Make sure gameList was actually populated with data, even if there are no games
                 if(gameList == null) {
-                    results.setResponseCode(500);
+                    results.setResponseCode(400);
                     results.setMessage("ERROR: invalid username in URL");
                 }
                 else {
-                    for(IGameOverview item : gameList.getGameList()) {
-                        List<IDatabasePlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
-                        List<String> playerUsernames = new ArrayList<>();
-                        for(IDatabasePlayer player : players) {                       //converts the list of players to a list of usernames
-                            playerUsernames.add(player.getUsername());
-                        }
-                        item.setPlayers(playerUsernames);
-                    }
                     results.setResponseCode(200);
                     results.setMessage(Serializer.serialize(gameList));
                 }

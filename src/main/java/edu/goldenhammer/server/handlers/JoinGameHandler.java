@@ -33,12 +33,12 @@ public class JoinGameHandler extends HandlerBase {
                         results.setResponseCode(200);
                         results.setMessage("GameOverview successfully joined!");
                     } else {
-                        results.setResponseCode(500);
+                        results.setResponseCode(400);
                         results.setMessage("Error: cannot join game");
                     }
                 }
                 else {
-                    results.setResponseCode(500);
+                    results.setResponseCode(400);
                     results.setMessage("Error: Invalid username or game name included in URL");
                 }
             }

@@ -32,12 +32,12 @@ public class LeaveGameHandler extends HandlerBase {
                         results.setResponseCode(200);
                         results.setMessage("GameOverview successfully left!");
                     } else {
-                        results.setResponseCode(500);
+                        results.setResponseCode(400);
                         results.setMessage("Error: cannot leave game");
                     }
                 }
                 else {
-                    results.setResponseCode(500);
+                    results.setResponseCode(400);
                     results.setMessage("Error: Invalid username or game name included in URL");
                 }
             }

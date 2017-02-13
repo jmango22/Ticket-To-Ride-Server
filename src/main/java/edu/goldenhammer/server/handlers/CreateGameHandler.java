@@ -33,7 +33,7 @@ public class CreateGameHandler extends HandlerBase {
                     results.setResponseCode(200);
                     results.setMessage("GameOverview successfully created!");
                 } else {
-                    results.setResponseCode(500);
+                    results.setResponseCode(400);
                     results.setMessage("Error: game already exists");
                 }
             }
