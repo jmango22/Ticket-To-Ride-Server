@@ -163,7 +163,7 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2,password);
             ResultSet resultSet = statement.executeQuery();
 
-            return !resultSet.next(); //if there is one result for the username and password input, it is a valid login
+            return resultSet.next(); //if there is one result for the username and password input, it is a valid login
         } catch(SQLException e){
             e.printStackTrace();
         }
