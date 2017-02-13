@@ -232,11 +232,48 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
+     * @param resultSet
+     * @return an ArrayList of players
+     */
+    private List<String> getPlayerNamesFromResultSet (ResultSet resultSet) throws SQLException{
+        List<String> playerList = new ArrayList<>();
+        while(resultSet.next()){
+            String username = resultSet.getString((DatabasePlayer.USERNAME));
+            playerList.add(username);
+        }
+        return playerList;
+    }
+
+    /**
+     *
      * @param game_name
      * @return the list of players that are a member of the game
      */
     @Override
     public List<String> getPlayers(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            //get the information to make the Gameplay object from the database
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN (SELECT * FROM %3$s" +
+                            "NATURAL JOIN %4$s WHERE %5$s IN %6$s AND %7$s = ?) WHERE %8$s IN %9$s",
+                    DatabasePlayer.columnNames(),
+                    DatabasePlayer.TABLE_NAME,
+                    DatabaseGame.TABLE_NAME,
+
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseGame.ID,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseParticipants.USER_ID,
+                    DatabasePlayer.ID);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            return getPlayerNamesFromResultSet(resultSet);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         return null;
     }
 
