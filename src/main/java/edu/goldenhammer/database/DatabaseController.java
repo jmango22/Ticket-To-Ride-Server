@@ -11,6 +11,7 @@ import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabaseGame;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 
@@ -259,7 +260,18 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public void setAccessToken(String userID, String accessToken){
-
+    public void setAccessToken(String player_user_name, String accessToken){
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.ACCESS_TOKEN,
+                    DatabasePlayer.USERNAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,accessToken);
+            statement.setString(2,player_user_name);
+            statement.executeQuery();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 }
