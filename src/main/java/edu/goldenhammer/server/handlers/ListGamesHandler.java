@@ -5,7 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.model.IGame;
+import edu.goldenhammer.model.IGameOverview;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
@@ -45,7 +45,7 @@ public class ListGamesHandler extends HandlerBase {
                     results.setMessage("ERROR: invalid username in URL");
                 }
                 else {
-                    for(IGame item : gameList.getGameList()) {
+                    for(IGameOverview item : gameList.getGameList()) {
                         List<IDatabasePlayer> players = dbc.getPlayers(item.getID()); //gets the list of players for the given game
                         List<String> playerUsernames = new ArrayList<>();
                         for(IDatabasePlayer player : players) {                       //converts the list of players to a list of usernames

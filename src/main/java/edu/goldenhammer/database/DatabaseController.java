@@ -3,7 +3,7 @@ package edu.goldenhammer.database;
 
 
 import edu.goldenhammer.database.data_types.DatabaseParticipants;
-import edu.goldenhammer.model.Game;
+import edu.goldenhammer.model.GameOverview;
 import edu.goldenhammer.model.GameList;
 
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
@@ -83,14 +83,14 @@ public class DatabaseController implements IDatabaseController {
 
     private GameList getGameListFromResultSet (ResultSet resultSet) throws SQLException{
         GameList gameList = new GameList();
-        Game game = null;
+        GameOverview game = null;
         while(resultSet.next()){
             String user_id = resultSet.getString((DatabaseParticipants.USER_ID));
             String game_id = resultSet.getString(DatabaseParticipants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
                 String name = resultSet.getString("name");
-                game = new Game(game_id, name, new ArrayList<>());
+                game = new GameOverview(game_id, name, false, new ArrayList<>());
                 gameList.add(game);
             }
             game.getPlayers().add(user_id);
@@ -163,7 +163,7 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2,password);
             ResultSet resultSet = statement.executeQuery();
 
-            return !resultSet.next(); //if there is one result for the username and password input, it is a valid login
+            return resultSet.next(); //if there is one result for the username and password input, it is a valid login
         } catch(SQLException e){
             e.printStackTrace();
         }
@@ -179,7 +179,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public Boolean createUser(String username, String password) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s,%2$s) VALUES (?,?)",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s) VALUES (?,?)",
                     DatabasePlayer.TABLE_NAME,
                     DatabasePlayer.USERNAME,
                     DatabasePlayer.PASSWORD);
@@ -200,7 +200,19 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean createGame(String name) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$b) VALUES (?,?)",
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+                    DatabaseGame.STARTED);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,name);
+            statement.setBoolean(2,false);
+            return  statement.executeUpdate() > 0;
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

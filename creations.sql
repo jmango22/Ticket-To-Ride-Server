@@ -9,7 +9,7 @@ CREATE TABLE player if not exists (
 CREATE TABLE participants if not exists (
     user_id INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
-    player_number INTEGER NOT NULL,
+    player_number INTEGER,
     PRIMARY Key(user_id, game_id),
     FOREIGN KEY(user_id)
       references player
