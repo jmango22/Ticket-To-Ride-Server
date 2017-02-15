@@ -271,6 +271,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             //get the information to make the GameModel object from the database
             String sqlString = String.format("SELECT user_id,username FROM player NATURAL JOIN participants where game_id in (select game_id from game where name =?)");
+
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
@@ -291,10 +292,18 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public Boolean leaveGame(String player_name, String game_name) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("delete from %1$s where " +
-                    "user_id in (select user_id from player where username=?)" +
-                    "and game_id in (select game_id from game where name=?)",
-                    DatabaseParticipants.TABLE_NAME);
+            String sqlString = String.format("DELETE FROM %1$s WHERE " +
+                    "%2$s IN (SELECT %3$s FROM %4$s WHERE %5$s=?)" +
+                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s=?)",
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.USER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_name);
             statement.setString(2,game_name);
@@ -326,13 +335,16 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2, game_name);
             statement.executeUpdate();
 
-            //get the information to make the GameModel object from the database
-            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (select %5$s from game where name=?)",
+            //get the information to make the Gameplay object from the database
+            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (SELECT %5$s FROM %6$s WHERE %7$s=?)",
+
                     DatabaseGame.columnNames() + ", " + DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseGame.TABLE_NAME,
                     DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.GAME_ID,
                     DatabaseGame.ID,
-                    DatabaseParticipants.GAME_ID);
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
             statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
