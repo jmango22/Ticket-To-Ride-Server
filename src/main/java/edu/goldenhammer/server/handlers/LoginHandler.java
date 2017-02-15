@@ -6,6 +6,8 @@ import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
+import java.io.IOException;
+
 /**
  * Created by seanjib on 2/5/2017.
  */
@@ -39,7 +41,14 @@ public class LoginHandler extends HandlerBase {
             }
             sendResponse(exchange, result);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            try {
+                Results result = new Results();
+                result.setResponseCode(400);
+                result.setMessage("Error: bad credentials");
+                sendResponse(exchange, result);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         }
     }
 }

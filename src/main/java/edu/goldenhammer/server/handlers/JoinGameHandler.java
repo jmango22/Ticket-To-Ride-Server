@@ -1,5 +1,8 @@
 package edu.goldenhammer.server.handlers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.server.Results;
@@ -22,6 +25,8 @@ public class JoinGameHandler extends HandlerBase {
             }
             else {
                 //Get games either for a specific user or get all the games at once
+                JsonObject jsonObject = (new JsonParser()).parse(readRequestBody(exchange)).getAsJsonObject();
+
                 if(exchange.getRequestHeaders().containsKey("username")
                         && exchange.getRequestHeaders().containsKey("gamename")) {
                     String username = exchange.getRequestHeaders().get("username").get(0);
