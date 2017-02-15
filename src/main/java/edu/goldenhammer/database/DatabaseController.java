@@ -223,25 +223,30 @@ public class DatabaseController implements IDatabaseController {
      *
      * @param player_name
      * @param game_name
-     * @return if the player was added to the game.
+     * @return if the statement was executed.
      */
     @Override
     public Boolean joinGame(String player_name, String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(
-                    "do $$\n" +
-                    "declare v_count bigint;\n" +
-                    " begin\n" +
-                    "    select count(*) into v_count from participants where game_id in (select game_id from game where name='ghteam');\n" +
-                    "\n" +
-                    "    if v_count < 2 then\n" +
-                    "            Insert into participants (user_id, game_id) values(2,1);\n" +
-                    "    end if;\n" +
-                    " end $$;");
+                    " insert into participants (user_id, game_id) \n" +
+                            "            (select player.user_id, game.game_id from game,player\n" +
+                            "             where player.username=? and \n" +
+                            "             game.name=? and \n" +
+                            "             5 > (select count(*) from participants where game_id in \n" +
+                            "             (select game_id from game where name=?))\n" +
+                            ");");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,player_name);
+            statement.setString(2,game_name);
+            statement.setString(3,game_name);
+            statement.execute();
+            return true;
+            //TODO: make this function return if it was entered not if it executed
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 
     /**
@@ -299,7 +304,21 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean leaveGame(String player_name, String game_name) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("delete from %1$s where " +
+                    "user_id in (select user_id from player where username=?)" +
+                    "and game_id in (select game_id from game where name=?)",
+                    DatabaseParticipants.TABLE_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,player_name);
+            statement.setString(2,game_name);
+            statement.execute();
+            return true;
+            //TODO: make this function return if it was entered not if it executed
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
