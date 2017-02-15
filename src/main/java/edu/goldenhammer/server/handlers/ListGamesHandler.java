@@ -1,5 +1,7 @@
 package edu.goldenhammer.server.handlers;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 
 import edu.goldenhammer.model.GameList;

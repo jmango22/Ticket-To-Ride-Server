@@ -89,7 +89,7 @@ public class DatabaseController implements IDatabaseController {
         GameList gameList = new GameList();
         GameOverview game = null;
         while(resultSet.next()){
-            String user_id = resultSet.getString((DatabaseParticipants.USER_ID));
+            String user_id = resultSet.getString((DatabasePlayer.USERNAME));
             String game_id = resultSet.getString(DatabaseParticipants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
@@ -110,8 +110,8 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames() {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where started=false order by game_id",
-                    DatabaseParticipants.columnNames() + ", name",
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game NATURAL JOIN player where started=false order by game_id",
+                    DatabaseParticipants.columnNames() + ", name, username",
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.USER_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
@@ -131,8 +131,9 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames(String player_user_name) {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game where %3$s in (select %4$s from %5$s where %6$s=?) order by game_id",
-                    DatabaseParticipants.columnNames() + ", name",
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN game NATURAL JOIN player where game_id in (" +
+                            "select game_id from participants where %3$s in (select %4$s from %5$s where %6$s=?)) order by game_id",
+                    DatabaseParticipants.columnNames() + ", name, username",
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.USER_ID,
                     DatabasePlayer.ID,
@@ -205,7 +206,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public Boolean createGame(String name) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$b) VALUES (?,?)",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s) VALUES (?,?)",
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME,
                     DatabaseGame.STARTED);
@@ -223,11 +224,30 @@ public class DatabaseController implements IDatabaseController {
      *
      * @param player_name
      * @param game_name
-     * @return if the player was added to the game.
+     * @return if the statement was executed.
      */
     @Override
     public Boolean joinGame(String player_name, String game_name) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    " insert into participants (user_id, game_id) \n" +
+                            "            (select player.user_id, game.game_id from game,player\n" +
+                            "             where player.username=? and \n" +
+                            "             game.name=? and \n" +
+                            "             5 > (select count(*) from participants where game_id in \n" +
+                            "             (select game_id from game where name=?))\n" +
+                            ");");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,player_name);
+            statement.setString(2,game_name);
+            statement.setString(3,game_name);
+            statement.execute();
+            return true;
+            //TODO: make this function return if it was entered not if it executed
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -285,7 +305,21 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean leaveGame(String player_name, String game_name) {
-        return null;
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("delete from %1$s where " +
+                    "user_id in (select user_id from player where username=?)" +
+                    "and game_id in (select game_id from game where name=?)",
+                    DatabaseParticipants.TABLE_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,player_name);
+            statement.setString(2,game_name);
+            statement.execute();
+            return true;
+            //TODO: make this function return if it was entered not if it executed
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -298,7 +332,7 @@ public class DatabaseController implements IDatabaseController {
     public IGameplay playGame(String player_user_name, String game_name) {
         try (Connection connection = session.getConnection()) {
             //update the database to indicate the game has started
-            String sqlString = String.format("UPDATE %1$s SET $2$s = ? WHERE %3$s = ?",
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.STARTED,
                     DatabaseGame.GAME_NAME);
@@ -308,19 +342,21 @@ public class DatabaseController implements IDatabaseController {
             statement.executeUpdate();
 
             //get the information to make the Gameplay object from the database
-            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN %5$s",
-                    DatabaseGame.columnNames() + DatabaseParticipants.PLAYER_NUMBER,
+            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (select %5$s from game where name=?)",
+                    DatabaseGame.columnNames() + ", " + DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseGame.TABLE_NAME,
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseGame.ID,
                     DatabaseParticipants.GAME_ID);
             statement = connection.prepareStatement(sqlString);
+            statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
-
-            return new Gameplay(resultSet.getString(DatabaseGame.ID),
-                    resultSet.getString(DatabaseGame.GAME_NAME),
-                    resultSet.getBoolean(DatabaseGame.STARTED),
-                    getPlayers(game_name));
+            if(resultSet.next()) {
+                return new Gameplay(resultSet.getString(DatabaseGame.ID),
+                        resultSet.getString(DatabaseGame.GAME_NAME),
+                        resultSet.getBoolean(DatabaseGame.STARTED),
+                        getPlayers(game_name));
+            }
         } catch(SQLException e){
             e.printStackTrace();
         }

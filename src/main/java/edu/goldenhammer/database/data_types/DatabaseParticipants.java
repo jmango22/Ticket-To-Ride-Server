@@ -13,7 +13,7 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
     public static final String PLAYER_NUMBER = "player_number";
 
     public static final String CREATE_STMT = String.format(
-                    "CREATE TABLE if not exists 1$s (\n" +
+                    "CREATE TABLE if not exists %1$s (\n" +
                     "    user_id INTEGER NOT NULL,\n" +
                     "    game_id INTEGER NOT NULL,\n" +
                     "    player_number INTEGER NOT NULL,\n" +

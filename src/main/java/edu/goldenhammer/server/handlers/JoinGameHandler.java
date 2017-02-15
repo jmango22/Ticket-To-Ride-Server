@@ -1,5 +1,8 @@
 package edu.goldenhammer.server.handlers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.server.Results;
@@ -22,6 +25,7 @@ public class JoinGameHandler extends HandlerBase {
             }
             else {
                 //Get games either for a specific user or get all the games at once
+
                 if(exchange.getRequestHeaders().containsKey("username")
                         && exchange.getRequestHeaders().containsKey("gamename")) {
                     String username = exchange.getRequestHeaders().get("username").get(0);
@@ -31,15 +35,15 @@ public class JoinGameHandler extends HandlerBase {
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("GameOverview successfully joined!");
+                        results.setMessage("{\"message\":\"GameOverview successfully joined!\"}");
                     } else {
                         results.setResponseCode(400);
-                        results.setMessage("Error: cannot join game");
+                        results.setMessage("{\"message\":\"Error: cannot join game\"}");
                     }
                 }
                 else {
                     results.setResponseCode(400);
-                    results.setMessage("Error: Invalid username or game name included in URL");
+                    results.setMessage("{\"message\":\"Error: Invalid username or game name included in URL\"}");
                 }
             }
             sendResponse(exchange, results);
