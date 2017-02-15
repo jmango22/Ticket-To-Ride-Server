@@ -28,7 +28,8 @@ public abstract class HandlerBase implements HttpHandler {
     }
 
     protected void sendResponse(HttpExchange httpExchange, Results results) throws IOException{
-        String response = Serializer.serialize(results);
+        String response = results.getMessage();
+        httpExchange.getResponseHeaders().add("Content-Type","application/json");
         httpExchange.sendResponseHeaders(results.getResponseCode(), response.length());
         OutputStream os = httpExchange.getResponseBody();
         os.write(response.getBytes());

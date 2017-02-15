@@ -10,25 +10,32 @@ import java.io.IOException;
 
 public class RegisterHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
+        int responseCode = 400;
+        String message = "{\"message\":\"Error: bad credentials\"";
         try {
-            String requestBody = readRequestBody(exchange);
-            JsonObject credentials = Serializer.deserialize(requestBody);
-            String username = credentials.get("username").getAsString();
-            String password = credentials.get("password").getAsString();
+            try {
+                String requestBody = readRequestBody(exchange);
+                JsonObject credentials = Serializer.deserialize(requestBody);
+                String username = credentials.get("username").getAsString();
+                String password = credentials.get("password").getAsString();
 
-            DatabaseController dbc = DatabaseController.getInstance();
-            boolean success = dbc.createUser(username, password);
+                DatabaseController dbc = DatabaseController.getInstance();
+                boolean success = dbc.createUser(username, password);
 
-            Results result = new Results();
-            if(success) {
-                String access_token = dbc.getPlayerInfo(username).getAccessToken();
-                result.setResponseCode(200);
-                result.setMessage(access_token);
+
+                if (success) {
+                    String access_token = dbc.getPlayerInfo(username).getAccessToken();
+                    responseCode = 200;
+                    message = String.format("{\"access_token\":\"%1$s\"}",access_token);
+                }
+            } catch (Exception e){
+
             }
-            else {
-                result.setResponseCode(400);
-                result.setMessage("Error: bad credentials");
-            }
+                Results result = new Results();
+                result.setResponseCode(responseCode);
+                result.setMessage(message);
+                sendResponse(exchange,result);
+
             sendResponse(exchange, result);
         } catch (IOException ex) {
             ex.printStackTrace();

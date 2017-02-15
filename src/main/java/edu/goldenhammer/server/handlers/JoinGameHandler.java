@@ -26,25 +26,24 @@ public class JoinGameHandler extends HandlerBase {
             else {
                 //Get games either for a specific user or get all the games at once
                 JsonObject jsonObject = (new JsonParser()).parse(readRequestBody(exchange)).getAsJsonObject();
-
-                if(exchange.getRequestHeaders().containsKey("username")
-                        && exchange.getRequestHeaders().containsKey("gamename")) {
-                    String username = exchange.getRequestHeaders().get("username").get(0);
-                    String gamename = exchange.getRequestHeaders().get("gamename").get(0);
+                if(jsonObject.get("username") != null
+                        && jsonObject.get("gamename") != null) {
+                    String username = jsonObject.get("username").getAsString();
+                    String gamename = jsonObject.get("gamename").getAsString();
 
                     boolean success = dbc.joinGame(username, gamename);
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("GameOverview successfully joined!");
+                        results.setMessage("{\"message\":\"GameOverview successfully joined!\"}");
                     } else {
                         results.setResponseCode(400);
-                        results.setMessage("Error: cannot join game");
+                        results.setMessage("{\"message\":\"Error: cannot join game\"}");
                     }
                 }
                 else {
                     results.setResponseCode(400);
-                    results.setMessage("Error: Invalid username or game name included in URL");
+                    results.setMessage("{\"message\":\"Error: Invalid username or game name included in URL\"}");
                 }
             }
             sendResponse(exchange, results);
