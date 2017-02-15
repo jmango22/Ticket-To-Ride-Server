@@ -273,19 +273,7 @@ public class DatabaseController implements IDatabaseController {
     public List<String> getPlayers(String game_name) {
         try (Connection connection = session.getConnection()) {
             //get the information to make the Gameplay object from the database
-            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN (SELECT * FROM %3$s" +
-                            "NATURAL JOIN %4$s WHERE %5$s IN %6$s AND %7$s = ?) WHERE %8$s IN %9$s",
-                    DatabasePlayer.columnNames(),
-                    DatabasePlayer.TABLE_NAME,
-                    DatabaseGame.TABLE_NAME,
-
-                    DatabaseParticipants.TABLE_NAME,
-                    DatabaseGame.ID,
-                    DatabaseParticipants.GAME_ID,
-                    DatabaseGame.GAME_NAME,
-
-                    DatabaseParticipants.USER_ID,
-                    DatabasePlayer.ID);
+            String sqlString = String.format("SELECT user_id,username FROM player NATURAL JOIN participants where game_id in (select game_id from game where name =?)");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
