@@ -227,6 +227,20 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public Boolean joinGame(String player_name, String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "do $$\n" +
+                    "declare v_count bigint;\n" +
+                    " begin\n" +
+                    "    select count(*) into v_count from participants where game_id in (select game_id from game where name='ghteam');\n" +
+                    "\n" +
+                    "    if v_count < 2 then\n" +
+                    "            Insert into participants (user_id, game_id) values(2,1);\n" +
+                    "    end if;\n" +
+                    " end $$;");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

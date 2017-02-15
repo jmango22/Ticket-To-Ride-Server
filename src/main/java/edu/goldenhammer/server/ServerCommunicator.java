@@ -40,7 +40,7 @@ public class ServerCommunicator {
 
         DatabaseController c = DatabaseController.getInstance();
         c.login("dk","aa");
-        String portNumber = "8080";//args[0];
+        String portNumber = "8081";//args[0];
         new ServerCommunicator().run(portNumber);
 //        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
 //        Connection conn = factory.getConnection();
