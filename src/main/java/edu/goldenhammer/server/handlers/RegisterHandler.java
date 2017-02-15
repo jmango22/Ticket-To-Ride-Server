@@ -26,7 +26,7 @@ public class RegisterHandler extends HandlerBase {
                 result.setMessage(access_token);
             }
             else {
-                result.setResponseCode(500);
+                result.setResponseCode(400);
                 result.setMessage("Error: bad credentials");
             }
             sendResponse(exchange, result);

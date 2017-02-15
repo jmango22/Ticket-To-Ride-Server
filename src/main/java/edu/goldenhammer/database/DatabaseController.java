@@ -2,6 +2,7 @@ package edu.goldenhammer.database;
 
 
 
+import com.sun.org.apache.regexp.internal.RE;
 import edu.goldenhammer.database.data_types.DatabaseParticipants;
 import edu.goldenhammer.model.GameOverview;
 import edu.goldenhammer.model.GameList;
@@ -10,7 +11,10 @@ import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabaseGame;
+import edu.goldenhammer.model.Gameplay;
+import edu.goldenhammer.model.IGameplay;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 
@@ -228,11 +232,48 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
+     * @param resultSet
+     * @return an ArrayList of players
+     */
+    private List<String> getPlayerNamesFromResultSet (ResultSet resultSet) throws SQLException{
+        List<String> playerList = new ArrayList<>();
+        while(resultSet.next()){
+            String username = resultSet.getString((DatabasePlayer.USERNAME));
+            playerList.add(username);
+        }
+        return playerList;
+    }
+
+    /**
+     *
      * @param game_name
      * @return the list of players that are a member of the game
      */
     @Override
-    public List<IDatabasePlayer> getPlayers(String game_name) {
+    public List<String> getPlayers(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            //get the information to make the Gameplay object from the database
+            String sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN (SELECT * FROM %3$s" +
+                            "NATURAL JOIN %4$s WHERE %5$s IN %6$s AND %7$s = ?) WHERE %8$s IN %9$s",
+                    DatabasePlayer.columnNames(),
+                    DatabasePlayer.TABLE_NAME,
+                    DatabaseGame.TABLE_NAME,
+
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseGame.ID,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseParticipants.USER_ID,
+                    DatabasePlayer.ID);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            return getPlayerNamesFromResultSet(resultSet);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -249,17 +290,56 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param player
-     * @param gameID
+     * @param player_user_name
+     * @param game_name
      * @return
      */
     @Override
-    public IDatabaseGame playGame(String player, String gameID) {
+    public IGameplay playGame(String player_user_name, String game_name) {
+        try (Connection connection = session.getConnection()) {
+            //update the database to indicate the game has started
+            String sqlString = String.format("UPDATE %1$s SET $2$s = ? WHERE %3$s = ?",
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.STARTED,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, true);
+            statement.setString(2, game_name);
+            statement.executeUpdate();
+
+            //get the information to make the Gameplay object from the database
+            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN %5$s",
+                    DatabaseGame.columnNames() + DatabaseParticipants.PLAYER_NUMBER,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseGame.ID,
+                    DatabaseParticipants.GAME_ID);
+            statement = connection.prepareStatement(sqlString);
+            ResultSet resultSet = statement.executeQuery();
+
+            return new Gameplay(resultSet.getString(DatabaseGame.ID),
+                    resultSet.getString(DatabaseGame.GAME_NAME),
+                    resultSet.getBoolean(DatabaseGame.STARTED),
+                    getPlayers(game_name));
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
-    public void setAccessToken(String userID, String accessToken){
-
+    public void setAccessToken(String player_user_name, String accessToken){
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.ACCESS_TOKEN,
+                    DatabasePlayer.USERNAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,accessToken);
+            statement.setString(2,player_user_name);
+            statement.executeUpdate();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 }
