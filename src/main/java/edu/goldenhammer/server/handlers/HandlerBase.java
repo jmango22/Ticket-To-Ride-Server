@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
@@ -40,8 +41,8 @@ public abstract class HandlerBase implements HttpHandler {
         String access_token = exchange.getRequestHeaders().get("Authorization").get(0);
         String username = exchange.getRequestHeaders().get("Username").get(0);
         DatabaseController dbc = DatabaseController.getInstance();
-//        return dbc.authorize(username).equals(access_token);
-        return true;
+        IDatabasePlayer player = dbc.getPlayerInfo(username);
+        return player.getAccessToken().equals(access_token);
     }
 
     protected Results getInvalidAuthorizationResults() {
@@ -54,6 +55,9 @@ public abstract class HandlerBase implements HttpHandler {
 
     public static Map<String, String> queryToMap(String query){
         Map<String, String> result = new HashMap<String, String>();
+        if(query == null){
+            return result;
+        }
         for (String param : query.split("&")) {
             String pair[] = param.split("=");
             if (pair.length>1) {

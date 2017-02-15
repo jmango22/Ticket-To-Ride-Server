@@ -25,11 +25,11 @@ public class JoinGameHandler extends HandlerBase {
             }
             else {
                 //Get games either for a specific user or get all the games at once
-                JsonObject jsonObject = (new JsonParser()).parse(readRequestBody(exchange)).getAsJsonObject();
-                if(jsonObject.get("username") != null
-                        && jsonObject.get("gamename") != null) {
-                    String username = jsonObject.get("username").getAsString();
-                    String gamename = jsonObject.get("gamename").getAsString();
+
+                if(exchange.getRequestHeaders().containsKey("username")
+                        && exchange.getRequestHeaders().containsKey("gamename")) {
+                    String username = exchange.getRequestHeaders().get("username").get(0);
+                    String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
                     boolean success = dbc.joinGame(username, gamename);
 

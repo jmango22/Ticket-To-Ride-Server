@@ -41,7 +41,7 @@ public class ServerCommunicator {
         DatabaseController c = DatabaseController.getInstance();
 //        c.joinGame("dk","ghteam");
 //        c.leaveGame("dk","ghteam");
-        String portNumber = "8081";//args[0];
+        String portNumber = "8080";//args[0];
         new ServerCommunicator().run(portNumber);
 //        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
 //        Connection conn = factory.getConnection();

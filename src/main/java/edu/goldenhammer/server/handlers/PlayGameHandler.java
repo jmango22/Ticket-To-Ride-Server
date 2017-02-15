@@ -33,12 +33,12 @@ public class PlayGameHandler extends HandlerBase {
                         results.setMessage(Serializer.serialize(game));
                     } else {
                         results.setResponseCode(400);
-                        results.setMessage("Error: cannot open game");
+                        results.setMessage("{\"message:\":\"Error: cannot open game\"}");
                     }
                 }
                 else {
                     results.setResponseCode(400);
-                    results.setMessage("Error: Invalid username or game name included in URL");
+                    results.setMessage("{\"message:\":\"Error: Invalid username or game name included in URL\"}");
                 }
             }
             sendResponse(exchange, results);

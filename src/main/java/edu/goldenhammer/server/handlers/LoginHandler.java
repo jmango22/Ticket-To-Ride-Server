@@ -36,7 +36,7 @@ public class LoginHandler extends HandlerBase {
                 if(!access_token.isEmpty()) {
                     responseCode =200;
                     Gson g = new Gson();
-                    message = String.format("{\"access_token\":\"%1$s\"}",access_token);
+                    message = String.format("{\"authorization\":\"%1$s\"}",access_token);
                 }
             }
 
