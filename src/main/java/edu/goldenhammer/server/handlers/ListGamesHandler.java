@@ -41,7 +41,7 @@ public class ListGamesHandler extends HandlerBase {
                 //Make sure gameList was actually populated with data, even if there are no games
                 if(gameList == null) {
                     results.setResponseCode(400);
-                    results.setMessage("ERROR: invalid username in URL");
+                    results.setAndSerializeMessage("ERROR: invalid username in URL");
                 }
                 else {
                     results.setResponseCode(200);

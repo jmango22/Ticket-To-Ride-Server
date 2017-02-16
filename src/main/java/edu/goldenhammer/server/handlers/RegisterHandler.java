@@ -11,8 +11,9 @@ import java.util.Random;
 
 public class RegisterHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
-        int responseCode = 404;
-        String message = "{\"message\":\"Error: user exists\"}";
+        Results result = new Results();
+        result.setResponseCode(404);
+        result.setAndSerializeMessage("Error: user exists");
         try {
             try {
                 String requestBody = readRequestBody(exchange);
@@ -27,19 +28,14 @@ public class RegisterHandler extends HandlerBase {
                 if (success) {
                     dbc.setAccessToken(username, Integer.toString(new Random().nextInt(100000000)));
                     String access_token = dbc.getPlayerInfo(username).getAccessToken();
-                    responseCode = 200;
-                    message = String.format("{\"authorization\":\"%1$s\"}",access_token);
+                    result.setResponseCode(200);
+                    result.setMessage(String.format("{\"authorization\":\"%1$s\"}",access_token));
                 }
             } catch (Exception e){
-                responseCode = 400;
-                message = "{\"message\":\"Error: need username and password\"}";
+                result.setResponseCode(400);
+                result.setAndSerializeMessage("Error: need username and password");
             }
-                Results result = new Results();
-                result.setResponseCode(responseCode);
-                result.setMessage(message);
-                sendResponse(exchange,result);
-
-//            sendResponse(exchange, result);
+            sendResponse(exchange, result);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

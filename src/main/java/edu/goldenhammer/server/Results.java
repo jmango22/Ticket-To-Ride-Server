@@ -8,8 +8,20 @@ public class Results {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    /**
+     * Serializes whatever message is passed in and stores it as the message
+     * @param message
+     */
+    public void setAndSerializeMessage(String message) {
+        this.message = "{\"message\":\"" + message + "\"}";
+    }
+
+    /**
+     * Sets the message to whatever string literal is input
+     * @param serializedMessage
+     */
+    public void setMessage(String serializedMessage) {
+        this.message = serializedMessage;
     }
 
     public int getResponseCode() {

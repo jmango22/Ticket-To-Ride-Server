@@ -31,10 +31,10 @@ public class CreateGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     dbc.joinGame(username, gameName);
                     results.setResponseCode(200);
-                    results.setMessage("{\"message\":\"GameListItem successfully created!\"}");
+                    results.setAndSerializeMessage("GameListItem successfully created!");
                 } else {
                     results.setResponseCode(400);
-                    results.setMessage("{\"message\":\"Error: game already exists\"}");
+                    results.setAndSerializeMessage("Error: game already exists");
                 }
             }
             sendResponse(exchange, results);
