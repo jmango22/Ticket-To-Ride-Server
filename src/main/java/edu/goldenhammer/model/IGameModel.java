@@ -5,6 +5,6 @@ package edu.goldenhammer.model;
  *
  * This is the interface for the game object we will be returning when playGame() is called
  */
-public interface IGameplay extends IGameOverview {
+public interface IGameModel extends IGameListItem {
 
 }

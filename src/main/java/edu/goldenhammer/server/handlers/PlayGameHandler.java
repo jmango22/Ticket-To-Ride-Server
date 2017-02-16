@@ -1,9 +1,8 @@
 package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.model.IGameplay;
+import edu.goldenhammer.model.IGameModel;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
@@ -27,7 +26,7 @@ public class PlayGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
-                    IGameplay game = dbc.playGame(username, gamename);
+                    IGameModel game = dbc.playGame(username, gamename);
                     if (game != null) {
                         results.setResponseCode(200);
                         results.setMessage(Serializer.serialize(game));

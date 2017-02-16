@@ -10,7 +10,7 @@ import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabaseGame;
 import edu.goldenhammer.model.GameModel;
-import edu.goldenhammer.model.IGameplay;
+import edu.goldenhammer.model.IGameModel;
 
 import java.util.List;
 
@@ -341,8 +341,8 @@ public class DatabaseController implements IDatabaseController {
     public Boolean leaveGame(String player_name, String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("DELETE FROM %1$s WHERE " +
-                    "%2$s IN (SELECT %3$s FROM %4$s WHERE %5$s=?)" +
-                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s=?)",
+                    "%2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
+                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s = ?)",
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.USER_ID,
                     DatabasePlayer.ID,
@@ -371,7 +371,7 @@ public class DatabaseController implements IDatabaseController {
      * @return
      */
     @Override
-    public IGameplay playGame(String player_user_name, String game_name) {
+    public IGameModel playGame(String player_user_name, String game_name) {
         try (Connection connection = session.getConnection()) {
             //update the database to indicate the game has started
             String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
