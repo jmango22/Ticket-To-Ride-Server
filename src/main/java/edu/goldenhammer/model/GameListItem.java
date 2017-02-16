@@ -5,15 +5,14 @@ import java.util.List;
 /**
  * Created by devonkinghorn on 2/8/17.
  */
-public class GameOverview implements IGameOverview {
-    public GameOverview(String id, String name, boolean started, List<String> players){
+public class GameListItem implements IGameOverview {
+    public GameListItem(String id, String name, boolean started, List<String> players){
         this.id = id;
         this.name = name;
         this.started = started;
         this.players = players;
     }
-
-
+    
     public String getID() {
         return id;
     }

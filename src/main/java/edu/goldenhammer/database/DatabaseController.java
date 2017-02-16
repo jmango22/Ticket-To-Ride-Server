@@ -2,19 +2,16 @@ package edu.goldenhammer.database;
 
 
 
-import com.sun.org.apache.regexp.internal.RE;
 import edu.goldenhammer.database.data_types.DatabaseParticipants;
-import edu.goldenhammer.model.GameOverview;
+import edu.goldenhammer.model.GameListItem;
 import edu.goldenhammer.model.GameList;
 
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
-import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabaseGame;
 import edu.goldenhammer.model.Gameplay;
 import edu.goldenhammer.model.IGameplay;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
 
@@ -87,14 +84,14 @@ public class DatabaseController implements IDatabaseController {
 
     private GameList getGameListFromResultSet (ResultSet resultSet) throws SQLException{
         GameList gameList = new GameList();
-        GameOverview game = null;
+        GameListItem game = null;
         while(resultSet.next()){
             String user_id = resultSet.getString((DatabasePlayer.USERNAME));
             String game_id = resultSet.getString(DatabaseParticipants.GAME_ID);
             if(game == null || !game_id.equals(game.getID())){
 
                 String name = resultSet.getString("name");
-                game = new GameOverview(game_id, name, false, new ArrayList<>());
+                game = new GameListItem(game_id, name, false, new ArrayList<>());
                 gameList.add(game);
             }
             game.getPlayers().add(user_id);
