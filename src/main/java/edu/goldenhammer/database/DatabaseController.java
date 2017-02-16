@@ -363,4 +363,21 @@ public class DatabaseController implements IDatabaseController {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void maybeDropGame(String gameName) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("DELETE FROM %1$s where %2$s=? and %3$s not in (select %4$s from %5$s)",
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+                    DatabaseGame.ID,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseParticipants.TABLE_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1,gameName);
+            statement.executeUpdate();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 }
