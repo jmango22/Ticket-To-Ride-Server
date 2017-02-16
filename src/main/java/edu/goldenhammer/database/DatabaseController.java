@@ -269,9 +269,17 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public List<String> getPlayers(String game_name) {
         try (Connection connection = session.getConnection()) {
-            //get the information to make the GameModel object from the database
-            String sqlString = String.format("SELECT user_id,username FROM player NATURAL JOIN participants where game_id in (select game_id from game where name =?)");
 
+            //get the information to make the GameModel object from the database
+            String sqlString = String.format("SELECT %1$s,%2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)",
+                    DatabasePlayer.ID,
+                    DatabasePlayer.USERNAME,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
@@ -335,9 +343,8 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2, game_name);
             statement.executeUpdate();
 
-            //get the information to make the Gameplay object from the database
-            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (SELECT %5$s FROM %6$s WHERE %7$s=?)",
-
+            //get the information to make the GameModel object from the database
+            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (SELECT %5$s FROM %6$s WHERE %7$s = ?)",
                     DatabaseGame.columnNames() + ", " + DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseGame.TABLE_NAME,
                     DatabaseParticipants.TABLE_NAME,
