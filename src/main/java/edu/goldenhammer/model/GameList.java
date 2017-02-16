@@ -12,13 +12,13 @@ public class GameList implements Serializable {
         gameList = new ArrayList<>();
     }
 
-    public List<IGameOverview> getGameList() {
+    public List<GameListItem> getGameList() {
         return gameList;
     }
 
-    public void add(IGameOverview g) {
+    public void add(GameListItem g) {
         gameList.add(g);
     }
 
-    private List<IGameOverview> gameList;
+    private List<GameListItem> gameList;
 }

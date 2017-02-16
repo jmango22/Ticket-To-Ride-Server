@@ -30,7 +30,7 @@ public class LeaveGameHandler extends HandlerBase {
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("{\"message\":\"GameOverview successfully left!\"}");
+                        results.setMessage("{\"message\":\"GameListItem successfully left!\"}");
                     } else {
                         results.setResponseCode(400);
                         results.setMessage("{\"message\":\"Error: cannot leave game\"}");
