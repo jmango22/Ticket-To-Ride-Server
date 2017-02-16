@@ -38,7 +38,10 @@ public class ListGamesHandler extends HandlerBase {
                     gameList = dbc.getGames(username);
                 }
                 else {
+                    String username = exchange.getRequestHeaders().get("Username").get(0);
                     gameList = dbc.getGames();
+                    gameList.filterOut(username);
+                    gameList.filterFull();
                 }
 
                 //Make sure gameList was actually populated with data, even if there are no games

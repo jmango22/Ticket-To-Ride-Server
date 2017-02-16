@@ -29,6 +29,7 @@ public class LeaveGameHandler extends HandlerBase {
                     boolean success = dbc.leaveGame(username, gamename);
 
                     if (success) {
+                        dbc.maybeDropGame(gamename);
                         results.setResponseCode(200);
                         results.setMessage("{\"message\":\"GameListItem successfully left!\"}");
                     } else {
