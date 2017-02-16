@@ -9,7 +9,7 @@ import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 import edu.goldenhammer.database.data_types.DatabaseGame;
-import edu.goldenhammer.model.Gameplay;
+import edu.goldenhammer.model.GameModel;
 import edu.goldenhammer.model.IGameplay;
 
 import java.util.List;
@@ -269,7 +269,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public List<String> getPlayers(String game_name) {
         try (Connection connection = session.getConnection()) {
-            //get the information to make the Gameplay object from the database
+            //get the information to make the GameModel object from the database
             String sqlString = String.format("SELECT user_id,username FROM player NATURAL JOIN participants where game_id in (select game_id from game where name =?)");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
@@ -326,7 +326,7 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2, game_name);
             statement.executeUpdate();
 
-            //get the information to make the Gameplay object from the database
+            //get the information to make the GameModel object from the database
             sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN (select %5$s from game where name=?)",
                     DatabaseGame.columnNames() + ", " + DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseGame.TABLE_NAME,
@@ -337,7 +337,7 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
-                return new Gameplay(resultSet.getString(DatabaseGame.ID),
+                return new GameModel(resultSet.getString(DatabaseGame.ID),
                         resultSet.getString(DatabaseGame.GAME_NAME),
                         resultSet.getBoolean(DatabaseGame.STARTED),
                         getPlayers(game_name));
