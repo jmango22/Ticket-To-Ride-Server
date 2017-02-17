@@ -65,7 +65,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public IDatabasePlayer getPlayerInfo(String player_user_name) {
         try (Connection connection = session.getConnection()){
-            String sqlString = String.format("SELECT %1$s FROM %2$s where %3$s = ?",
+            String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
                     DatabasePlayer.columnNames(),
                     DatabasePlayer.TABLE_NAME,
                     DatabasePlayer.USERNAME);
@@ -384,9 +384,10 @@ public class DatabaseController implements IDatabaseController {
             statement.executeUpdate();
 
             //get the information to make the GameModel object from the database
-            sqlString = String.format("SELECT %1$s FROM %2$s NATURAL JOIN %3$s WHERE %4$s IN" +
-                            "(SELECT %5$s FROM %6$s WHERE %7$s = ?)",
-                    DatabaseGame.columnNames() + ", " + DatabaseParticipants.PLAYER_NUMBER,
+            sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
+                            "(SELECT %6$s FROM %7$s WHERE %8$s = ?)",
+                    DatabaseGame.columnNames(),
+                    DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseGame.TABLE_NAME,
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.GAME_ID,
