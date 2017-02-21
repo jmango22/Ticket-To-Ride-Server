@@ -31,15 +31,15 @@ public class LeaveGameHandler extends HandlerBase {
                     if (success) {
                         dbc.maybeDropGame(gamename);
                         results.setResponseCode(200);
-                        results.setMessage("{\"message\":\"GameListItem successfully left!\"}");
+                        results.setAndSerializeMessage("GameListItem successfully left!");
                     } else {
                         results.setResponseCode(400);
-                        results.setMessage("{\"message\":\"Error: cannot leave game\"}");
+                        results.setAndSerializeMessage("Error: cannot leave game");
                     }
                 }
                 else {
                     results.setResponseCode(400);
-                    results.setMessage("{\"message\":\"Error: Invalid username or game name included in URL\"}");
+                    results.setAndSerializeMessage("Error: Invalid username or game name included in URL");
                 }
             }
             sendResponse(exchange, results);

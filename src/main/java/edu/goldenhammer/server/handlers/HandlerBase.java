@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.server.Results;
-import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -48,7 +47,7 @@ public abstract class HandlerBase implements HttpHandler {
     protected Results getInvalidAuthorizationResults() {
         Results results = new Results();
         results.setResponseCode(500);
-        results.setMessage("Error: invalid username or invalid access token.");
+        results.setAndSerializeMessage("Error: invalid username or invalid access token.");
 
         return results;
     }

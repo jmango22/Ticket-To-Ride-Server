@@ -1,6 +1,5 @@
 package edu.goldenhammer.server.handlers;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
@@ -8,7 +7,6 @@ import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Random;
 
 /**
@@ -16,8 +14,9 @@ import java.util.Random;
  */
 public class LoginHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
-        String message = "{\"message\":\"Error: bad credentials\"";
-        int responseCode = 400;
+        Results results = new Results();
+        results.setAndSerializeMessage("Error: bad credentials");
+        results.setResponseCode(400);
         try {
             String requestBody = readRequestBody(exchange);
             JsonObject credentials = Serializer.deserialize(requestBody);
@@ -34,9 +33,8 @@ public class LoginHandler extends HandlerBase {
                 String access_token = dbc.getPlayerInfo(username).getAccessToken();
 
                 if(!access_token.isEmpty()) {
-                    responseCode =200;
-                    Gson g = new Gson();
-                    message = String.format("{\"authorization\":\"%1$s\"}",access_token);
+                    results.setResponseCode(200);
+                    results.setMessage(String.format("{\"authorization\":\"%1$s\"}",access_token));
                 }
             }
 
@@ -44,10 +42,7 @@ public class LoginHandler extends HandlerBase {
 
         }
         try{
-            Results result = new Results();
-            result.setMessage(message);
-            result.setResponseCode(responseCode);
-            sendResponse(exchange, result);
+            sendResponse(exchange, results);
         } catch(IOException e){
             e.printStackTrace();
         }

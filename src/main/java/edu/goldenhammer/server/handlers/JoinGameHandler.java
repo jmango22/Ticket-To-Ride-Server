@@ -1,8 +1,5 @@
 package edu.goldenhammer.server.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.server.Results;
@@ -35,15 +32,15 @@ public class JoinGameHandler extends HandlerBase {
 
                     if (success) {
                         results.setResponseCode(200);
-                        results.setMessage("{\"message\":\"GameListItem successfully joined!\"}");
+                        results.setAndSerializeMessage("GameListItem successfully joined!");
                     } else {
                         results.setResponseCode(400);
-                        results.setMessage("{\"message\":\"Error: cannot join game\"}");
+                        results.setAndSerializeMessage("Error: cannot join game");
                     }
                 }
                 else {
                     results.setResponseCode(400);
-                    results.setMessage("{\"message\":\"Error: Invalid username or game name included in URL\"}");
+                    results.setAndSerializeMessage("Error: Invalid username or game name included in URL");
                 }
             }
             sendResponse(exchange, results);

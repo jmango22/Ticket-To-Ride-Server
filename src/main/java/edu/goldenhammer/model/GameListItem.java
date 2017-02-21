@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by devonkinghorn on 2/8/17.
  */
-public class GameListItem implements IGameOverview {
+public class GameListItem implements IGameListItem {
     public GameListItem(String id, String name, boolean started, List<String> players){
         this.id = id;
         this.name = name;

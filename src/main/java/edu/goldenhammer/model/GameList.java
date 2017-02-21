@@ -24,7 +24,6 @@ public class GameList implements Serializable {
     private List<GameListItem> gameList;
 
     public void filterOut(String player){
-        int max = 4;
         Iterator<GameListItem> i = getGameList().iterator();
         while(i.hasNext()){
             GameListItem listItem = i.next();

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by seanjib on 2/11/2017.
  */
-public class GameModel implements IGameplay {
+public class GameModel implements IGameModel {
     public GameModel(String id, String name, boolean started, List<String> players){
         this.id = id;
         this.name = name;

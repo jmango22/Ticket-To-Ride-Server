@@ -10,14 +10,14 @@ public class DatabasePlayer implements IDatabasePlayer {
     public static final String ACCESS_TOKEN = "access_token";
     public static final String TABLE_NAME = "player";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE if not exists %1$s (\n" +
-                    "    user_id SERIAL unique,\n" +
-                    "    username VARCHAR(20) UNIQUE NOT NULL,\n" +
-                    "    password VARCHAR(20) NOT NULL,\n" +
-                    "    access_token VARCHAR(20) UNIQUE,\n" +
-                    "    PRIMARY KEY(user_id)\n" +
+            "CREATE TABLE IF NOT EXISTS %1$s (\n" +
+                    "    %2$s SERIAL UNIQUE,\n" +
+                    "    %3$s VARCHAR(20) UNIQUE NOT NULL,\n" +
+                    "    %4$s VARCHAR(20) NOT NULL,\n" +
+                    "    %5$s VARCHAR(20) UNIQUE,\n" +
+                    "    PRIMARY KEY(%6$s)\n" +
                     ")"
-            , TABLE_NAME);
+            , TABLE_NAME, ID, USERNAME, PASSWORD, ACCESS_TOKEN, ID);
 
 
     public DatabasePlayer(String id, String username, String password, String accessToken) {

@@ -13,19 +13,20 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
     public static final String PLAYER_NUMBER = "player_number";
 
     public static final String CREATE_STMT = String.format(
-                    "CREATE TABLE if not exists %1$s (\n" +
+                    "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    user_id INTEGER NOT NULL,\n" +
                     "    game_id INTEGER NOT NULL,\n" +
                     "    player_number INTEGER NOT NULL,\n" +
                     "    PRIMARY Key(user_id, game_id),\n" +
                     "    FOREIGN KEY(user_id)\n" +
-                    "      references player\n" +
-                    "      on delete CASCADE,\n" +
+                    "      REFERENCES player\n" +
+                    "      ON DELETE CASCADE,\n" +
                     "    FOREIGN KEY(game_id)\n" +
-                    "      references game\n" +
-                    "      on delete CASCADE\n" +
+                    "      REFERENCES game\n" +
+                    "      ON DELETE CASCADE\n" +
                     ")"
-            , TABLE_NAME);
+            , TABLE_NAME, USER_ID, GAME_ID, PLAYER_NUMBER, USER_ID, GAME_ID,
+            USER_ID, DatabasePlayer.TABLE_NAME, DatabaseGame.TABLE_NAME);
 
     public DatabaseParticipants(String id, String name, boolean started, List<String> players) {
         this.id = id;

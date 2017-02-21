@@ -1,19 +1,13 @@
 package edu.goldenhammer.server.handlers;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 
 import edu.goldenhammer.model.GameList;
-import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.model.IGameOverview;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,7 +41,7 @@ public class ListGamesHandler extends HandlerBase {
                 //Make sure gameList was actually populated with data, even if there are no games
                 if(gameList == null) {
                     results.setResponseCode(400);
-                    results.setMessage("ERROR: invalid username in URL");
+                    results.setAndSerializeMessage("ERROR: invalid username in URL");
                 }
                 else {
                     results.setResponseCode(200);
