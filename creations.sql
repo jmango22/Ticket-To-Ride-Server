@@ -29,11 +29,24 @@ CREATE TABLE game IF NOT EXISTS (
 );
 
 CREATE TABLE route IF NOT EXISTS (
-    route_id INTEGER NOT NULL,
-    city_1 INTEGER NOT NULL,
-    city_2 INTEGER NOT NULL,
-    length INTEGER NOT NULL,
-    PRIMARY KEY route_id
+    route_id SERIAL INTEGER NOT NULL,
+    city_1 UNIQUE INTEGER NOT NULL,
+    city_2 UNIQUE INTEGER NOT NULL,
+    route_color VARCHAR(10) NOT NULL,
+    route_length INTEGER NOT NULL,
+    PRIMARY KEY route_id,
+    FOREIGN KEY(city_1)
+      REFERENCES city
+      ON DELETE CASCADE,
+    FOREIGN KEY(city_2)
+      REFERENCES city
+      ON DELETE CASCADE
+);
+
+CREATE TABLE city IF NOT EXISTS (
+    city_id SERIAL INTEGER NOT NULL,
+    city_name VARCHAR(20) NOT NULL,
+    PRIMARY KEY city_id
 );
 
 CREATE TABLE claimed_routes IF NOT EXISTS (
@@ -55,6 +68,7 @@ CREATE TABLE train_cards IF NOT EXISTS (
     train_card_id SERIAL INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
     player_id INTEGER,
+    train_type VARCHAR(10),
     discarded BOOLEAN,
     PRIMARY KEY train_card_id,
     FOREIGN KEY(player_id)
@@ -68,6 +82,8 @@ CREATE TABLE train_cards IF NOT EXISTS (
 CREATE TABLE destination_cards IF NOT EXISTS (
     destination_card_id SERIAL INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
+    city_1 INTEGER NOT NULL,
+    city_2 INTEGER NOT NULL,
     player_id INTEGER,
     discarded BOOLEAN,
     PRIMARY KEY destination_card_id,
@@ -77,6 +93,12 @@ CREATE TABLE destination_cards IF NOT EXISTS (
     FOREIGN KEY(game_id)
       REFERENCES game
       on delete CASCADE
+    FOREIGN KEY(city_1)
+      REFERENCES city
+      ON DELETE CASCADE,
+    FOREIGN KEY(city_2)
+      REFERENCES city
+      ON DELETE CASCADE
 );
 
 CREATE TABLE chat_messages IF NOT EXISTS (
