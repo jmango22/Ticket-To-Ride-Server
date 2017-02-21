@@ -325,15 +325,10 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-<<<<<<< HEAD
      * @param game_name the name of the game to find players associated with
      * @pre the database schema has not been altered
      * @post all players involved in a game will be returned.
-     * @return the list of players that are a member of the game
-=======
-     * @param game_name
      * @return the list of usernames of players that are a member of the game
->>>>>>> Started adding database classes for City, Route, TrainCard, and DestinationCard. Added SQL for those tables. Modified Participants to include number of tracks left and number of points earned.
      */
     @Override
     public List<String> getPlayers(String game_name) {
