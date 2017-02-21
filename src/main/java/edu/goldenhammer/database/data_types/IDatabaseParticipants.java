@@ -9,6 +9,8 @@ public interface IDatabaseParticipants {
     String getID();
     String getName();
     boolean isStarted();
+    int getPoints();
+    int getTrainsLeft();
     List<String> getPlayers();
     void setPlayers(List<String> players);
 }
