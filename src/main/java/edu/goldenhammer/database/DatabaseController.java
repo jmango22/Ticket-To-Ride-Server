@@ -327,6 +327,7 @@ public class DatabaseController implements IDatabaseController {
      *
      * @param game_name the name of the game to find players associated with
      * @pre the database schema has not been altered
+     * @post all players involved in a game will be returned.
      * @return the list of usernames of players that are a member of the game
      */
     @Override

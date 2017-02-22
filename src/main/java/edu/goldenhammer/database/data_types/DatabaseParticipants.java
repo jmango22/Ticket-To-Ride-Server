@@ -30,8 +30,8 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
                     "      on delete CASCADE\n" +
                     ")"
             , TABLE_NAME,
-            DatabasePlayer.ID,
-            DatabaseGame.ID,
+            USER_ID,
+            GAME_ID,
             PLAYER_NUMBER,
             POINTS,
             TRAINS_LEFT,
