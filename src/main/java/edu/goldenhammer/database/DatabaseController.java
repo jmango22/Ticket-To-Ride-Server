@@ -36,7 +36,7 @@ public class DatabaseController implements IDatabaseController {
      * @pre The PSQL database is able to connect with the credentials in the config
      *
      * @post an instance of DatabaseController is returned with a connection to the SQL database
-     * @return
+     * @return an instance of DatabaseController
      */
     public static DatabaseController getInstance(){
         if(singleton == null)
@@ -49,7 +49,6 @@ public class DatabaseController implements IDatabaseController {
      * @pre The PSQL database is able to connect with the credentials in the config
      *
      * @post an instance of DatabaseController is returned with a connection to the SQL database
-     * @return
      */
     public DatabaseController(){
         initializeDatabase();
@@ -78,8 +77,8 @@ public class DatabaseController implements IDatabaseController {
     /**
      * @param player_user_name the username associated with the IDatabasePlayer to be returned
      * @pre the database connection is valid and the player_user_name is associated with a user already stored and the database schema has not been altered
-     * @post The IDatabasePlayer associated with the username is returned
-     * @return
+     * @post The IDatabasePlayer is read from the database
+     * @return The IDatabasePlayer associated with the username is returned
      */
     @Override
     public IDatabasePlayer getPlayerInfo(String player_user_name) {
