@@ -58,6 +58,7 @@ public class DatabaseController implements IDatabaseController {
 
     private void ensureTablesCreated() {
         createTable(DatabaseCity.CREATE_STMT);
+        createTable(DatabaseClaimedRoute.CREATE_STMT);
         createTable(DatabaseCommand.CREATE_STMT);
         createTable(DatabaseDestinationCard.CREATE_STMT);
         createTable(DatabaseGame.CREATE_STMT);
