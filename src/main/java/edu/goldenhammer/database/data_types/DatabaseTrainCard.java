@@ -11,7 +11,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     public static final String DISCARDED = "discarded";
     public static final String TABLE_NAME = "train_cards";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE %1$s IF NOT EXISTS (\n" +
+            "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    %2$s SERIAL INTEGER NOT NULL,\n" +
                     "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER,\n" +
