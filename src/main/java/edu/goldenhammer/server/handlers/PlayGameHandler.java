@@ -26,7 +26,7 @@ public class PlayGameHandler extends HandlerBase {
                     String username = exchange.getRequestHeaders().get("username").get(0);
                     String gamename = exchange.getRequestHeaders().get("gamename").get(0);
 
-                    IGameModel game = dbc.playGame(username, gamename);
+                    IGameModel game = dbc.playGame(gamename);
                     if (game != null) {
                         results.setResponseCode(200);
                         results.setMessage(Serializer.serialize(game));

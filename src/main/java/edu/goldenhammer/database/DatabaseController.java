@@ -32,6 +32,12 @@ public class DatabaseController implements IDatabaseController {
     private static DatabaseController singleton;
     private DatabaseConnectionFactory session;
 
+    /**
+     * @pre The PSQL database is able to connect with the credentials in the config
+     *
+     * @post an instance of DatabaseController is returned with a connection to the SQL database
+     * @return an instance of DatabaseController
+     */
     public static DatabaseController getInstance(){
         if(singleton == null)
             singleton = new DatabaseController();
@@ -39,9 +45,15 @@ public class DatabaseController implements IDatabaseController {
     }
 
 
+    /**
+     * @pre The PSQL database is able to connect with the credentials in the config
+     *
+     * @post an instance of DatabaseController is returned with a connection to the SQL database
+     */
     public DatabaseController(){
         initializeDatabase();
     }
+
     private void initializeDatabase() {
         this.session = DatabaseConnectionFactory.getInstance();
         ensureTablesCreated();
@@ -62,6 +74,12 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
+    /**
+     * @param player_user_name the username associated with the IDatabasePlayer to be returned
+     * @pre the database connection is valid and the player_user_name is associated with a user already stored and the database schema has not been altered
+     * @post The IDatabasePlayer is read from the database
+     * @return The IDatabasePlayer associated with the username is returned
+     */
     @Override
     public IDatabasePlayer getPlayerInfo(String player_user_name) {
         try (Connection connection = session.getConnection()){
@@ -104,7 +122,8 @@ public class DatabaseController implements IDatabaseController {
     }
 
     /**
-     *
+     * @pre the connection to the SQL database is valid and the database schema has not been altered
+     * @post all games that are not started are returned
      * @return all games that have not been started
      */
     @Override
@@ -130,8 +149,9 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
     /**
-     *
-     * @param player_user_name
+     * @param player_user_name the name of the user to find all games associated with
+     * @pre the connection to the SQL database is valid
+     * @post all games in which the player_user_name are involved is returned
      * @return all games in which the player is a participant
      */
     @Override
@@ -166,10 +186,11 @@ public class DatabaseController implements IDatabaseController {
     }
 
     /**
-     *
-     * @param username users username
-     * @param password the password
-     * @return if the player exists
+     * @param username users username for the person logging in
+     * @param password the password for the person logging in
+     * @pre the database schema has not been altered
+     * @post the method will return true if a record with the same username and password exist in the database
+     * @return returns true if the player exists else false
      */
     @Override
     public Boolean login(String username, String password) {
@@ -193,9 +214,11 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param username
-     * @param password
-     * @return if the new user was created
+     * @param username the username wanting to be stored for a new user
+     * @param password the password to be used for logging in later.
+     * @pre the database schema has not been altered, the username is not in use
+     * @post the associated username and password will be added to the database.
+     * @return if the new user was created true, else false is returned
      */
     @Override
     public Boolean createUser(String username, String password) {
@@ -216,7 +239,9 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param name
+     * @param name the name the new game should have.
+     * @pre the database schema has not been altered, and another game with the same name doesn't exist
+     * @post a new game will be created with the name.
      * @return if a game with that name was created
      */
     @Override
@@ -238,9 +263,11 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param player_name
-     * @param game_name
-     * @return if the statement was executed.
+     * @param player_name username of the player to be added to the game
+     * @param game_name the name of the game the player above should be added to.
+     * @pre the database schema has not been altered, The game exists with fewer than 5 participants and has not yet started, and the player exists
+     * @post the player will be added to the game.
+     * @return returns true if the player was added to the game else it returns false.
      */
     @Override
     public Boolean joinGame(String player_name, String game_name) {
@@ -286,11 +313,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    /**
-     *
-     * @param resultSet
-     * @return an ArrayList of players
-     */
+
     private List<String> getPlayerNamesFromResultSet (ResultSet resultSet) throws SQLException{
         List<String> playerList = new ArrayList<>();
         while(resultSet.next()){
@@ -302,7 +325,9 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param game_name
+     * @param game_name the name of the game to find players associated with
+     * @pre the database schema has not been altered
+     * @post all players involved in a game will be returned.
      * @return the list of players that are a member of the game
      */
     @Override
@@ -333,9 +358,11 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param player_name
-     * @param game_name
-     * @return if the player left the game
+     * @param player_name the player username to leave the game
+     * @param game_name the name of the game to remove the player from
+     * @pre the player is part of the game and the game has not yet started
+     * @post the player will be removed from the game
+     * @return returns true if the player left the game else false
      */
     @Override
     public Boolean leaveGame(String player_name, String game_name) {
@@ -366,12 +393,13 @@ public class DatabaseController implements IDatabaseController {
 
     /**
      *
-     * @param player_user_name
-     * @param game_name
-     * @return
+     * @param game_name the name of the game to start
+     * @pre the game has not yet started
+     * @post the game will begin and no one will be able to join the game anymore
+     * @return the IGameModel associated with the game
      */
     @Override
-    public IGameModel playGame(String player_user_name, String game_name) {
+    public IGameModel playGame(String game_name) {
         try (Connection connection = session.getConnection()) {
             //update the database to indicate the game has started
             String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
@@ -409,6 +437,13 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    /**
+     *
+     * @param player_user_name the username of the player to set the access token
+     * @param accessToken the new access token to be associated with the player
+     * @pre the username exists
+     * @post the database will store the accessToken for the associated user
+     */
     @Override
     public void setAccessToken(String player_user_name, String accessToken){
         try (Connection connection = session.getConnection()) {
@@ -425,6 +460,12 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
+    /**
+     *
+     * @param gameName name of the game to possibly drop
+     * @pre no one is participating in the game
+     * @post the game will be dropped
+     */
     @Override
     public void maybeDropGame(String gameName) {
         try (Connection connection = session.getConnection()) {
