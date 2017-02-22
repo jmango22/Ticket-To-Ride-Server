@@ -28,7 +28,7 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
                     "    FOREIGN KEY(%3$s)\n" +
                     "      references %8$s\n" +
                     "      on delete CASCADE\n" +
-                    ")"
+                    ");"
             , TABLE_NAME,
             USER_ID,
             GAME_ID,

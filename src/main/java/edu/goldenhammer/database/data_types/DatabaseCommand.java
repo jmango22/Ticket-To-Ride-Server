@@ -28,7 +28,8 @@ public class DatabaseCommand implements IDatabaseCommand{
                     "   ON DELETE CASCADE," +
                     "FOREIGN KEY(%5$s)" +
                     "   REFERENCES %5$s" +
-                    "   ON DELETE CASCADE",
+                    "   ON DELETE CASCADE" +
+                    ");",
             TABLE_NAME,
             COMMAND_ID,
             GAME_ID,

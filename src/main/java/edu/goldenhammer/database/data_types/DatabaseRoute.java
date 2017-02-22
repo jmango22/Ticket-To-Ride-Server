@@ -23,7 +23,8 @@ public class DatabaseRoute implements IDatabaseRoute {
                     "      ON DELETE CASCADE,\n" +
                     "    FOREIGN KEY(4$s)\n" +
                     "      REFERENCES 7$s\n" +
-                    "      ON DELETE CASCADE)",
+                    "      ON DELETE CASCADE" +
+                    ");",
             TABLE_NAME,
             ID,
             CITY_1,

@@ -21,7 +21,8 @@ public class DatabaseMessage implements IDatabaseMessage {
                     "   ON DELETE CASCADE," +
                     "FOREIGN KEY(%9$s)" +
                     "   REFERENCES %10$s" +
-                    "   ON DELETE CASCADE",
+                    "   ON DELETE CASCADE" +
+                    ");",
             TABLE_NAME,
             ID,
             GAME_ID,
