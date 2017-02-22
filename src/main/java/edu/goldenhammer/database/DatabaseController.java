@@ -328,7 +328,7 @@ public class DatabaseController implements IDatabaseController {
      * @param game_name the name of the game to find players associated with
      * @pre the database schema has not been altered
      * @post all players involved in a game will be returned.
-     * @return the list of players that are a member of the game
+     * @return the list of usernames of players that are a member of the game
      */
     @Override
     public List<String> getPlayers(String game_name) {
@@ -401,18 +401,10 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public IGameModel playGame(String game_name) {
         try (Connection connection = session.getConnection()) {
-            //update the database to indicate the game has started
-            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.STARTED,
-                    DatabaseGame.GAME_NAME);
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setBoolean(1, true);
-            statement.setString(2, game_name);
-            statement.executeUpdate();
+            initializeGame(game_name);
 
             //get the information to make the GameModel object from the database
-            sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
+            String sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
                             "(SELECT %6$s FROM %7$s WHERE %8$s = ?)",
                     DatabaseGame.columnNames(),
                     DatabaseParticipants.PLAYER_NUMBER,
@@ -422,7 +414,7 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME);
-            statement = connection.prepareStatement(sqlString);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
@@ -482,5 +474,80 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    private void initializeGame(String game_name) {
+        setGameStarted(game_name);
+        initializeParticipants(game_name);
+        initializeCities();
+        initializeRoutes();
+        initializeTrainCards(game_name);
+        initializeDestinationCards(game_name);
+    }
+
+    private void setGameStarted(String game_name) {
+        try (Connection connection = session.getConnection()){
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.STARTED,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, true);
+            statement.setString(2, game_name);
+            statement.executeUpdate();
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeParticipants(String game_name) {
+        int MAX_TRAIN_COUNT = 30;
+        List<String> players = getPlayers(game_name);
+        try (Connection connection = session.getConnection()){
+            for (int i = 0; i < players.size(); i++) {
+                String sqlString = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?" +
+                                " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)" +
+                                " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?)",
+                        DatabaseParticipants.TABLE_NAME,
+                        DatabaseParticipants.PLAYER_NUMBER,
+                        DatabaseParticipants.POINTS,
+                        DatabaseParticipants.TRAINS_LEFT,
+
+                        DatabaseParticipants.GAME_ID,
+                        DatabaseGame.ID,
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME,
+
+                        DatabaseParticipants.USER_ID,
+                        DatabasePlayer.ID,
+                        DatabasePlayer.TABLE_NAME,
+                        DatabasePlayer.USERNAME
+                );
+
+                PreparedStatement statement = connection.prepareStatement(sqlString);
+                statement.setInt(1, i);
+                statement.setInt(2, MAX_TRAIN_COUNT);
+
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void initializeCities() {
+
+    }
+
+    private void initializeRoutes() {
+
+    }
+
+    private void initializeTrainCards(String game_name) {
+
+    }
+
+    private void initializeDestinationCards(String game_name) {
+
     }
 }

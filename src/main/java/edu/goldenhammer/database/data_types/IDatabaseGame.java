@@ -8,5 +8,5 @@ import java.util.List;
 public interface IDatabaseGame {
     String getID();
     String getName();
-    Boolean getStarted();
+    Boolean isStarted();
 }
