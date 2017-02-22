@@ -19,6 +19,7 @@ import java.sql.SQLException;
 
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -507,13 +508,13 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeParticipants(String game_name) {
-        int MAX_TRAIN_COUNT = 30;
+        final int MAX_TRAIN_COUNT = 30;
         List<String> players = getPlayers(game_name);
         try (Connection connection = session.getConnection()){
             for (int i = 0; i < players.size(); i++) {
                 String sqlString = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?" +
                                 " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)" +
-                                " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?)",
+                                " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?);",
                         DatabaseParticipants.TABLE_NAME,
                         DatabaseParticipants.PLAYER_NUMBER,
                         DatabaseParticipants.POINTS,
@@ -533,6 +534,7 @@ public class DatabaseController implements IDatabaseController {
                 PreparedStatement statement = connection.prepareStatement(sqlString);
                 statement.setInt(1, i);
                 statement.setInt(2, MAX_TRAIN_COUNT);
+                statement.executeUpdate();
 
             }
         } catch (SQLException ex) {
@@ -541,18 +543,34 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeCities() {
+        final int MAX_CITY_COUNT = 4; //modify this
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                            "CASE WHEN (SELECT count(*) FROM %1$s) != %2$d THEN" +
+                                "DELETE FROM %1$s;" +
+                                "INSERT INTO %1$s(%3$s) VALUES" +
+                                "(The Shire)," +
+                                "(Mordor)," +
+                                "(Minas Tirith)," +
+                                "(Lothlorien)" + //add in more cities here
+                            "END;",
+                    DatabaseCity.TABLE_NAME,
+                    MAX_CITY_COUNT,
+                    DatabaseCity.NAME);
 
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeRoutes() {
-
     }
 
     private void initializeTrainCards(String game_name) {
-
     }
 
     private void initializeDestinationCards(String game_name) {
-
     }
 }
