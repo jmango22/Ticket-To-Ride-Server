@@ -16,7 +16,7 @@ public interface IDatabaseController {
     Boolean joinGame(String player, String gameID);
     List<String> getPlayers(String gameID);
     Boolean leaveGame(String player, String gameID);
-    IGameModel playGame(String player, String gameID);
+    IGameModel playGame(String gameID);
     void setAccessToken(String userID, String accessToken);
     void maybeDropGame(String gameName);
 }
