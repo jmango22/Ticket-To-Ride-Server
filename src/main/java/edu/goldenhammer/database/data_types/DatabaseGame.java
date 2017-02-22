@@ -17,7 +17,7 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
                     "    %3$s VARCHAR(20) NOT NULL,\n" +
                     "    %4$s BOOLEAN NOT NULL,\n" +
                     "    PRIMARY KEY(%5$s)" +
-                    ")"
+                    ");"
             , TABLE_NAME, ID, GAME_NAME, STARTED, ID);
 
     public DatabaseGame(String id, String name, Boolean started){

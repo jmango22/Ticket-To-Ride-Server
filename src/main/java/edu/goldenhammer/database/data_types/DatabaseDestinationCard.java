@@ -33,7 +33,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                     "   ON DELETE CASCADE," +
                     "FOREIGN KEY(%15$s)" +
                     "   REFERENCES %16$s" +
-                    "   ON DELETE CASCADE",
+                    "   ON DELETE CASCADE" +
+                    ");",
             TABLE_NAME,
             ID,
             GAME_ID,

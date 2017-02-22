@@ -2,13 +2,10 @@ package edu.goldenhammer.database;
 
 
 
-import edu.goldenhammer.database.data_types.DatabaseParticipants;
+import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.GameListItem;
 import edu.goldenhammer.model.GameList;
 
-import edu.goldenhammer.database.data_types.IDatabasePlayer;
-import edu.goldenhammer.database.data_types.DatabasePlayer;
-import edu.goldenhammer.database.data_types.DatabaseGame;
 import edu.goldenhammer.model.GameModel;
 import edu.goldenhammer.model.IGameModel;
 
@@ -60,9 +57,15 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void ensureTablesCreated() {
-        createTable(DatabasePlayer.CREATE_STMT);
+        createTable(DatabaseCity.CREATE_STMT);
+        createTable(DatabaseCommand.CREATE_STMT);
+        createTable(DatabaseDestinationCard.CREATE_STMT);
         createTable(DatabaseGame.CREATE_STMT);
+        createTable(DatabaseMessage.CREATE_STMT);
         createTable(DatabaseParticipants.CREATE_STMT);
+        createTable(DatabasePlayer.CREATE_STMT);
+        createTable(DatabaseRoute.CREATE_STMT);
+        createTable(DatabaseTrainCard.CREATE_STMT);
     }
 
     private void createTable(String sqlStatementString) {
@@ -401,8 +404,6 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public IGameModel playGame(String game_name) {
         try (Connection connection = session.getConnection()) {
-            initializeGame(game_name);
-
             //get the information to make the GameModel object from the database
             String sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
                             "(SELECT %6$s FROM %7$s WHERE %8$s = ?)",
@@ -418,10 +419,13 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
-                return new GameModel(resultSet.getString(DatabaseGame.ID),
+                GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
                         resultSet.getString(DatabaseGame.GAME_NAME),
                         resultSet.getBoolean(DatabaseGame.STARTED),
                         getPlayers(game_name));
+                if(!gameModel.isStarted()){
+                    initializeGame(game_name);
+                }
             }
         } catch(SQLException e){
             e.printStackTrace();
