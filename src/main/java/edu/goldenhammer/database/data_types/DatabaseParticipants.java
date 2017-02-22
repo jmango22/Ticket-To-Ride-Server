@@ -38,38 +38,28 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
             DatabasePlayer.TABLE_NAME,
             DatabaseGame.TABLE_NAME);
 
-    public DatabaseParticipants(String id, String name, boolean started, int points, int trainsLeft, List<String> players) {
-        this.id = id;
-        this.name = name;
-        this.started = started;
-        this.players = players;
+    public DatabaseParticipants(String playerID, String gameID, int playerNumber, int points, int trainsLeft) {
+        this.playerID = playerID;
+        this.gameID = gameID;
+        this.playerNumber = playerNumber;
         this.points = points;
         this.trainsLeft = trainsLeft;
     }
 
     @Override
-    public String getID() {
-        return id;
+    public String getPlayerID() {
+        return playerID;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getGameID() {
+        return gameID;
     }
 
     @Override
-    public boolean isStarted() {
-        return started;
+    public int getPlayerNumber() {
+        return playerNumber;
     }
-
-    @Override
-    public List<String> getPlayers() {
-        return players;
-    }
-
-
-    @Override
-    public void setPlayers(List<String> players) { this.players = players; }
 
     @Override
     public int getPoints() {
@@ -82,14 +72,13 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
     }
 
     public static String columnNames() {
-        return String.join(",", USER_ID, GAME_ID, PLAYER_NUMBER);
+        return String.join(",", USER_ID, GAME_ID, PLAYER_NUMBER, POINTS, TRAINS_LEFT);
     }
 
 
-    private String id;
-    private String name;
-    private boolean started;
+    private String playerID;
+    private String gameID;
+    private int playerNumber;
     private int points;
     private int trainsLeft;
-    private List<String> players;
 }

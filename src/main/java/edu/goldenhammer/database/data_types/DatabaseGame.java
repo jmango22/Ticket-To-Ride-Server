@@ -37,7 +37,7 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
     }
 
 
-    public Boolean getStarted() {
+    public Boolean isStarted() {
         return started;
     }
 
