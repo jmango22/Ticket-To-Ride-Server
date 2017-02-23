@@ -543,7 +543,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeCities() {
-        final int MAX_CITY_COUNT = 4; //modify this
+        final int CITY_COUNT = 4; //modify this
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format(
                             "CASE WHEN (SELECT count(*) FROM %1$s) != %2$d THEN" +
@@ -555,7 +555,7 @@ public class DatabaseController implements IDatabaseController {
                                 "(Lothlorien)" + //add in more cities here
                             "END;",
                     DatabaseCity.TABLE_NAME,
-                    MAX_CITY_COUNT,
+                    CITY_COUNT,
                     DatabaseCity.NAME);
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
