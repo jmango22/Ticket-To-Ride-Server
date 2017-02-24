@@ -20,7 +20,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                     "%4$s INTEGER," +
                     "%5$s VARCHAR(20) NOT NULL," +
                     "%6$s VARCHAR(20) NOT NULL," +
-                    "%7$s BOOLEAN," +
+                    "%7$s BOOLEAN NOT NULL DEFAULT false," +
                     "PRIMARY KEY(%2$s)," +
                     "FOREIGN KEY(%3$s)" +
                     "   REFERENCES %8$s" +

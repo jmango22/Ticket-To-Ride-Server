@@ -24,7 +24,7 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
                     "INSERT INTO %1$s(%3$s, %4$s, %5$s, %6$s) VALUES" +
                     "('The Shire', 'Lothlorien', 'red', 3)," +
                     "('Rivindell', 'The Shire', 'gray', 5)," +
-                    "('Forodwaith', 'Mordor', 'white', 4)" +
+                    "('Bree', 'Mordor', 'white', 6)" +
                     ";", //City 1, City 2, Color, Length
             TABLE_NAME,
             ID,

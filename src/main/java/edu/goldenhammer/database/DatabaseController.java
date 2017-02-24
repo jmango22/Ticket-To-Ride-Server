@@ -556,7 +556,7 @@ public class DatabaseController implements IDatabaseController {
                             DatabaseGame.GAME_NAME
                     );
 
-                    switch (j) {
+                    switch (i) {
                         case 0:
                             sqlString += "'red'),";
                             break;
@@ -599,8 +599,8 @@ public class DatabaseController implements IDatabaseController {
                 }
             }
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            for(int i = 0; i < (MAX_COLORED_CARDS * 8 + MAX_WILD_CARDS); i++) {
-                statement.setString(i, game_name);
+            for(int i = 0; i < ((MAX_COLORED_CARDS * 8) + MAX_WILD_CARDS); i++) {
+                statement.setString(i + 1, game_name);
             }
             statement.execute();
 
@@ -610,5 +610,120 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeDestinationCards(String game_name) {
+        final int MAX_DESTINATION_CARDS = 76;
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseDestinationCard.CITY_1,
+                    DatabaseDestinationCard.CITY_2,
+                    getAllDestinations());
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            for(int i = 0; i < MAX_DESTINATION_CARDS; i++) {
+                statement.setString(i + 1, game_name);
+            }
+
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private String getAllDestinations() {
+        return getFormattedDestination("Amon Sul", "Crossings of Poros") +
+                getFormattedDestination("Amon Sul", "Dol Guldur") +
+                getFormattedDestination("Amon Sul", "Falls of Rauros") +
+                getFormattedDestination("Amon Sul", "Lorien") +
+                getFormattedDestination("Bree", "Dagorlad (Battle Plains)") +
+                getFormattedDestination("Bree", "Edhellond") +
+                getFormattedDestination("Bree", "Erech") +
+                getFormattedDestination("Bree", "Minas Morgul") +
+                getFormattedDestination("Crossings of Poros", "Ash Mountains") +
+                getFormattedDestination("Crossings of Poros", "The Lonely Mountain") +
+                getFormattedDestination("Edhellond", "Falls of Rauros") +
+                getFormattedDestination("Edoras", "East Bight") +
+                getFormattedDestination("Edoras", "Minas Morgul") +
+                getFormattedDestination("Edoras", "Sea of Rhun") +
+                getFormattedDestination("Erech", "Dagorlad (Battle Plains)") +
+                getFormattedDestination("Erech", "Iron Hills") +
+                getFormattedDestination("Erech", "Minas Morgul") +
+                getFormattedDestination("Eryn Vorn", "Ash Mountains") +
+                getFormattedDestination("Eryn Vorn", "Dol Guldur") +
+                getFormattedDestination("Eryn Vorn", "East Bight") +
+                getFormattedDestination("Eryn Vorn", "The Lonely Mountain") +
+                getFormattedDestination("Ettenmoors", "Edhellond") +
+                getFormattedDestination("Ettenmoors", "Helm's Deep") +
+                getFormattedDestination("Ettenmoors", "Sea of Nurnen") +
+                getFormattedDestination("Ettenmoors", "Sea of Rhun") +
+                getFormattedDestination("Fangorn", "Barad-Dur") +
+                getFormattedDestination("Fangorn", "Sea of Rhun") +
+                getFormattedDestination("Forlindon", "Barad-Dur") +
+                getFormattedDestination("Forlindon", "East Bight") +
+                getFormattedDestination("Forlindon", "Ras Morthil") +
+                getFormattedDestination("Forlindon", "Sea of Nurnen") +
+                getFormattedDestination("Grey Havens", "Ash Mountains") +
+                getFormattedDestination("Grey Havens", "Dagorlad (Battle Plains)") +
+                getFormattedDestination("Grey Havens", "Emyn Muil") +
+                getFormattedDestination("Grey Havens", "Rivendell") +
+                getFormattedDestination("Harlindon", "Iron Hills") +
+                getFormattedDestination("Harlindon", "Isengard") +
+                getFormattedDestination("Harlindon", "Lorien") +
+                getFormattedDestination("Harlindon", "Sea of Nurnen") +
+                getFormattedDestination("Helm's Deep", "Emyn Muil") +
+                getFormattedDestination("Helm's Deep", "The Lonely Mountain") +
+                getFormattedDestination("Hobbiton", "Ash Mountains") +
+                getFormattedDestination("Hobbiton", "Barad-Dur") +
+                getFormattedDestination("Hobbiton", "Dol Guldur") +
+                getFormattedDestination("Hobbiton", "Isengard") +
+                getFormattedDestination("Hobbiton", "The Lonely Mountain") +
+                getFormattedDestination("Iron Hills", "Sea of Nurnen") +
+                getFormattedDestination("Isengard", "Barad-Dur") +
+                getFormattedDestination("Isengard", "Minas Tirith") +
+                getFormattedDestination("Isengard", "The Lonely Mountain") +
+                getFormattedDestination("Lake Evendum", "Edoras") +
+                getFormattedDestination("Lake Evendum", "Falls of Rauros") +
+                getFormattedDestination("Lake Evendum", "Fangorn") +
+                getFormattedDestination("Lake Evendum", "Helm's Deep") +
+                getFormattedDestination("Lake Evendum", "Iron Hills") +
+                getFormattedDestination("Lond Daer", "Crossings of Poros") +
+                getFormattedDestination("Lond Daer", "East Bight") +
+                getFormattedDestination("Lond Daer", "Lorien") +
+                getFormattedDestination("Lond Daer", "Rivendell") +
+                getFormattedDestination("Lorien", "Minas Morgul") +
+                getFormattedDestination("Minas Tirith", "Barad-Dur") +
+                getFormattedDestination("Minas Tirith", "Iron Hills") +
+                getFormattedDestination("Moria's Gate", "East Bight") +
+                getFormattedDestination("Moria's Gate", "Fangorn") +
+                getFormattedDestination("Moria's Gate", "Minas Tirith") +
+                getFormattedDestination("Ras Morthil", "Ash Mountains") +
+                getFormattedDestination("Ras Morthil", "Dol Guldur") +
+                getFormattedDestination("Ras Morthil", "Moria's Gate") +
+                getFormattedDestination("Ras Morthil", "Sea of Rhun") +
+                getFormattedDestination("Rivendell", "Emyn Muil") +
+                getFormattedDestination("Rivindell", "Falls of Rauros") +
+                getFormattedDestination("Tharbad", "Edhellond") +
+                getFormattedDestination("Tharbad", "Emyn Muil") +
+                getFormattedDestination("Tharbad", "Falls of Rauros") +
+                getFormattedDestination("Tharbad", "Sea of Rhun") +
+                getFormattedDestination("Dagorlad (Battle Plains)", "The Lonely Mountain");
+    }
+
+    private String getFormattedDestination(String startCity, String endCity) {
+        return String.format("(%1$s, %2$s, %3$s)",
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '?'",
+                        DatabaseGame.ID,
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME),
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
+                        DatabaseCity.ID,
+                        DatabaseCity.TABLE_NAME,
+                        DatabaseCity.NAME,
+                        startCity),
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
+                        DatabaseCity.ID,
+                        DatabaseCity.TABLE_NAME,
+                        DatabaseCity.NAME,
+                        endCity)
+        );
     }
 }
