@@ -15,24 +15,18 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     public static final String DISCARDED = "discarded";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (" +
-                    "%2$s SERIAL INTEGER NOT NULL," +
+                    "%2$s SERIAL NOT NULL," +
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER," +
-                    "%5$s INTEGER NOT NULL," +
-                    "%6$s INTEGER NOT NULL," +
+                    "%5$s VARCHAR(20) NOT NULL," +
+                    "%6$s VARCHAR(20) NOT NULL," +
                     "%7$s BOOLEAN," +
-                    "PRIMARY KEY %8$s," +
-                    "FOREIGN KEY(%9$s)" +
-                    "   REFERENCES %10$s" +
+                    "PRIMARY KEY(%2$s)," +
+                    "FOREIGN KEY(%3$s)" +
+                    "   REFERENCES %8$s" +
                     "   ON DELETE CASCADE," +
-                    "FOREIGN KEY(%11$s)" +
-                    "   REFERENCES %12$s" +
-                    "   ON DELETE CASCADE," +
-                    "FOREIGN KEY(%13$s)" +
-                    "   REFERENCES %14$s" +
-                    "   ON DELETE CASCADE," +
-                    "FOREIGN KEY(%15$s)" +
-                    "   REFERENCES %16$s" +
+                    "FOREIGN KEY(%4$s)" +
+                    "   REFERENCES %9$s" +
                     "   ON DELETE CASCADE" +
                     ");",
             TABLE_NAME,
@@ -42,15 +36,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             CITY_1,
             CITY_2,
             DISCARDED,
-            ID,
-            GAME_ID,
             DatabaseGame.TABLE_NAME,
-            PLAYER_ID,
-            DatabasePlayer.TABLE_NAME,
-            CITY_1,
-            DatabaseCity.TABLE_NAME,
-            CITY_2,
-            DatabaseCity.TABLE_NAME
+            DatabasePlayer.TABLE_NAME
     );
 
     public DatabaseDestinationCard(String destinationCardID, String gameID, String city1, String city2, String playerID, boolean discarded) {

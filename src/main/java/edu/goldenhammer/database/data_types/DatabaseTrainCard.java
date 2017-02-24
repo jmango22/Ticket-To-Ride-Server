@@ -9,15 +9,15 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     public static final String PLAYER_ID = "player_id";
     public static final String TRAIN_TYPE = "train_type";
     public static final String DISCARDED = "discarded";
-    public static final String TABLE_NAME = "train_cards";
+    public static final String TABLE_NAME = "train_card";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
-                    "    %2$s SERIAL INTEGER NOT NULL,\n" +
+                    "    %2$s SERIAL NOT NULL,\n" +
                     "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER,\n" +
                     "    %5$s VARCHAR(10),\n" +
-                    "    %6$s BOOLEAN,\n" +
-                    "    PRIMARY KEY %1$s,\n" +
+                    "    %6$s BOOLEAN NOT NULL DEFAULT false,\n" +
+                    "    PRIMARY KEY(%2$s),\n" +
                     "    FOREIGN KEY(%3$s)\n" +
                     "      REFERENCES %7$s\n" +
                     "      ON DELETE CASCADE,\n" +

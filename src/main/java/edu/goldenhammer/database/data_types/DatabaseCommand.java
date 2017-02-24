@@ -16,18 +16,18 @@ public class DatabaseCommand implements IDatabaseCommand{
     public static final String VISIBLE_TO_ALL = "visible_to_all";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (" +
-                    "%2$s SERIAL INTEGER NOT NULL," +
+                    "%2$s SERIAL NOT NULL," +
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER NOT NULL," +
                     "%5$s VARCHAR(200) NOT NULL," +
                     "%6$s BOOLEAN NOT NULL," +
                     "%7$s BOOLEAN NOT NULL," +
-                    "PRIMARY KEY %5$s," +
-                    "FOREIGN KEY(%5$s)" +
-                    "   REFERENCES %5$s" +
+                    "PRIMARY KEY(%2$s)," +
+                    "FOREIGN KEY(%3$s)" +
+                    "   REFERENCES %8$s" +
                     "   ON DELETE CASCADE," +
-                    "FOREIGN KEY(%5$s)" +
-                    "   REFERENCES %5$s" +
+                    "FOREIGN KEY(%4$s)" +
+                    "   REFERENCES %9$s" +
                     "   ON DELETE CASCADE" +
                     ");",
             TABLE_NAME,
@@ -37,10 +37,7 @@ public class DatabaseCommand implements IDatabaseCommand{
             METADATA,
             VISIBLE_TO_SELF,
             VISIBLE_TO_ALL,
-            COMMAND_ID,
-            GAME_ID,
             DatabaseGame.TABLE_NAME,
-            PLAYER_ID,
             DatabasePlayer.TABLE_NAME
     );
 

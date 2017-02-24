@@ -485,8 +485,6 @@ public class DatabaseController implements IDatabaseController {
     private void initializeGame(String game_name) {
         setGameStarted(game_name);
         initializeParticipants(game_name);
-        initializeCities();
-        initializeRoutes();
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
     }
@@ -542,33 +540,73 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    private void initializeCities() {
-        final int CITY_COUNT = 4; //modify this
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format(
-                            "CASE WHEN (SELECT count(*) FROM %1$s) != %2$d THEN" +
-                                "DELETE FROM %1$s;" +
-                                "INSERT INTO %1$s(%3$s) VALUES" +
-                                "(The Shire)," +
-                                "(Mordor)," +
-                                "(Minas Tirith)," +
-                                "(Lothlorien)" + //add in more cities here
-                            "END;",
-                    DatabaseCity.TABLE_NAME,
-                    CITY_COUNT,
-                    DatabaseCity.NAME);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void initializeRoutes() {
-    }
-
     private void initializeTrainCards(String game_name) {
+        final int MAX_COLORED_CARDS = 12;
+        final int MAX_WILD_CARDS = 14;
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES",
+                    DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.GAME_ID,
+                    DatabaseTrainCard.TRAIN_TYPE);
+            for(int i = 0; i < 8; i++) {
+                for(int j = 0; j < MAX_COLORED_CARDS; j++) {
+                    sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), ",
+                            DatabaseGame.ID,
+                            DatabaseGame.TABLE_NAME,
+                            DatabaseGame.GAME_NAME
+                    );
+
+                    switch (j) {
+                        case 0:
+                            sqlString += "'red'),";
+                            break;
+                        case 1:
+                            sqlString += "'orange'),";
+                            break;
+                        case 2:
+                            sqlString += "'yellow'),";
+                            break;
+                        case 3:
+                            sqlString += "'green'),";
+                            break;
+                        case 4:
+                            sqlString += "'blue'),";
+                            break;
+                        case 5:
+                            sqlString += "'violet'),";
+                            break;
+                        case 6:
+                            sqlString += "'black'),";
+                            break;
+                        case 7:
+                            sqlString += "'white'),";
+                            break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < MAX_WILD_CARDS; i++) {
+                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), 'wild')",
+                        DatabaseGame.ID,
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME
+                );
+                if(i != MAX_WILD_CARDS - 1) {
+                    sqlString += ",";
+                }
+                else {
+                    sqlString += ";";
+                }
+            }
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            for(int i = 0; i < (MAX_COLORED_CARDS * 8 + MAX_WILD_CARDS); i++) {
+                statement.setString(i, game_name);
+            }
+            statement.execute();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void initializeDestinationCards(String game_name) {

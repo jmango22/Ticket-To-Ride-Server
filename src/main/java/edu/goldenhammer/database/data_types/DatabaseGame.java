@@ -12,8 +12,8 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
     public static final String STARTED = "started";
     public static final String TABLE_NAME = "game";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE if not exists %1$s (\n" +
-                    "    %2$s SERIAL unique,\n" +
+            "CREATE TABLE IF NOT EXISTS %1$s (\n" +
+                    "    %2$s SERIAL UNIQUE,\n" +
                     "    %3$s VARCHAR(20) NOT NULL,\n" +
                     "    %4$s BOOLEAN NOT NULL,\n" +
                     "    PRIMARY KEY(%5$s)" +
@@ -25,7 +25,6 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
         this.name = name;
         this.started = started;
     }
-
 
     public String getID() {
         return id;
