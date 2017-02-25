@@ -10,4 +10,5 @@ public interface IDatabaseDestinationCard {
     String getCity2();
     String getPlayerID();
     boolean isDiscarded();
+    int getPoints();
 }

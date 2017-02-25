@@ -1,27 +1,15 @@
 package edu.goldenhammer.database;
 
-
-
-import edu.goldenhammer.database.data_types.DatabaseParticipants;
-import edu.goldenhammer.model.GameListItem;
-import edu.goldenhammer.model.GameList;
-
-import edu.goldenhammer.database.data_types.IDatabasePlayer;
-import edu.goldenhammer.database.data_types.DatabasePlayer;
-import edu.goldenhammer.database.data_types.DatabaseGame;
-import edu.goldenhammer.model.GameModel;
-import edu.goldenhammer.model.IGameModel;
-
-import java.util.List;
-
+import edu.goldenhammer.database.data_types.*;
+import edu.goldenhammer.model.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -60,9 +48,16 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void ensureTablesCreated() {
-        createTable(DatabasePlayer.CREATE_STMT);
         createTable(DatabaseGame.CREATE_STMT);
+        createTable(DatabasePlayer.CREATE_STMT);
         createTable(DatabaseParticipants.CREATE_STMT);
+        createTable(DatabaseCity.CREATE_STMT);
+        createTable(DatabaseRoute.CREATE_STMT);
+        createTable(DatabaseClaimedRoute.CREATE_STMT);
+        createTable(DatabaseDestinationCard.CREATE_STMT);
+        createTable(DatabaseTrainCard.CREATE_STMT);
+        createTable(DatabaseCommand.CREATE_STMT);
+        createTable(DatabaseMessage.CREATE_STMT);
     }
 
     private void createTable(String sqlStatementString) {
@@ -401,8 +396,6 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public IGameModel playGame(String game_name) {
         try (Connection connection = session.getConnection()) {
-            initializeGame(game_name);
-
             //get the information to make the GameModel object from the database
             String sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
                             "(SELECT %6$s FROM %7$s WHERE %8$s = ?)",
@@ -418,10 +411,13 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
-                return new GameModel(resultSet.getString(DatabaseGame.ID),
+                GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
                         resultSet.getString(DatabaseGame.GAME_NAME),
                         resultSet.getBoolean(DatabaseGame.STARTED),
                         getPlayers(game_name));
+                if(!gameModel.isStarted()){
+                    initializeGame(game_name);
+                }
             }
         } catch(SQLException e){
             e.printStackTrace();
@@ -479,8 +475,6 @@ public class DatabaseController implements IDatabaseController {
     private void initializeGame(String game_name) {
         setGameStarted(game_name);
         initializeParticipants(game_name);
-        initializeCities();
-        initializeRoutes();
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
     }
@@ -502,13 +496,13 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeParticipants(String game_name) {
-        int MAX_TRAIN_COUNT = 30;
+        final int MAX_TRAIN_COUNT = 30;
         List<String> players = getPlayers(game_name);
         try (Connection connection = session.getConnection()){
             for (int i = 0; i < players.size(); i++) {
                 String sqlString = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?" +
                                 " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)" +
-                                " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?)",
+                                " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?);",
                         DatabaseParticipants.TABLE_NAME,
                         DatabaseParticipants.PLAYER_NUMBER,
                         DatabaseParticipants.POINTS,
@@ -528,6 +522,7 @@ public class DatabaseController implements IDatabaseController {
                 PreparedStatement statement = connection.prepareStatement(sqlString);
                 statement.setInt(1, i);
                 statement.setInt(2, MAX_TRAIN_COUNT);
+                statement.executeUpdate();
 
             }
         } catch (SQLException ex) {
@@ -535,19 +530,41 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    private void initializeCities() {
-
-    }
-
-    private void initializeRoutes() {
-
-    }
-
     private void initializeTrainCards(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES %4$s",
+                    DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.GAME_ID,
+                    DatabaseTrainCard.TRAIN_TYPE,
+                    DatabaseTrainCard.getAllTrainCards());
 
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            for(int i = 0; i < ((DatabaseTrainCard.MAX_COLORED_CARDS * 8) + DatabaseTrainCard.MAX_WILD_CARDS); i++) {
+                statement.setString(i + 1, game_name);
+            }
+            statement.execute();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void initializeDestinationCards(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseDestinationCard.CITY_1,
+                    DatabaseDestinationCard.CITY_2,
+                    DatabaseDestinationCard.getAllDestinations());
 
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS; i++) {
+                statement.setString(i + 1, game_name);
+            }
+
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }

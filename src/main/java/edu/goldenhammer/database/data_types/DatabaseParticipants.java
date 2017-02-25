@@ -15,7 +15,7 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
     public static final String TRAINS_LEFT = "trains_left";
 
     public static final String CREATE_STMT = String.format(
-                    "CREATE TABLE if not exists %1$s (\n" +
+                    "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    %2$s INTEGER NOT NULL,\n" +
                     "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER,\n" +
@@ -23,12 +23,12 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
                     "    %6$s INTEGER,\n" +
                     "    PRIMARY KEY(%2$s, %3$s),\n" +
                     "    FOREIGN KEY(%2$s)\n" +
-                    "      references %7$s\n" +
-                    "      on delete CASCADE,\n" +
+                    "      REFERENCES %7$s\n" +
+                    "      ON DELETE CASCADE,\n" +
                     "    FOREIGN KEY(%3$s)\n" +
-                    "      references %8$s\n" +
-                    "      on delete CASCADE\n" +
-                    ")"
+                    "      REFERENCES %8$s\n" +
+                    "      ON DELETE CASCADE\n" +
+                    ");"
             , TABLE_NAME,
             USER_ID,
             GAME_ID,

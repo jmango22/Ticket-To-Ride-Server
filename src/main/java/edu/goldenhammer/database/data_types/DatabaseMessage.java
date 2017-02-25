@@ -11,17 +11,18 @@ public class DatabaseMessage implements IDatabaseMessage {
     public static final String MESSAGE = "message";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (" +
-                    "%2$s SERIAL INTEGER NOT NULL," +
+                    "%2$s SERIAL NOT NULL," +
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER NOT NULL," +
                     "%5$s VARCHAR(120)," +
-                    "PRIMARY KEY %6$s," +
+                    "PRIMARY KEY(%6$s)," +
                     "FOREIGN KEY(%7$s)" +
                     "   REFERENCES %8$s" +
                     "   ON DELETE CASCADE," +
                     "FOREIGN KEY(%9$s)" +
                     "   REFERENCES %10$s" +
-                    "   ON DELETE CASCADE",
+                    "   ON DELETE CASCADE" +
+                    ");",
             TABLE_NAME,
             ID,
             GAME_ID,

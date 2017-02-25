@@ -16,7 +16,7 @@ public class DatabasePlayer implements IDatabasePlayer {
                     "    %4$s VARCHAR(20) NOT NULL,\n" +
                     "    %5$s VARCHAR(20) UNIQUE,\n" +
                     "    PRIMARY KEY(%6$s)\n" +
-                    ")"
+                    ");"
             , TABLE_NAME, ID, USERNAME, PASSWORD, ACCESS_TOKEN, ID);
 
 
