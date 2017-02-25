@@ -19,7 +19,13 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
                     "    %4$s INTEGER NOT NULL,\n" +
                     "    %5$s VARCHAR(10) NOT NULL,\n" +
                     "    %6$s INTEGER NOT NULL,\n" +
-                    "    PRIMARY KEY(2$s)\n" +
+                    "    PRIMARY KEY(%2$s)," +
+                    "    FOREIGN KEY(%3$s)" +
+                    "       REFERENCES %7$s" +
+                    "       ON DELETE CASCADE," +
+                    "    FOREIGN KEY(%4$s)" +
+                    "       REFERENCES %7$s" +
+                    "       ON DELETE CASCADE\n" +
                     ");" +
                     "INSERT INTO %1$s(%3$s, %4$s, %5$s, %6$s) VALUES %7$s",
             TABLE_NAME,
