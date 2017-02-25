@@ -15,8 +15,8 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    %2$s SERIAL NOT NULL,\n" +
-                    "    %3$s VARCHAR(20) NOT NULL,\n" +
-                    "    %4$s VARCHAR(20) NOT NULL,\n" +
+                    "    %3$s INTEGER NOT NULL,\n" +
+                    "    %4$s INTEGER NOT NULL,\n" +
                     "    %5$s VARCHAR(10) NOT NULL,\n" +
                     "    %6$s INTEGER NOT NULL,\n" +
                     "    PRIMARY KEY(2$s)\n" +
