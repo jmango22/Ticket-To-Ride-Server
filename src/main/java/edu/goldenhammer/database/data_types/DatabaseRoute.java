@@ -27,13 +27,14 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
                     "       REFERENCES %7$s" +
                     "       ON DELETE CASCADE\n" +
                     ");" +
-                    "INSERT INTO %1$s(%3$s, %4$s, %5$s, %6$s) VALUES %7$s",
+                    "INSERT INTO %1$s(%3$s, %4$s, %5$s, %6$s) VALUES %8$s",
             TABLE_NAME,
             ID,
             CITY_1,
             CITY_2,
             ROUTE_COLOR,
             ROUTE_LENGTH,
+            DatabaseCity.TABLE_NAME,
             getAllRoutes());
 
     public DatabaseRoute(String id, String city1, String city2, String routeColor, int routeLength) {
