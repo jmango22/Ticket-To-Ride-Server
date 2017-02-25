@@ -5,8 +5,8 @@ package edu.goldenhammer.database.data_types;
  */
 public interface IDatabaseRoute {
     String getID();
-    String  getCity1();
-    String getCity2();
+    int  getCity1();
+    int getCity2();
     String getRouteColor();
     int getRouteLength();
 }

@@ -6,4 +6,6 @@ package edu.goldenhammer.database.data_types;
 public interface IDatabaseCity {
     String getID();
     String getName();
+    double getPointX();
+    double getPointY();
 }

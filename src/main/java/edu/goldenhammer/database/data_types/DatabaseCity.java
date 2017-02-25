@@ -28,17 +28,31 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
             getAllCities()
             );
 
-    public DatabaseCity(String id, String name) {
+    public DatabaseCity(String id, String name, double pointX, double pointY) {
         this.id = id;
         this.name = name;
+        this.pointX = pointX;
+        this.pointY = pointY;
     }
 
+    @Override
     public String getID() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public double getPointX() {
+        return pointX;
+    }
+
+    @Override
+    public double getPointY() {
+        return pointY;
     }
 
     public static String columnNames() {
@@ -94,4 +108,6 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     private String id;
     private String name;
+    private double pointX;
+    private double pointY;
 }

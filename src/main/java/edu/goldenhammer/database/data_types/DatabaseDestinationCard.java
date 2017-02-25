@@ -1,7 +1,5 @@
 package edu.goldenhammer.database.data_types;
 
-import javax.xml.crypto.Data;
-
 /**
  * Created by seanjib on 2/22/2017.
  */
@@ -19,8 +17,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                     "%2$s SERIAL NOT NULL," +
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER," +
-                    "%5$s VARCHAR(20) NOT NULL," +
-                    "%6$s VARCHAR(20) NOT NULL," +
+                    "%5$s INTEGER NOT NULL," +
+                    "%6$s INTEGER NOT NULL," +
                     "%7$s BOOLEAN NOT NULL DEFAULT false," +
                     "PRIMARY KEY(%2$s)," +
                     "FOREIGN KEY(%3$s)" +
@@ -28,10 +26,16 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                     "   ON DELETE CASCADE," +
                     "FOREIGN KEY(%4$s)" +
                     "   REFERENCES %9$s" +
+                    "   ON DELETE CASCADE," +
+                    "FOREIGN KEY (%5$s)" +
+                    "   REFERENCES %10$s" +
+                    "   ON DELETE CASCADE," +
+                    "FOREIGN KEY (%6$s)" +
+                    "   REFERENCES %10$s" +
                     "   ON DELETE CASCADE" +
                     ");" +
             "INSERT INTO %1$s(%3$s, %5$s, %6$s, %7$s) VALUES " +
-                    "%10$s;",
+                    "%11$s;",
             TABLE_NAME,
             ID,
             GAME_ID,
@@ -41,16 +45,19 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             DISCARDED,
             DatabaseGame.TABLE_NAME,
             DatabasePlayer.TABLE_NAME,
+            DatabaseCity.TABLE_NAME,
             getAllDestinations()
     );
 
-    public DatabaseDestinationCard(String destinationCardID, String gameID, String city1, String city2, String playerID, boolean discarded) {
+    public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
+                                   String playerID, boolean discarded, int points) {
         this.destinationCardID = destinationCardID;
         this.gameID = gameID;
         this.playerID = playerID;
         this.city1 = city1;
         this.city2 = city2;
         this.discarded = discarded;
+        this.points = points;
     }
 
     @Override
@@ -69,12 +76,12 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     }
 
     @Override
-    public String getCity1() {
+    public int getCity1() {
         return city1;
     }
 
     @Override
-    public String getCity2() {
+    public int getCity2() {
         return city2;
     }
 
@@ -171,7 +178,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
 
     private static String getFormattedDestination(String startCity, String endCity, int points) {
         return String.format("(%1$s, %2$s, %3$s, %4$s),",
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '?'",
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '?')",
                         DatabaseGame.ID,
                         DatabaseGame.TABLE_NAME,
                         DatabaseGame.GAME_NAME),
@@ -192,8 +199,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     private String destinationCardID;
     private String gameID;
     private String playerID;
-    private String city1;
-    private String city2;
+    private int city1;
+    private int city2;
     private boolean discarded;
     private int points;
 }
