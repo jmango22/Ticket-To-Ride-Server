@@ -4,6 +4,8 @@ package edu.goldenhammer.database.data_types;
  * Created by seanjib on 2/19/2017.
  */
 public class DatabaseTrainCard implements IDatabaseTrainCard {
+    public static final int MAX_COLORED_CARDS = 12;
+    public static final int MAX_WILD_CARDS = 14;
     public static final String ID = "train_card_id";
     public static final String GAME_ID = "game_id";
     public static final String PLAYER_ID = "player_id";
@@ -67,6 +69,61 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     @Override
     public boolean isDiscarded() {
         return discarded;
+    }
+
+    public static String getAllTrainCards() {
+        String sqlString = "";
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < MAX_COLORED_CARDS; j++) {
+                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), ",
+                        DatabaseGame.ID,
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME
+                );
+
+                switch (i) {
+                    case 0:
+                        sqlString += "'red'),";
+                        break;
+                    case 1:
+                        sqlString += "'orange'),";
+                        break;
+                    case 2:
+                        sqlString += "'yellow'),";
+                        break;
+                    case 3:
+                        sqlString += "'green'),";
+                        break;
+                    case 4:
+                        sqlString += "'blue'),";
+                        break;
+                    case 5:
+                        sqlString += "'violet'),";
+                        break;
+                    case 6:
+                        sqlString += "'black'),";
+                        break;
+                    case 7:
+                        sqlString += "'white'),";
+                        break;
+                }
+            }
+        }
+
+        for(int i = 0; i < MAX_WILD_CARDS; i++) {
+            sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), 'wild')",
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME
+            );
+            if(i != MAX_WILD_CARDS - 1) {
+                sqlString += ",";
+            }
+            else {
+                sqlString += ";";
+            }
+        }
+        return sqlString;
     }
 
     private String id;

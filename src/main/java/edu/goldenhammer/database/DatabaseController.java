@@ -1,25 +1,15 @@
 package edu.goldenhammer.database;
 
-
-
 import edu.goldenhammer.database.data_types.*;
-import edu.goldenhammer.model.GameListItem;
-import edu.goldenhammer.model.GameList;
-
-import edu.goldenhammer.model.GameModel;
-import edu.goldenhammer.model.IGameModel;
-
-import java.util.List;
-
+import edu.goldenhammer.model.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 
 /**
@@ -58,16 +48,16 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void ensureTablesCreated() {
-        createTable(DatabaseCity.CREATE_STMT);
-        createTable(DatabaseClaimedRoute.CREATE_STMT);
-        createTable(DatabaseCommand.CREATE_STMT);
-        createTable(DatabaseDestinationCard.CREATE_STMT);
         createTable(DatabaseGame.CREATE_STMT);
-        createTable(DatabaseMessage.CREATE_STMT);
-        createTable(DatabaseParticipants.CREATE_STMT);
         createTable(DatabasePlayer.CREATE_STMT);
+        createTable(DatabaseParticipants.CREATE_STMT);
+        createTable(DatabaseCity.CREATE_STMT);
         createTable(DatabaseRoute.CREATE_STMT);
+        createTable(DatabaseClaimedRoute.CREATE_STMT);
+        createTable(DatabaseDestinationCard.CREATE_STMT);
         createTable(DatabaseTrainCard.CREATE_STMT);
+        createTable(DatabaseCommand.CREATE_STMT);
+        createTable(DatabaseMessage.CREATE_STMT);
     }
 
     private void createTable(String sqlStatementString) {
@@ -541,65 +531,15 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeTrainCards(String game_name) {
-        final int MAX_COLORED_CARDS = 12;
-        final int MAX_WILD_CARDS = 14;
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES %4$s",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
-                    DatabaseTrainCard.TRAIN_TYPE);
-            for(int i = 0; i < 8; i++) {
-                for(int j = 0; j < MAX_COLORED_CARDS; j++) {
-                    sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), ",
-                            DatabaseGame.ID,
-                            DatabaseGame.TABLE_NAME,
-                            DatabaseGame.GAME_NAME
-                    );
+                    DatabaseTrainCard.TRAIN_TYPE,
+                    DatabaseTrainCard.getAllTrainCards());
 
-                    switch (i) {
-                        case 0:
-                            sqlString += "'red'),";
-                            break;
-                        case 1:
-                            sqlString += "'orange'),";
-                            break;
-                        case 2:
-                            sqlString += "'yellow'),";
-                            break;
-                        case 3:
-                            sqlString += "'green'),";
-                            break;
-                        case 4:
-                            sqlString += "'blue'),";
-                            break;
-                        case 5:
-                            sqlString += "'violet'),";
-                            break;
-                        case 6:
-                            sqlString += "'black'),";
-                            break;
-                        case 7:
-                            sqlString += "'white'),";
-                            break;
-                    }
-                }
-            }
-
-            for(int i = 0; i < MAX_WILD_CARDS; i++) {
-                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), 'wild')",
-                        DatabaseGame.ID,
-                        DatabaseGame.TABLE_NAME,
-                        DatabaseGame.GAME_NAME
-                );
-                if(i != MAX_WILD_CARDS - 1) {
-                    sqlString += ",";
-                }
-                else {
-                    sqlString += ";";
-                }
-            }
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            for(int i = 0; i < ((MAX_COLORED_CARDS * 8) + MAX_WILD_CARDS); i++) {
+            for(int i = 0; i < ((DatabaseTrainCard.MAX_COLORED_CARDS * 8) + DatabaseTrainCard.MAX_WILD_CARDS); i++) {
                 statement.setString(i + 1, game_name);
             }
             statement.execute();
@@ -610,120 +550,21 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeDestinationCards(String game_name) {
-        final int MAX_DESTINATION_CARDS = 76;
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.GAME_ID,
                     DatabaseDestinationCard.CITY_1,
                     DatabaseDestinationCard.CITY_2,
-                    getAllDestinations());
+                    DatabaseDestinationCard.getAllDestinations());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            for(int i = 0; i < MAX_DESTINATION_CARDS; i++) {
+            for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS; i++) {
                 statement.setString(i + 1, game_name);
             }
 
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-    }
-
-    private String getAllDestinations() {
-        return getFormattedDestination("Amon Sul", "Crossings of Poros") +
-                getFormattedDestination("Amon Sul", "Dol Guldur") +
-                getFormattedDestination("Amon Sul", "Falls of Rauros") +
-                getFormattedDestination("Amon Sul", "Lorien") +
-                getFormattedDestination("Bree", "Dagorlad (Battle Plains)") +
-                getFormattedDestination("Bree", "Edhellond") +
-                getFormattedDestination("Bree", "Erech") +
-                getFormattedDestination("Bree", "Minas Morgul") +
-                getFormattedDestination("Crossings of Poros", "Ash Mountains") +
-                getFormattedDestination("Crossings of Poros", "The Lonely Mountain") +
-                getFormattedDestination("Edhellond", "Falls of Rauros") +
-                getFormattedDestination("Edoras", "East Bight") +
-                getFormattedDestination("Edoras", "Minas Morgul") +
-                getFormattedDestination("Edoras", "Sea of Rhun") +
-                getFormattedDestination("Erech", "Dagorlad (Battle Plains)") +
-                getFormattedDestination("Erech", "Iron Hills") +
-                getFormattedDestination("Erech", "Minas Morgul") +
-                getFormattedDestination("Eryn Vorn", "Ash Mountains") +
-                getFormattedDestination("Eryn Vorn", "Dol Guldur") +
-                getFormattedDestination("Eryn Vorn", "East Bight") +
-                getFormattedDestination("Eryn Vorn", "The Lonely Mountain") +
-                getFormattedDestination("Ettenmoors", "Edhellond") +
-                getFormattedDestination("Ettenmoors", "Helm's Deep") +
-                getFormattedDestination("Ettenmoors", "Sea of Nurnen") +
-                getFormattedDestination("Ettenmoors", "Sea of Rhun") +
-                getFormattedDestination("Fangorn", "Barad-Dur") +
-                getFormattedDestination("Fangorn", "Sea of Rhun") +
-                getFormattedDestination("Forlindon", "Barad-Dur") +
-                getFormattedDestination("Forlindon", "East Bight") +
-                getFormattedDestination("Forlindon", "Ras Morthil") +
-                getFormattedDestination("Forlindon", "Sea of Nurnen") +
-                getFormattedDestination("Grey Havens", "Ash Mountains") +
-                getFormattedDestination("Grey Havens", "Dagorlad (Battle Plains)") +
-                getFormattedDestination("Grey Havens", "Emyn Muil") +
-                getFormattedDestination("Grey Havens", "Rivendell") +
-                getFormattedDestination("Harlindon", "Iron Hills") +
-                getFormattedDestination("Harlindon", "Isengard") +
-                getFormattedDestination("Harlindon", "Lorien") +
-                getFormattedDestination("Harlindon", "Sea of Nurnen") +
-                getFormattedDestination("Helm's Deep", "Emyn Muil") +
-                getFormattedDestination("Helm's Deep", "The Lonely Mountain") +
-                getFormattedDestination("Hobbiton", "Ash Mountains") +
-                getFormattedDestination("Hobbiton", "Barad-Dur") +
-                getFormattedDestination("Hobbiton", "Dol Guldur") +
-                getFormattedDestination("Hobbiton", "Isengard") +
-                getFormattedDestination("Hobbiton", "The Lonely Mountain") +
-                getFormattedDestination("Iron Hills", "Sea of Nurnen") +
-                getFormattedDestination("Isengard", "Barad-Dur") +
-                getFormattedDestination("Isengard", "Minas Tirith") +
-                getFormattedDestination("Isengard", "The Lonely Mountain") +
-                getFormattedDestination("Lake Evendum", "Edoras") +
-                getFormattedDestination("Lake Evendum", "Falls of Rauros") +
-                getFormattedDestination("Lake Evendum", "Fangorn") +
-                getFormattedDestination("Lake Evendum", "Helm's Deep") +
-                getFormattedDestination("Lake Evendum", "Iron Hills") +
-                getFormattedDestination("Lond Daer", "Crossings of Poros") +
-                getFormattedDestination("Lond Daer", "East Bight") +
-                getFormattedDestination("Lond Daer", "Lorien") +
-                getFormattedDestination("Lond Daer", "Rivendell") +
-                getFormattedDestination("Lorien", "Minas Morgul") +
-                getFormattedDestination("Minas Tirith", "Barad-Dur") +
-                getFormattedDestination("Minas Tirith", "Iron Hills") +
-                getFormattedDestination("Moria's Gate", "East Bight") +
-                getFormattedDestination("Moria's Gate", "Fangorn") +
-                getFormattedDestination("Moria's Gate", "Minas Tirith") +
-                getFormattedDestination("Ras Morthil", "Ash Mountains") +
-                getFormattedDestination("Ras Morthil", "Dol Guldur") +
-                getFormattedDestination("Ras Morthil", "Moria's Gate") +
-                getFormattedDestination("Ras Morthil", "Sea of Rhun") +
-                getFormattedDestination("Rivendell", "Emyn Muil") +
-                getFormattedDestination("Rivindell", "Falls of Rauros") +
-                getFormattedDestination("Tharbad", "Edhellond") +
-                getFormattedDestination("Tharbad", "Emyn Muil") +
-                getFormattedDestination("Tharbad", "Falls of Rauros") +
-                getFormattedDestination("Tharbad", "Sea of Rhun") +
-                getFormattedDestination("Dagorlad (Battle Plains)", "The Lonely Mountain");
-    }
-
-    private String getFormattedDestination(String startCity, String endCity) {
-        return String.format("(%1$s, %2$s, %3$s)",
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '?'",
-                        DatabaseGame.ID,
-                        DatabaseGame.TABLE_NAME,
-                        DatabaseGame.GAME_NAME),
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME,
-                        startCity),
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME,
-                        endCity)
-        );
     }
 }
