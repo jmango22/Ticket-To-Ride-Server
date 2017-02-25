@@ -18,3 +18,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+task execute(type:JavaExec) {
+    main = 'edu.goldenhammer.server.ServerCommunicator'
+    classpath = sourceSets.main.runtimeClasspath
+}

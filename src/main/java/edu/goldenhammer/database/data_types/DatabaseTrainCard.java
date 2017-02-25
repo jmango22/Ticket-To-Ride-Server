@@ -1,5 +1,8 @@
 package edu.goldenhammer.database.data_types;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by seanjib on 2/19/2017.
  */
@@ -124,6 +127,16 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
             }
         }
         return sqlString;
+    }
+
+    public static DatabaseTrainCard buildTrainCardFromResultSet(ResultSet resultSet) throws SQLException{
+        return new DatabaseTrainCard(
+                resultSet.getString(ID),
+                resultSet.getString(GAME_ID),
+                resultSet.getString(PLAYER_ID),
+                resultSet.getString(TRAIN_TYPE),
+                resultSet.getBoolean(DISCARDED)
+        );
     }
 
     private String id;

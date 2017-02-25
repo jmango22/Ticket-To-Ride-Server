@@ -7,6 +7,7 @@ import java.util.List;
  * Created by seanjib on 2/3/2017.
  */
 public class DatabaseParticipants implements IDatabaseParticipants, Serializable {
+    public static final int MAX_TRAIN_COUNT = 30;
     public static final String TABLE_NAME = "participants";
     public static final String USER_ID = "user_id";
     public static final String GAME_ID = "game_id";

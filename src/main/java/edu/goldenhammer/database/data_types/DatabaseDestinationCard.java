@@ -12,30 +12,30 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     public static final String CITY_1 = "city_1";
     public static final String CITY_2 = "city_2";
     public static final String DISCARDED = "discarded";
+    public static final String POINTS = "points";
     public static final String CREATE_STMT = String.format(
-            "CREATE TABLE IF NOT EXISTS %1$s (" +
-                    "%2$s SERIAL NOT NULL," +
-                    "%3$s INTEGER NOT NULL," +
-                    "%4$s INTEGER," +
-                    "%5$s INTEGER NOT NULL," +
-                    "%6$s INTEGER NOT NULL," +
-                    "%7$s BOOLEAN NOT NULL DEFAULT false," +
-                    "PRIMARY KEY(%2$s)," +
+            "CREATE TABLE IF NOT EXISTS %1$s (\n" +
+                    "%2$s SERIAL NOT NULL,\n" +
+                    "%3$s INTEGER NOT NULL,\n" +
+                    "%4$s INTEGER,\n" +
+                    "%5$s INTEGER NOT NULL,\n" +
+                    "%6$s INTEGER NOT NULL,\n" +
+                    "%7$s BOOLEAN NOT NULL DEFAULT false,\n" +
+                    "%8$s INTEGER NOT NULL," +
+                    "PRIMARY KEY(%2$s),\n" +
                     "FOREIGN KEY(%3$s)" +
-                    "   REFERENCES %8$s" +
-                    "   ON DELETE CASCADE," +
-                    "FOREIGN KEY(%4$s)" +
                     "   REFERENCES %9$s" +
-                    "   ON DELETE CASCADE," +
+                    "   ON DELETE CASCADE,\n" +
+                    "FOREIGN KEY(%4$s)" +
+                    "   REFERENCES %10$s" +
+                    "   ON DELETE CASCADE,\n" +
                     "FOREIGN KEY (%5$s)" +
-                    "   REFERENCES %10$s" +
-                    "   ON DELETE CASCADE," +
+                    "   REFERENCES %11$s" +
+                    "   ON DELETE CASCADE,\n" +
                     "FOREIGN KEY (%6$s)" +
-                    "   REFERENCES %10$s" +
-                    "   ON DELETE CASCADE" +
-                    ");" +
-            "INSERT INTO %1$s(%3$s, %5$s, %6$s, %7$s) VALUES " +
-                    "%11$s;",
+                    "   REFERENCES %11$s" +
+                    "   ON DELETE CASCADE\n" +
+                    ");",
             TABLE_NAME,
             ID,
             GAME_ID,
@@ -43,10 +43,10 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             CITY_1,
             CITY_2,
             DISCARDED,
+            POINTS,
             DatabaseGame.TABLE_NAME,
             DatabasePlayer.TABLE_NAME,
-            DatabaseCity.TABLE_NAME,
-            getAllDestinations()
+            DatabaseCity.TABLE_NAME
     );
 
     public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
@@ -119,7 +119,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 getFormattedDestination("Eryn Vorn", "East Bight", 10) +
                 getFormattedDestination("Eryn Vorn", "The Lonely Mountain", 13) +
                 getFormattedDestination("Ettenmoors", "Edhellond", 10) +
-                getFormattedDestination("Ettenmoors", "Helm's Deep", 8) +
+                getFormattedDestination("Ettenmoors", "Helm''s Deep", 8) +
                 getFormattedDestination("Ettenmoors", "Sea of Nurnen", 15) +
                 getFormattedDestination("Ettenmoors", "Sea of Rhun", 13) +
                 getFormattedDestination("Fangorn", "Barad-Dur", 6) +
@@ -136,8 +136,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 getFormattedDestination("Harlindon", "Isengard", 8) +
                 getFormattedDestination("Harlindon", "Lorien", 9) +
                 getFormattedDestination("Harlindon", "Sea of Nurnen", 20) +
-                getFormattedDestination("Helm's Deep", "Emyn Muil", 4) +
-                getFormattedDestination("Helm's Deep", "The Lonely Mountain", 11) +
+                getFormattedDestination("Helm''s Deep", "Emyn Muil", 4) +
+                getFormattedDestination("Helm''s Deep", "The Lonely Mountain", 11) +
                 getFormattedDestination("Hobbiton", "Ash Mountains", 16) +
                 getFormattedDestination("Hobbiton", "Barad-Dur", 16) +
                 getFormattedDestination("Hobbiton", "Dol Guldur", 9) +
@@ -150,7 +150,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 getFormattedDestination("Lake Evendum", "Edoras", 11) +
                 getFormattedDestination("Lake Evendum", "Falls of Rauros", 12) +
                 getFormattedDestination("Lake Evendum", "Fangorn", 9) +
-                getFormattedDestination("Lake Evendum", "Helm's Deep", 9) +
+                getFormattedDestination("Lake Evendum", "Helm''s Deep", 9) +
                 getFormattedDestination("Lake Evendum", "Iron Hills", 14) +
                 getFormattedDestination("Lond Daer", "Crossings of Poros", 11) +
                 getFormattedDestination("Lond Daer", "East Bight", 10) +
@@ -159,12 +159,12 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 getFormattedDestination("Lorien", "Minas Morgul", 7) +
                 getFormattedDestination("Minas Tirith", "Barad-Dur", 3) +
                 getFormattedDestination("Minas Tirith", "Iron Hills", 14) +
-                getFormattedDestination("Moria's Gate", "East Bight", 5) +
-                getFormattedDestination("Moria's Gate", "Fangorn", 4) +
-                getFormattedDestination("Moria's Gate", "Minas Tirith", 8) +
+                getFormattedDestination("Moria''s Gate", "East Bight", 5) +
+                getFormattedDestination("Moria''s Gate", "Fangorn", 4) +
+                getFormattedDestination("Moria''s Gate", "Minas Tirith", 8) +
                 getFormattedDestination("Ras Morthil", "Ash Mountains", 13) +
                 getFormattedDestination("Ras Morthil", "Dol Guldur", 10) +
-                getFormattedDestination("Ras Morthil", "Moria's Gate", 8) +
+                getFormattedDestination("Ras Morthil", "Moria''s Gate", 8) +
                 getFormattedDestination("Ras Morthil", "Sea of Rhun", 16) +
                 getFormattedDestination("Rivendell", "Emyn Muil", 6) +
                 getFormattedDestination("Rivindell", "Falls of Rauros", 7) +
@@ -173,11 +173,11 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 getFormattedDestination("Tharbad", "Falls of Rauros", 8) +
                 getFormattedDestination("Tharbad", "Sea of Rhun", 15) +
                 getFormattedDestination("Dagorlad (Battle Plains)", "The Lonely Mountain", 8);
-        return formattedDestination.substring(0, formattedDestination.length() - 1);
+        return formattedDestination.substring(0, formattedDestination.length() - 2);
     }
 
     private static String getFormattedDestination(String startCity, String endCity, int points) {
-        return String.format("(%1$s, %2$s, %3$s, %4$s),",
+        return String.format("(%1$s, %2$s, %3$s, %4$s),\n",
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '?')",
                         DatabaseGame.ID,
                         DatabaseGame.TABLE_NAME,

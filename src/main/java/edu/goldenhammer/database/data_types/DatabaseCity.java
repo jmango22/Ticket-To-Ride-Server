@@ -80,7 +80,7 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
                 getFormattedCity("Forlindon", 0, 0) +
                 getFormattedCity("Grey Havens", 0, 0) +
                 getFormattedCity("Harlindon", 0, 0) +
-                getFormattedCity("Helm's Deep", 0, 0) +
+                getFormattedCity("Helm''s Deep", 0, 0) +
                 getFormattedCity("Hobbiton", 0, 0) +
                 getFormattedCity("Iron Hills", 0, 0) +
                 getFormattedCity("Isengard", 0, 0) +
@@ -89,7 +89,7 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
                 getFormattedCity("Lorien", 0, 0) +
                 getFormattedCity("Minas Morgul", 0, 0) +
                 getFormattedCity("Minas Tirith", 0, 0) +
-                getFormattedCity("Moria's Gate", 0, 0) +
+                getFormattedCity("Moria''s Gate", 0, 0) +
                 getFormattedCity("Ras Morthil", 0, 0) +
                 getFormattedCity("Rivendell", 0, 0) +
                 getFormattedCity("Sea of Nurnen", 0, 0) +
@@ -100,7 +100,7 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
     }
 
     public static String getFormattedCity(String cityName, double pointX, double pointY) {
-        return String.format("('%1', %2, %3),",
+        return String.format("('%1$s', %2$f, %3$f),",
                 cityName,
                 pointX,
                 pointY);
