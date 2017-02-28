@@ -41,7 +41,12 @@ public abstract class HandlerBase implements HttpHandler {
         String username = exchange.getRequestHeaders().get("Username").get(0);
         DatabaseController dbc = DatabaseController.getInstance();
         IDatabasePlayer player = dbc.getPlayerInfo(username);
-        return player.getAccessToken().equals(access_token);
+        if(player == null) {
+            return false;
+        }
+        else {
+            return access_token.equals(player.getAccessToken());
+        }
     }
 
     protected Results getInvalidAuthorizationResults() {

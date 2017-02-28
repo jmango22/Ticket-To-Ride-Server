@@ -48,12 +48,12 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void ensureTablesCreated() {
-        //createTable(DatabaseGame.CREATE_STMT);
-        //createTable(DatabasePlayer.CREATE_STMT);
-        //createTable(DatabaseParticipants.CREATE_STMT);
-        //createTable(DatabaseCity.CREATE_STMT);
-        //createTable(DatabaseRoute.CREATE_STMT);
-        //createTable(DatabaseClaimedRoute.CREATE_STMT);
+        createTable(DatabaseGame.CREATE_STMT);
+        createTable(DatabasePlayer.CREATE_STMT);
+        createTable(DatabaseParticipants.CREATE_STMT);
+        createTable(DatabaseCity.CREATE_STMT);
+        createTable(DatabaseRoute.CREATE_STMT);
+        createTable(DatabaseClaimedRoute.CREATE_STMT);
         createTable(DatabaseDestinationCard.CREATE_STMT);
         createTable(DatabaseTrainCard.CREATE_STMT);
         createTable(DatabaseCommand.CREATE_STMT);
@@ -125,7 +125,7 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames() {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s" +
+            String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s " +
                             "NATURAL JOIN %6$s WHERE %7$s = false ORDER BY %8$s",
                     DatabaseParticipants.columnNames(),
                     DatabaseGame.GAME_NAME,
@@ -267,41 +267,50 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public Boolean joinGame(String player_name, String game_name) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format(" INSERT INTO %1$s (%2$s, %3$s) " +
-                            "(SELECT %4$s.%5$s, %6$s.%7$s FROM %8$s, %9$s " +
-                            "WHERE %10$s.%11$s = ? AND %12$s.%13$s = ? AND " +
-                            "5 > (SELECT count(*) FROM %14$s WHERE %15$s IN " +
-                            "(SELECT %16$s FROM %17$s WHERE %18$s = ?)) );",
+            String sqlString = String.format("SELECT count(*) FROM (\n" +
+                    "SELECT * FROM %1$s INNER JOIN (\n" +
+                    "SELECT %2$s FROM %3$s WHERE %4$s = ?\n" +
+                    ") AS game_ids ON (%1$s.%5$s = game_ids.%2$s)\n" +
+                    ") AS participant_count;",
                     DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.USER_ID,
-                    DatabaseParticipants.GAME_ID,
-
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabasePlayer.TABLE_NAME,
-
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.TABLE_NAME,
-
-                    DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.GAME_ID,
 
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME
-                    );
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseParticipants.GAME_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1,player_name);
-            statement.setString(2,game_name);
-            statement.setString(3,game_name);
-            statement.execute();
-            return true;
-            //TODO: make this function return if it was entered not if it executed
+            statement.setString(1,game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                int currentParticipantsCount = resultSet.getInt(1);
+                if(currentParticipantsCount < 5) {
+                    sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s)" +
+                            "VALUES (" +
+                                    "(SELECT %4$s FROM %5$s WHERE %6$s = ?)," +
+                                    "(SELECT %7$s FROM %8$s WHERE %9$s =  ?)" +
+                            ");",
+                            DatabaseParticipants.TABLE_NAME,
+                            DatabaseParticipants.USER_ID,
+                            DatabaseParticipants.GAME_ID,
+
+                            DatabasePlayer.ID,
+                            DatabasePlayer.TABLE_NAME,
+                            DatabasePlayer.USERNAME,
+
+                            DatabaseGame.ID,
+                            DatabaseGame.TABLE_NAME,
+                            DatabaseGame.GAME_NAME);
+                    statement = connection.prepareStatement(sqlString);
+                    statement.setString(1, player_name);
+                    statement.setString(2, game_name);
+
+                    return (statement.executeUpdate() != 0);
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

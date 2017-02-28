@@ -14,7 +14,7 @@ public class DatabaseGame implements IDatabaseGame, Serializable {
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    %2$s SERIAL UNIQUE,\n" +
-                    "    %3$s VARCHAR(20) NOT NULL,\n" +
+                    "    %3$s VARCHAR(20) UNIQUE NOT NULL,\n" +
                     "    %4$s BOOLEAN NOT NULL,\n" +
                     "    PRIMARY KEY(%5$s)" +
                     ");"
