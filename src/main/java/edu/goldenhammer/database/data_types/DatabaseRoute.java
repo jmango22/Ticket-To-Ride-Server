@@ -72,107 +72,107 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
 
     private static String getAllRoutes() {
         String formattedRoute =
-                getFormattedRoute("Amon Sul", "Bree", "gray", 1) +
-                getFormattedRoute("Amon Sul", "Bree", "gray", 1) +
-                getFormattedRoute("Amon Sul", "Ettenmoors", "red", 3) +
-                getFormattedRoute("Amon Sul", "Rivendell", "gray", 2) +
-                getFormattedRoute("Amon Sul", "Rivendell", "gray", 2) +
-                getFormattedRoute("Amon Sul", "Tharbad", "orange", 2) +
-                getFormattedRoute("Ash Mountains", "Barad Dur", "red", 2) +
-                getFormattedRoute("Ash Mountains", "Sea of Nurnen", "gray", 4) +
-                getFormattedRoute("Ash Mountains", "Sea of Rhun", "blue", 4) +
-                getFormattedRoute("Barad Dur", "Dagorlad (Battle Plains)", "blue", 2) +
-                getFormattedRoute("Barad Dur", "Dagorlad (Battle Plains)", "yellow", 2) +
-                getFormattedRoute("Barad Dur", "Minas Morgul", "gray", 2) +
-                getFormattedRoute("Barad Dur", "Minas Morgul", "gray", 2) +
-                getFormattedRoute("Barad Dur", "Sea of Nurnen", "white", 4) +
-                getFormattedRoute("Barad Dur", "Sea of Rhun", "orange", 5) +
-                getFormattedRoute("Bree", "Hobbiton", "gray", 2) +
-                getFormattedRoute("Bree", "Hobbiton", "gray", 2) +
-                getFormattedRoute("Bree", "Lake Evendim", "black", 2) +
-                getFormattedRoute("Bree", "Lake Evendim", "white", 2) +
-                getFormattedRoute("Bree", "Tharbad", "gray", 2) +
-                getFormattedRoute("Crossings of Poros", "Edhellond", "orange", 4) +
-                getFormattedRoute("Crossings of Poros", "Minas Morgul", "green", 2) +
-                getFormattedRoute("Crossings of Poros", "Minas Tirith", "yellow", 2) +
-                getFormattedRoute("Crossings of Poros", "Sea of Nurnen", "violet", 4) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Dol Guldur", "gray", 3) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Emyn Muil", "black", 2) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Emyn Muil", "orange", 2) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Falls of Rauros", "white", 2) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Minas Morgul", "gray", 2) +
-                getFormattedRoute("Dagorlad (Battle Plains)", "Sea of Rhun", "green", 6) +
-                getFormattedRoute("Dol Guldur", "East Bight", "yellow", 1) +
-                getFormattedRoute("Dol Guldur", "Emyn Muil", "red", 2) +
-                getFormattedRoute("Dol Guldur", "Lorien", "black", 2) +
-                getFormattedRoute("East Bight", "Iron Hills", "red", 6) +
-                getFormattedRoute("East Bight", "Lorien", "green", 3) +
-                getFormattedRoute("East Bight", "Rivendell", "orange", 5) +
-                getFormattedRoute("East Bight", "Sea of Rhun", "violet", 6) +
-                getFormattedRoute("East Bight", "The Lonely Mountain", "blue", 4) +
-                getFormattedRoute("Edhellond", "Erech", "green", 1) +
-                getFormattedRoute("Edhellond", "Minas Tirith", "black", 4) +
-                getFormattedRoute("Edhellond", "Ras Morthil", "black", 5) +
-                getFormattedRoute("Edoras", "Erech", "white", 1) +
-                getFormattedRoute("Edoras", "Falls of Rauros", "black", 2) +
-                getFormattedRoute("Edoras", "Helm''s Deep", "gray", 1) +
-                getFormattedRoute("Edoras", "Helm''s Deep", "gray", 1) +
-                getFormattedRoute("Edoras", "Fangorn", "yellow", 2) +
-                getFormattedRoute("Edoras", "Minas Tirith", "violet", 3) +
-                getFormattedRoute("Edoras", "Minas Tirith", "red", 3) +
-                getFormattedRoute("Emyn Muil", "Falls of Rauros", "gray", 1) +
-                getFormattedRoute("Emyn Muil", "Falls of Rauros", "gray", 1) +
-                getFormattedRoute("Emyn Muil", "Fangorn", "gray", 2) +
-                getFormattedRoute("Emyn Muil", "Fangorn", "gray", 2) +
-                getFormattedRoute("Erech", "Helm''s Deep", "orange", 1) +
-                getFormattedRoute("Erech", "Ras Morthil", "blue", 2) +
-                getFormattedRoute("Eryn Vorn", "Harlindon", "blue", 2) +
-                getFormattedRoute("Eryn Vorn", "Hobbiton", "black", 3) +
-                getFormattedRoute("Eryn Vorn", "Tharbad", "red", 3) +
-                getFormattedRoute("Eryn Vorn", "Lond Daer", "green", 3) +
-                getFormattedRoute("Ettenmoors", "Lake Evendim", "orange", 6) +
-                getFormattedRoute("Ettenmoors", "Rivendell", "blue", 2) +
-                getFormattedRoute("Ettenmoors", "Rivendell", "green", 2) +
-                getFormattedRoute("Ettenmoors", "The Lonely Mountain", "gray", 6) +
-                getFormattedRoute("Falls of Rauros", "Minas Tirith", "gray", 1) +
-                getFormattedRoute("Falls of Rauros", "Minas Tirith", "gray", 1) +
-                getFormattedRoute("Fangorn", "Helm''s Deep", "white", 2) +
-                getFormattedRoute("Fangorn", "Isengard", "black", 2) +
-                getFormattedRoute("Fangorn", "Isengard", "green", 2) +
-                getFormattedRoute("Fangorn", "Lorien", "gray", 2) +
-                getFormattedRoute("Fangorn", "Lorien", "gray", 2) +
-                getFormattedRoute("Forlindon", "Grey Havens", "violet", 2) +
-                getFormattedRoute("Forlindon", "Harlindon", "red", 4) +
-                getFormattedRoute("Forlindon", "Lake Evendim", "blue", 5) +
-                getFormattedRoute("Grey Havens", "Harlindon", "white", 3) +
-                getFormattedRoute("Grey Havens", "Hobbiton", "green", 2) +
-                getFormattedRoute("Grey Havens", "Hobbiton", "orange", 2) +
-                getFormattedRoute("Grey Havens", "Lake Evendim", "gray", 3) +
-                getFormattedRoute("Harlindon", "Hobbiton", "yellow", 4) +
-                getFormattedRoute("Helm''s Deep", "Isengard", "gray", 2) +
-                getFormattedRoute("Helm''s Deep", "Isengard", "gray", 2) +
-                getFormattedRoute("Helm''s Deep", "Ras Morthil", "violet", 6) +
-                getFormattedRoute("Hobbiton", "Lake Evendim", "red", 1) +
-                getFormattedRoute("Hobbiton", "Lake Evendim", "violet", 1) +
-                getFormattedRoute("Iron Hills", "Sea of Rhun", "yellow", 5) +
-                getFormattedRoute("Iron Hills", "The Lonely Mountain", "black", 3) +
-                getFormattedRoute("Isengard", "Lond Daer", "orange", 3) +
-                getFormattedRoute("Isengard", "Moria''s Gate", "blue", 2) +
-                getFormattedRoute("Isengard", "Moria''s Gate", "red", 2) +
-                getFormattedRoute("Isengard", "Ras Morthil", "violet", 6) +
-                getFormattedRoute("Isengard", "Tharbad", "gray", 3) +
-                getFormattedRoute("Lond Daer", "Ras Morthil", "white", 5) +
-                getFormattedRoute("Lond Daer", "Tharbad", "yellow", 3) +
-                getFormattedRoute("Lorien", "Moria''s Gate", "white", 2) +
-                getFormattedRoute("Lorien", "Rivendell", "gray", 2) +
-                getFormattedRoute("Lorien", "Rivendell", "gray", 2) +
-                getFormattedRoute("Minas Morgul", "Minas Tirith", "gray", 2) +
-                getFormattedRoute("Minas Morgul", "Minas Tirith", "gray", 2) +
-                getFormattedRoute("Minas Morgul", "Sea of Nurnen", "blue", 5) +
-                getFormattedRoute("Moria''s Gate", "Rivendell", "violet", 2) +
-                getFormattedRoute("Moria''s Gate", "Rivendell", "yellow", 2) +
-                getFormattedRoute("Moria''s Gate", "Tharbad", "green", 2) +
-                getFormattedRoute("Rivendell", "The Lonely Mountain", "white", 6);
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.BREE, "gray", 1) +
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.BREE, "gray", 1) +
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.ETTENMOORS, "red", 3) +
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.RIVENDELL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.RIVENDELL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.AMON_SUL, DatabaseCity.THARBAD, "orange", 2) +
+                getFormattedRoute(DatabaseCity.ASH_MOUNTAINS, DatabaseCity.BARAD_DUR, "red", 2) +
+                getFormattedRoute(DatabaseCity.ASH_MOUNTAINS, DatabaseCity.SEA_OF_NURNEN, "gray", 4) +
+                getFormattedRoute(DatabaseCity.ASH_MOUNTAINS, DatabaseCity.SEA_OF_RHUN, "blue", 4) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.DAGORLAD_BATTLE_PLAINS, "blue", 2) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.DAGORLAD_BATTLE_PLAINS, "yellow", 2) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.MINAS_MORGUL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.MINAS_MORGUL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.SEA_OF_NURNEN, "white", 4) +
+                getFormattedRoute(DatabaseCity.BARAD_DUR, DatabaseCity.SEA_OF_RHUN, "orange", 5) +
+                getFormattedRoute(DatabaseCity.BREE, DatabaseCity.HOBBITON, "gray", 2) +
+                getFormattedRoute(DatabaseCity.BREE, DatabaseCity.HOBBITON, "gray", 2) +
+                getFormattedRoute(DatabaseCity.BREE, DatabaseCity.LAKE_EVENDIM, "black", 2) +
+                getFormattedRoute(DatabaseCity.BREE, DatabaseCity.LAKE_EVENDIM, "white", 2) +
+                getFormattedRoute(DatabaseCity.BREE, DatabaseCity.THARBAD, "gray", 2) +
+                getFormattedRoute(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.EDHELLOND, "orange", 4) +
+                getFormattedRoute(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.MINAS_MORGUL, "green", 2) +
+                getFormattedRoute(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.MINAS_TIRITH, "yellow", 2) +
+                getFormattedRoute(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.SEA_OF_NURNEN, "violet", 4) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.DOL_GULDUR, "gray", 3) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.EMYN_MUIL, "black", 2) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.EMYN_MUIL, "orange", 2) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.FALLS_OF_RAUROS, "white", 2) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.MINAS_MORGUL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.SEA_OF_RHUN, "green", 6) +
+                getFormattedRoute(DatabaseCity.DOL_GULDUR, DatabaseCity.EAST_BIGHT, "yellow", 1) +
+                getFormattedRoute(DatabaseCity.DOL_GULDUR, DatabaseCity.EMYN_MUIL, "red", 2) +
+                getFormattedRoute(DatabaseCity.DOL_GULDUR, DatabaseCity.LORIEN, "black", 2) +
+                getFormattedRoute(DatabaseCity.EAST_BIGHT, DatabaseCity.IRON_HILLS, "red", 6) +
+                getFormattedRoute(DatabaseCity.EAST_BIGHT, DatabaseCity.LORIEN, "green", 3) +
+                getFormattedRoute(DatabaseCity.EAST_BIGHT, DatabaseCity.RIVENDELL, "orange", 5) +
+                getFormattedRoute(DatabaseCity.EAST_BIGHT, DatabaseCity.SEA_OF_RHUN, "violet", 6) +
+                getFormattedRoute(DatabaseCity.EAST_BIGHT, DatabaseCity.THE_LONELY_MOUNTAIN, "blue", 4) +
+                getFormattedRoute(DatabaseCity.EDHELLOND, DatabaseCity.ERECH, "green", 1) +
+                getFormattedRoute(DatabaseCity.EDHELLOND, DatabaseCity.MINAS_TIRITH, "black", 4) +
+                getFormattedRoute(DatabaseCity.EDHELLOND, DatabaseCity.RAS_MORTHIL, "black", 5) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.ERECH, "white", 1) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.FALLS_OF_RAUROS, "black", 2) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.HELMS_DEEP, "gray", 1) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.HELMS_DEEP, "gray", 1) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.FANGORN, "yellow", 2) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.MINAS_TIRITH, "violet", 3) +
+                getFormattedRoute(DatabaseCity.EDORAS, DatabaseCity.MINAS_TIRITH, "red", 3) +
+                getFormattedRoute(DatabaseCity.EMYN_MUIL, DatabaseCity.FALLS_OF_RAUROS, "gray", 1) +
+                getFormattedRoute(DatabaseCity.EMYN_MUIL, DatabaseCity.FALLS_OF_RAUROS, "gray", 1) +
+                getFormattedRoute(DatabaseCity.EMYN_MUIL, DatabaseCity.FANGORN, "gray", 2) +
+                getFormattedRoute(DatabaseCity.EMYN_MUIL, DatabaseCity.FANGORN, "gray", 2) +
+                getFormattedRoute(DatabaseCity.ERECH, DatabaseCity.HELMS_DEEP, "orange", 1) +
+                getFormattedRoute(DatabaseCity.ERECH, DatabaseCity.RAS_MORTHIL, "blue", 2) +
+                getFormattedRoute(DatabaseCity.ERYN_VORN, DatabaseCity.HARLINDON, "blue", 2) +
+                getFormattedRoute(DatabaseCity.ERYN_VORN, DatabaseCity.HOBBITON, "black", 3) +
+                getFormattedRoute(DatabaseCity.ERYN_VORN, DatabaseCity.THARBAD, "red", 3) +
+                getFormattedRoute(DatabaseCity.ERYN_VORN, DatabaseCity.LOND_DAER, "green", 3) +
+                getFormattedRoute(DatabaseCity.ETTENMOORS, DatabaseCity.LAKE_EVENDIM, "orange", 6) +
+                getFormattedRoute(DatabaseCity.ETTENMOORS, DatabaseCity.RIVENDELL, "blue", 2) +
+                getFormattedRoute(DatabaseCity.ETTENMOORS, DatabaseCity.RIVENDELL, "green", 2) +
+                getFormattedRoute(DatabaseCity.ETTENMOORS, DatabaseCity.THE_LONELY_MOUNTAIN, "gray", 6) +
+                getFormattedRoute(DatabaseCity.FALLS_OF_RAUROS, DatabaseCity.MINAS_TIRITH, "gray", 1) +
+                getFormattedRoute(DatabaseCity.FALLS_OF_RAUROS, DatabaseCity.MINAS_TIRITH, "gray", 1) +
+                getFormattedRoute(DatabaseCity.FANGORN, DatabaseCity.HELMS_DEEP, "white", 2) +
+                getFormattedRoute(DatabaseCity.FANGORN, DatabaseCity.ISENGARD, "black", 2) +
+                getFormattedRoute(DatabaseCity.FANGORN, DatabaseCity.ISENGARD, "green", 2) +
+                getFormattedRoute(DatabaseCity.FANGORN, DatabaseCity.LORIEN, "gray", 2) +
+                getFormattedRoute(DatabaseCity.FANGORN, DatabaseCity.LORIEN, "gray", 2) +
+                getFormattedRoute(DatabaseCity.FORLINDON, DatabaseCity.GREY_HAVENS, "violet", 2) +
+                getFormattedRoute(DatabaseCity.FORLINDON, DatabaseCity.HARLINDON, "red", 4) +
+                getFormattedRoute(DatabaseCity.FORLINDON, DatabaseCity.LAKE_EVENDIM, "blue", 5) +
+                getFormattedRoute(DatabaseCity.GREY_HAVENS, DatabaseCity.HARLINDON, "white", 3) +
+                getFormattedRoute(DatabaseCity.GREY_HAVENS, DatabaseCity.HOBBITON, "green", 2) +
+                getFormattedRoute(DatabaseCity.GREY_HAVENS, DatabaseCity.HOBBITON, "orange", 2) +
+                getFormattedRoute(DatabaseCity.GREY_HAVENS, DatabaseCity.LAKE_EVENDIM, "gray", 3) +
+                getFormattedRoute(DatabaseCity.HARLINDON, DatabaseCity.HOBBITON, "yellow", 4) +
+                getFormattedRoute(DatabaseCity.HELMS_DEEP, DatabaseCity.ISENGARD, "gray", 2) +
+                getFormattedRoute(DatabaseCity.HELMS_DEEP, DatabaseCity.ISENGARD, "gray", 2) +
+                getFormattedRoute(DatabaseCity.HELMS_DEEP, DatabaseCity.RAS_MORTHIL, "violet", 6) +
+                getFormattedRoute(DatabaseCity.HOBBITON, DatabaseCity.LAKE_EVENDIM, "red", 1) +
+                getFormattedRoute(DatabaseCity.HOBBITON, DatabaseCity.LAKE_EVENDIM, "violet", 1) +
+                getFormattedRoute(DatabaseCity.IRON_HILLS, DatabaseCity.SEA_OF_RHUN, "yellow", 5) +
+                getFormattedRoute(DatabaseCity.IRON_HILLS, DatabaseCity.THE_LONELY_MOUNTAIN, "black", 3) +
+                getFormattedRoute(DatabaseCity.ISENGARD, DatabaseCity.LOND_DAER, "orange", 3) +
+                getFormattedRoute(DatabaseCity.ISENGARD, DatabaseCity.MORIAS_GATE, "blue", 2) +
+                getFormattedRoute(DatabaseCity.ISENGARD, DatabaseCity.MORIAS_GATE, "red", 2) +
+                getFormattedRoute(DatabaseCity.ISENGARD, DatabaseCity.RAS_MORTHIL, "violet", 6) +
+                getFormattedRoute(DatabaseCity.ISENGARD, DatabaseCity.THARBAD, "gray", 3) +
+                getFormattedRoute(DatabaseCity.LOND_DAER, DatabaseCity.RAS_MORTHIL, "white", 5) +
+                getFormattedRoute(DatabaseCity.LOND_DAER, DatabaseCity.THARBAD, "yellow", 3) +
+                getFormattedRoute(DatabaseCity.LORIEN, DatabaseCity.MORIAS_GATE, "white", 2) +
+                getFormattedRoute(DatabaseCity.LORIEN, DatabaseCity.RIVENDELL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.LORIEN, DatabaseCity.RIVENDELL, "gray", 2) +
+                getFormattedRoute(DatabaseCity.MINAS_MORGUL, DatabaseCity.MINAS_TIRITH, "gray", 2) +
+                getFormattedRoute(DatabaseCity.MINAS_MORGUL, DatabaseCity.MINAS_TIRITH, "gray", 2) +
+                getFormattedRoute(DatabaseCity.MINAS_MORGUL, DatabaseCity.SEA_OF_NURNEN, "blue", 5) +
+                getFormattedRoute(DatabaseCity.MORIAS_GATE, DatabaseCity.RIVENDELL, "violet", 2) +
+                getFormattedRoute(DatabaseCity.MORIAS_GATE, DatabaseCity.RIVENDELL, "yellow", 2) +
+                getFormattedRoute(DatabaseCity.MORIAS_GATE, DatabaseCity.THARBAD, "green", 2) +
+                getFormattedRoute(DatabaseCity.RIVENDELL, DatabaseCity.THE_LONELY_MOUNTAIN, "white", 6);
         return formattedRoute.substring(0, formattedRoute.length() - 2) + ";"; //replaces the final comma with a semicolon
     }
 

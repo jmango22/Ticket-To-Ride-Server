@@ -339,7 +339,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
 
             //get the information to make the GameModel object from the database
-            String sqlString = String.format("SELECT %1$s,%2$s FROM %3$s NATURAL JOIN %4$s" +
+            String sqlString = String.format("SELECT %1$s,%2$s FROM %3$s NATURAL JOIN %4$s\n" +
                             "WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)",
                     DatabasePlayer.ID,
                     DatabasePlayer.USERNAME,
@@ -419,13 +419,14 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
-                GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
-                        resultSet.getString(DatabaseGame.GAME_NAME),
-                        resultSet.getBoolean(DatabaseGame.STARTED),
-                        getPlayers(game_name));
-                if(!gameModel.isStarted()){
+                if(!resultSet.getBoolean(DatabaseGame.STARTED)){
                     initializeGame(game_name);
                 }
+                GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
+                        resultSet.getString(DatabaseGame.GAME_NAME),
+                        true,
+                        getPlayers(game_name));
+                return gameModel;
             }
         } catch(SQLException e){
             e.printStackTrace();
@@ -481,11 +482,11 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializeGame(String game_name) {
-        setGameStarted(game_name);
         initializeParticipants(game_name);
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
         initializePlayerTrainCards(game_name);
+        setGameStarted(game_name);
     }
 
     private void setGameStarted(String game_name) {
