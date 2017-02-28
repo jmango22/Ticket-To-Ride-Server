@@ -153,8 +153,8 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames(String player_user_name) {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s" +
-                            "NATURAL JOIN %6$s WHERE %7$s IN (SELECT %8$s FROM %9$s" +
+            String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s\n" +
+                            "NATURAL JOIN %6$s WHERE %7$s IN (SELECT %8$s FROM %9$s\n" +
                             "WHERE %10$s IN (SELECT %11$s FROM %12$s WHERE %13$s=?)) ORDER BY %14$s",
                     DatabaseParticipants.columnNames(),
                     DatabaseGame.GAME_NAME,
@@ -379,6 +379,7 @@ public class DatabaseController implements IDatabaseController {
                     DatabasePlayer.ID,
                     DatabasePlayer.TABLE_NAME,
                     DatabasePlayer.USERNAME,
+
                     DatabaseParticipants.GAME_ID,
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
@@ -386,9 +387,7 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,player_name);
             statement.setString(2,game_name);
-            statement.execute();
-            return true;
-            //TODO: make this function return if it was entered not if it executed
+            return (statement.executeUpdate() != 0);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -580,10 +579,11 @@ public class DatabaseController implements IDatabaseController {
     }
 
     private void initializePlayerTrainCards(String game_name) {
+        final int INITIAL_TRAIN_CARD_COUNT = 4;
         List<String> players = getPlayers(game_name);
 
         for (String player_name : players) {
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < INITIAL_TRAIN_CARD_COUNT; i++) {
                 drawRandomTrainCard(game_name, player_name);
             }
         }
