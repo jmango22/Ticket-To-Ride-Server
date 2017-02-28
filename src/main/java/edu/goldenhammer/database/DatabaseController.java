@@ -418,14 +418,16 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
+
+            List<String> players = getPlayers(game_name);
+            if(resultSet.next() && players.size() > 1) {
                 if(!resultSet.getBoolean(DatabaseGame.STARTED)){
                     initializeGame(game_name);
                 }
                 GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
                         resultSet.getString(DatabaseGame.GAME_NAME),
                         true,
-                        getPlayers(game_name));
+                        players);
                 return gameModel;
             }
         } catch(SQLException e){
