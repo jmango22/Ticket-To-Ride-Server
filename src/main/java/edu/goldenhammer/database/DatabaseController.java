@@ -269,14 +269,15 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT count(*) FROM (\n" +
                     "SELECT * FROM %1$s INNER JOIN (\n" +
-                    "SELECT %2$s FROM %3$s WHERE %4$s = ?\n" +
-                    ") AS game_ids ON (%1$s.%5$s = game_ids.%2$s)\n" +
+                    "SELECT %2$s FROM %3$s WHERE %4$s = ? AND %5$s = false\n" +
+                    ") AS game_ids ON (%1$s.%6$s = game_ids.%2$s)\n" +
                     ") AS participant_count;",
                     DatabaseParticipants.TABLE_NAME,
 
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME,
+                    DatabaseGame.STARTED,
 
                     DatabaseParticipants.GAME_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
