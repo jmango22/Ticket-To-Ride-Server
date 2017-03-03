@@ -51,8 +51,8 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
             "CREATE TABLE IF NOT EXISTS %1$s (" +
                     "%2$s SERIAL NOT NULL," +
                     "%3$s VARCHAR(30) UNIQUE," +
-                    "%4$s DECIMAL NOT NULL," +
-                    "%5$s DECIMAL NOT NULL," +
+                    "%4$s INTEGER NOT NULL," +
+                    "%5$s INTEGER NOT NULL," +
                     "PRIMARY KEY(%2$s)" +
                     ");" +
                     "INSERT INTO %1$s(%3$s, %4$s, %5$s) VALUES %6$s",
@@ -64,7 +64,7 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
             getAllCities()
             );
 
-    public DatabaseCity(String id, String name, double pointX, double pointY) {
+    public DatabaseCity(String id, String name, int pointX, int pointY) {
         this.id = id;
         this.name = name;
         this.pointX = pointX;
@@ -82,12 +82,12 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
     }
 
     @Override
-    public double getPointX() {
+    public int getPointX() {
         return pointX;
     }
 
     @Override
-    public double getPointY() {
+    public int getPointY() {
         return pointY;
     }
 
@@ -97,45 +97,45 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     public static String getAllCities() {
         String formattedCities =
-                getFormattedCity(AMON_SUL, 0, 0) +
-                getFormattedCity(ASH_MOUNTAINS, 0, 0) +
-                getFormattedCity(BARAD_DUR, 0, 0) +
-                getFormattedCity(BREE, 0, 0) +
-                getFormattedCity(CROSSINGS_OF_POROS, 0, 0) +
-                getFormattedCity(DAGORLAD_BATTLE_PLAINS, 0, 0) +
-                getFormattedCity(DOL_GULDUR, 0, 0) +
-                getFormattedCity(EAST_BIGHT, 0, 0) +
-                getFormattedCity(EDHELLOND, 0, 0) +
-                getFormattedCity(EDORAS, 0, 0) +
-                getFormattedCity(EMYN_MUIL, 0, 0) +
-                getFormattedCity(ERECH, 0, 0) +
-                getFormattedCity(ERYN_VORN, 0, 0) +
-                getFormattedCity(ETTENMOORS, 0, 0) +
-                getFormattedCity(FALLS_OF_RAUROS, 0, 0) +
-                getFormattedCity(FANGORN, 0, 0) +
-                getFormattedCity(FORLINDON, 0, 0) +
-                getFormattedCity(GREY_HAVENS, 0, 0) +
-                getFormattedCity(HARLINDON, 0, 0) +
-                getFormattedCity(HELMS_DEEP, 0, 0) +
-                getFormattedCity(HOBBITON, 0, 0) +
-                getFormattedCity(IRON_HILLS, 0, 0) +
-                getFormattedCity(ISENGARD, 0, 0) +
-                getFormattedCity(LAKE_EVENDIM, 0, 0) +
-                getFormattedCity(LOND_DAER, 0, 0) +
-                getFormattedCity(LORIEN, 0, 0) +
-                getFormattedCity(MINAS_MORGUL, 0, 0) +
-                getFormattedCity(MINAS_TIRITH, 0, 0) +
-                getFormattedCity(MORIAS_GATE, 0, 0) +
-                getFormattedCity(RAS_MORTHIL, 0, 0) +
-                getFormattedCity(RIVENDELL, 0, 0) +
-                getFormattedCity(SEA_OF_NURNEN, 0, 0) +
-                getFormattedCity(SEA_OF_RHUN, 0, 0) +
-                getFormattedCity(THARBAD, 0, 0) +
-                getFormattedCity(THE_LONELY_MOUNTAIN, 0, 0);
+                getFormattedCity(AMON_SUL, 757, 305) +
+                getFormattedCity(ASH_MOUNTAINS, 1528, 759) +
+                getFormattedCity(BARAD_DUR, 1392, 845) +
+                getFormattedCity(BREE, 618, 388) +
+                getFormattedCity(CROSSINGS_OF_POROS, 1150, 1091) +
+                getFormattedCity(DAGORLAD_BATTLE_PLAINS, 1321, 696) +
+                getFormattedCity(DOL_GULDUR, 1144, 561) +
+                getFormattedCity(EAST_BIGHT, 1100, 410) +
+                getFormattedCity(EDHELLOND, 886, 993) +
+                getFormattedCity(EDORAS, 861, 824) +
+                getFormattedCity(EMYN_MUIL, 1142, 671) +
+                getFormattedCity(ERECH, 758, 908) +
+                getFormattedCity(ERYN_VORN, 371, 599) +
+                getFormattedCity(ETTENMOORS, 871, 158) +
+                getFormattedCity(FALLS_OF_RAUROS, 1065, 772) +
+                getFormattedCity(FANGORN, 949, 662) +
+                getFormattedCity(FORLINDON, 95, 273) +
+                getFormattedCity(GREY_HAVENS, 272, 297) +
+                getFormattedCity(HARLINDON, 229, 522) +
+                getFormattedCity(HELMS_DEEP, 767, 796) +
+                getFormattedCity(HOBBITON, 470, 383) +
+                getFormattedCity(IRON_HILLS, 1418, 204) +
+                getFormattedCity(ISENGARD, 692, 641) +
+                getFormattedCity(LAKE_EVENDIM, 496, 248) +
+                getFormattedCity(LOND_DAER, 478, 695) +
+                getFormattedCity(LORIEN, 990, 523) +
+                getFormattedCity(MINAS_MORGUL, 1186, 885) +
+                getFormattedCity(MINAS_TIRITH, 1111, 918) +
+                getFormattedCity(MORIAS_GATE, 835, 517) +
+                getFormattedCity(RAS_MORTHIL, 495, 977) +
+                getFormattedCity(RIVENDELL, 884, 326) +
+                getFormattedCity(SEA_OF_NURNEN, 1422, 1030) +
+                getFormattedCity(SEA_OF_RHUN, 1464, 505) +
+                getFormattedCity(THARBAD, 604, 515) +
+                getFormattedCity(THE_LONELY_MOUNTAIN, 1216, 262);
         return formattedCities.substring(0, formattedCities.length() - 1) + ';'; //replaces the final comma with a semicolon
     }
 
-    public static String getFormattedCity(String cityName, double pointX, double pointY) {
+    public static String getFormattedCity(String cityName, int pointX, int pointY) {
         return String.format("('%1$s', %2$f, %3$f),",
                 cityName,
                 pointX,
@@ -144,6 +144,6 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     private String id;
     private String name;
-    private double pointX;
-    private double pointY;
+    private int pointX;
+    private int pointY;
 }
