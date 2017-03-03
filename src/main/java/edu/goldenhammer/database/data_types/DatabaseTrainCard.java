@@ -1,5 +1,8 @@
 package edu.goldenhammer.database.data_types;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by seanjib on 2/19/2017.
  */
@@ -20,10 +23,10 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
                     "    %5$s VARCHAR(10),\n" +
                     "    %6$s BOOLEAN NOT NULL DEFAULT false,\n" +
                     "    PRIMARY KEY(%2$s),\n" +
-                    "    FOREIGN KEY(%3$s)\n" +
+                    "    FOREIGN KEY(%4$s)\n" +
                     "      REFERENCES %7$s\n" +
                     "      ON DELETE CASCADE,\n" +
-                    "    FOREIGN KEY(%2$s)\n" +
+                    "    FOREIGN KEY(%3$s)\n" +
                     "      REFERENCES %8$s\n" +
                     "      ON DELETE CASCADE\n" +
                     ");",
@@ -75,7 +78,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         String sqlString = "";
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < MAX_COLORED_CARDS; j++) {
-                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), ",
+                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = ?), ",
                         DatabaseGame.ID,
                         DatabaseGame.TABLE_NAME,
                         DatabaseGame.GAME_NAME
@@ -111,7 +114,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         }
 
         for(int i = 0; i < MAX_WILD_CARDS; i++) {
-            sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = '?'), 'wild')",
+            sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = ?), 'wild')",
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME
@@ -124,6 +127,16 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
             }
         }
         return sqlString;
+    }
+
+    public static DatabaseTrainCard buildTrainCardFromResultSet(ResultSet resultSet) throws SQLException{
+        return new DatabaseTrainCard(
+                resultSet.getString(ID),
+                resultSet.getString(GAME_ID),
+                resultSet.getString(PLAYER_ID),
+                resultSet.getString(TRAIN_TYPE),
+                resultSet.getBoolean(DISCARDED)
+        );
     }
 
     private String id;

@@ -6,6 +6,42 @@ import java.io.Serializable;
  * Created by seanjib on 2/19/2017.
  */
 public class DatabaseCity implements Serializable, IDatabaseCity{
+    public static final String AMON_SUL = "Amon Sul";
+    public static final String ASH_MOUNTAINS = "Ash Mountains";
+    public static final String BARAD_DUR = "Barad Dur";
+    public static final String BREE = "Bree";
+    public static final String CROSSINGS_OF_POROS = "Crossings of Poros";
+    public static final String DAGORLAD_BATTLE_PLAINS = "Dagorlad (Battle Plains)";
+    public static final String DOL_GULDUR = "Dol Guldur";
+    public static final String EAST_BIGHT = "East Bight";
+    public static final String EDHELLOND = "Edhellond";
+    public static final String EDORAS = "Edoras";
+    public static final String EMYN_MUIL = "Emyn Muil";
+    public static final String ERECH = "Erech";
+    public static final String ERYN_VORN = "Eryn Vorn";
+    public static final String ETTENMOORS = "Ettenmoors";
+    public static final String FALLS_OF_RAUROS = "Falls of Rauros";
+    public static final String FANGORN = "Fangorn";
+    public static final String FORLINDON = "Forlindon";
+    public static final String GREY_HAVENS = "Grey Havens";
+    public static final String HARLINDON = "Harlindon";
+    public static final String HELMS_DEEP = "Helm''s Deep";
+    public static final String HOBBITON = "Hobbiton";
+    public static final String IRON_HILLS = "Iron Hills";
+    public static final String ISENGARD = "Isengard";
+    public static final String LAKE_EVENDIM = "Lake Evendim";
+    public static final String LOND_DAER = "Lond Daer";
+    public static final String LORIEN = "Lorien";
+    public static final String MINAS_MORGUL = "Minas Morgul";
+    public static final String MINAS_TIRITH = "Minas Tirith";
+    public static final String MORIAS_GATE = "Moria''s Gate";
+    public static final String RAS_MORTHIL = "Ras Morthil";
+    public static final String RIVENDELL = "Rivendell";
+    public static final String SEA_OF_NURNEN = "Sea of Nurnen";
+    public static final String SEA_OF_RHUN = "Sea of Rhun";
+    public static final String THARBAD = "Tharbad";
+    public static final String THE_LONELY_MOUNTAIN = "The Lonely Mountain";
+
     public static final String ID = "city_id";
     public static final String NAME = "city_name";
     public static final String POINT_X = "point_x";
@@ -14,7 +50,7 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (" +
                     "%2$s SERIAL NOT NULL," +
-                    "%3$s VARCHAR(20) UNIQUE," +
+                    "%3$s VARCHAR(30) UNIQUE," +
                     "%4$s DECIMAL NOT NULL," +
                     "%5$s DECIMAL NOT NULL," +
                     "PRIMARY KEY(%2$s)" +
@@ -28,17 +64,31 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
             getAllCities()
             );
 
-    public DatabaseCity(String id, String name) {
+    public DatabaseCity(String id, String name, double pointX, double pointY) {
         this.id = id;
         this.name = name;
+        this.pointX = pointX;
+        this.pointY = pointY;
     }
 
+    @Override
     public String getID() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public double getPointX() {
+        return pointX;
+    }
+
+    @Override
+    public double getPointY() {
+        return pointY;
     }
 
     public static String columnNames() {
@@ -47,46 +97,46 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     public static String getAllCities() {
         String formattedCities =
-                getFormattedCity("Amon Sul", 0, 0) +
-                getFormattedCity("Ash Mountains", 0, 0) +
-                getFormattedCity("Barad Dur", 0, 0) +
-                getFormattedCity("Bree", 0, 0) +
-                getFormattedCity("Crossings of Poros", 0, 0) +
-                getFormattedCity("Dagorlad (Battle Plains)", 0, 0) +
-                getFormattedCity("Dol Guldur", 0, 0) +
-                getFormattedCity("East Bight", 0, 0) +
-                getFormattedCity("Edhellond", 0, 0) +
-                getFormattedCity("Edoras", 0, 0) +
-                getFormattedCity("Emyn Muil", 0, 0) +
-                getFormattedCity("Erech", 0, 0) +
-                getFormattedCity("Eryn Vorn", 0, 0) +
-                getFormattedCity("Ettenmoors", 0, 0) +
-                getFormattedCity("Falls of Rauros", 0, 0) +
-                getFormattedCity("Fangorn", 0, 0) +
-                getFormattedCity("Forlindon", 0, 0) +
-                getFormattedCity("Grey Havens", 0, 0) +
-                getFormattedCity("Harlindon", 0, 0) +
-                getFormattedCity("Helm's Deep", 0, 0) +
-                getFormattedCity("Hobbiton", 0, 0) +
-                getFormattedCity("Iron Hills", 0, 0) +
-                getFormattedCity("Isengard", 0, 0) +
-                getFormattedCity("Lake Evendim", 0, 0) +
-                getFormattedCity("Lond Daer", 0, 0) +
-                getFormattedCity("Lorien", 0, 0) +
-                getFormattedCity("Minas Morgul", 0, 0) +
-                getFormattedCity("Minas Tirith", 0, 0) +
-                getFormattedCity("Moria's Gate", 0, 0) +
-                getFormattedCity("Ras Morthil", 0, 0) +
-                getFormattedCity("Rivendell", 0, 0) +
-                getFormattedCity("Sea of Nurnen", 0, 0) +
-                getFormattedCity("Sea of Rhun", 0, 0) +
-                getFormattedCity("Tharbad", 0, 0) +
-                getFormattedCity("The Lonely Mountain", 0, 0);
+                getFormattedCity(AMON_SUL, 0, 0) +
+                getFormattedCity(ASH_MOUNTAINS, 0, 0) +
+                getFormattedCity(BARAD_DUR, 0, 0) +
+                getFormattedCity(BREE, 0, 0) +
+                getFormattedCity(CROSSINGS_OF_POROS, 0, 0) +
+                getFormattedCity(DAGORLAD_BATTLE_PLAINS, 0, 0) +
+                getFormattedCity(DOL_GULDUR, 0, 0) +
+                getFormattedCity(EAST_BIGHT, 0, 0) +
+                getFormattedCity(EDHELLOND, 0, 0) +
+                getFormattedCity(EDORAS, 0, 0) +
+                getFormattedCity(EMYN_MUIL, 0, 0) +
+                getFormattedCity(ERECH, 0, 0) +
+                getFormattedCity(ERYN_VORN, 0, 0) +
+                getFormattedCity(ETTENMOORS, 0, 0) +
+                getFormattedCity(FALLS_OF_RAUROS, 0, 0) +
+                getFormattedCity(FANGORN, 0, 0) +
+                getFormattedCity(FORLINDON, 0, 0) +
+                getFormattedCity(GREY_HAVENS, 0, 0) +
+                getFormattedCity(HARLINDON, 0, 0) +
+                getFormattedCity(HELMS_DEEP, 0, 0) +
+                getFormattedCity(HOBBITON, 0, 0) +
+                getFormattedCity(IRON_HILLS, 0, 0) +
+                getFormattedCity(ISENGARD, 0, 0) +
+                getFormattedCity(LAKE_EVENDIM, 0, 0) +
+                getFormattedCity(LOND_DAER, 0, 0) +
+                getFormattedCity(LORIEN, 0, 0) +
+                getFormattedCity(MINAS_MORGUL, 0, 0) +
+                getFormattedCity(MINAS_TIRITH, 0, 0) +
+                getFormattedCity(MORIAS_GATE, 0, 0) +
+                getFormattedCity(RAS_MORTHIL, 0, 0) +
+                getFormattedCity(RIVENDELL, 0, 0) +
+                getFormattedCity(SEA_OF_NURNEN, 0, 0) +
+                getFormattedCity(SEA_OF_RHUN, 0, 0) +
+                getFormattedCity(THARBAD, 0, 0) +
+                getFormattedCity(THE_LONELY_MOUNTAIN, 0, 0);
         return formattedCities.substring(0, formattedCities.length() - 1) + ';'; //replaces the final comma with a semicolon
     }
 
     public static String getFormattedCity(String cityName, double pointX, double pointY) {
-        return String.format("('%1', %2, %3),",
+        return String.format("('%1$s', %2$f, %3$f),",
                 cityName,
                 pointX,
                 pointY);
@@ -94,4 +144,6 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     private String id;
     private String name;
+    private double pointX;
+    private double pointY;
 }

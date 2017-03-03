@@ -5,14 +5,14 @@ import edu.goldenhammer.server.Results;
 import java.io.Serializable;
 
 public abstract class BaseCommand implements Serializable {
-    private String _name;
+    private String name;
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     protected final void setName(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public abstract Results execute();

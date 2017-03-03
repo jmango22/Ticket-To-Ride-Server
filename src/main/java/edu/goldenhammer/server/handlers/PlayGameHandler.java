@@ -20,7 +20,6 @@ public class PlayGameHandler extends HandlerBase {
                 results = getInvalidAuthorizationResults();
             }
             else {
-                //Get games either for a specific user or get all the games at once
                 if(exchange.getRequestHeaders().containsKey("username")
                         && exchange.getRequestHeaders().containsKey("gamename")) {
                     String username = exchange.getRequestHeaders().get("username").get(0);

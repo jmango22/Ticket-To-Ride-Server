@@ -45,7 +45,9 @@ CREATE TABLE IF NOT EXISTS route (
 
 CREATE TABLE IF NOT EXISTS city (
     city_id SERIAL NOT NULL,
-    city_name VARCHAR(20) NOT NULL,
+    city_name VARCHAR(20) UNIQUE,
+    point_x DECIMAL NOT NULL,
+    point_y DECIMAL NOT NULL
     PRIMARY KEY(city_id)
 );
 
@@ -53,7 +55,7 @@ CREATE TABLE IF NOT EXISTS claimed_route (
     route_id INTEGER NOT NULL,
     game_id INTEGER NOT NULL,
     player_id INTEGER NOT NULL,
-    PRIMARY KEY(route_id, user_id, game_id),
+    PRIMARY KEY(route_id, game_id),
     FOREIGN KEY(route_id)
       REFERENCES route
       ON DELETE CASCADE,

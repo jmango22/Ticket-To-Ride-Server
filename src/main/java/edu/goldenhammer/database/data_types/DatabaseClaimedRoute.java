@@ -13,7 +13,7 @@ public class DatabaseClaimedRoute implements IDatabaseClaimedRoute{
                     "%2$s INTEGER NOT NULL," +
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER NOT NULL," +
-                    "PRIMARY KEY(%2$s, %3$s, %4$s)," +
+                    "PRIMARY KEY(%2$s, %3$s)," +
                     "FOREIGN KEY(%2$s)" +
                     "   REFERENCES %5$s" +
                     "   ON DELETE CASCADE," +

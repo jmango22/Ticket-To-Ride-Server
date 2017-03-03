@@ -1,7 +1,5 @@
 package edu.goldenhammer.database.data_types;
 
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-
 /**
  * Created by seanjib on 2/22/2017.
  */

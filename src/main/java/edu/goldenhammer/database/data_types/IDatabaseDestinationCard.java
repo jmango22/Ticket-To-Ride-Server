@@ -6,8 +6,8 @@ package edu.goldenhammer.database.data_types;
 public interface IDatabaseDestinationCard {
     String getID();
     String getGameID();
-    String getCity1();
-    String getCity2();
+    int getCity1();
+    int getCity2();
     String getPlayerID();
     boolean isDiscarded();
     int getPoints();
