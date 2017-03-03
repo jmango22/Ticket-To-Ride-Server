@@ -12,10 +12,10 @@ public class CommandHandler extends HandlerBase {
     public void handle(HttpExchange httpExchange) throws IOException {
         try {
             String requestBody = readRequestBody(httpExchange);
-            Class c = this.getClass();
-            String pkg = c.getPackage().getName();
+            //Class c = this.getClass();
+            String pkg = "edu.goldenhammer.server.commands";//c.getPackage().getName();
             BaseCommand baseCommand = Serializer.deserializeCommand(
-                    requestBody, pkg + ".Server");
+                    requestBody, pkg/* + ".Server"*/);
             Results result = baseCommand.execute();
             sendResponse(httpExchange, result);
         } catch (Exception ex) {

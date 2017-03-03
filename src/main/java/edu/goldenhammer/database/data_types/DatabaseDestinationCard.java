@@ -1,5 +1,8 @@
 package edu.goldenhammer.database.data_types;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by seanjib on 2/22/2017.
  */
@@ -195,7 +198,18 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 points
         );
     }
-
+    public static DatabaseDestinationCard buildDestinationCardFromResultSet(ResultSet resultSet) throws SQLException {
+        return new DatabaseDestinationCard(
+                resultSet.getString(ID),
+                resultSet.getString(GAME_ID),
+                resultSet.getInt(CITY_1),
+                resultSet.getInt(CITY_2),
+                resultSet.getString(PLAYER_ID),
+                resultSet.getBoolean(DISCARDED),
+                resultSet.getInt(POINTS)
+        );
+    }
+    
     private String destinationCardID;
     private String gameID;
     private String playerID;

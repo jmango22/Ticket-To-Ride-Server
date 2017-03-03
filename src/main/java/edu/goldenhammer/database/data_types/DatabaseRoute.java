@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by seanjib on 2/19/2017.
  */
 public class DatabaseRoute implements Serializable, IDatabaseRoute {
-    public static final String ID = "route_id";
+    public static final String ROUTE_NUMBER = "route_number";
     public static final String CITY_1 = "city_1";
     public static final String CITY_2 = "city_2";
     public static final String ROUTE_COLOR = "route_color";
@@ -15,21 +15,21 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "    %2$s SERIAL NOT NULL,\n" +
-                    "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER NOT NULL,\n" +
-                    "    %5$s VARCHAR(10) NOT NULL,\n" +
-                    "    %6$s INTEGER NOT NULL,\n" +
+                    "    %5$s INTEGER NOT NULL,\n" +
+                    "    %6$s VARCHAR(10) NOT NULL,\n" +
+                    "    %7$s INTEGER NOT NULL,\n" +
                     "    PRIMARY KEY(%2$s),\n" +
-                    "    FOREIGN KEY(%3$s)" +
-                    "       REFERENCES %7$s" +
-                    "       ON DELETE CASCADE,\n" +
                     "    FOREIGN KEY(%4$s)" +
-                    "       REFERENCES %7$s" +
+                    "       REFERENCES %8$s" +
+                    "       ON DELETE CASCADE,\n" +
+                    "    FOREIGN KEY(%5$s)" +
+                    "       REFERENCES %8$s" +
                     "       ON DELETE CASCADE\n" +
                     ");" +
-                    "INSERT INTO %1$s(%3$s, %4$s, %5$s, %6$s) VALUES %8$s",
+                    "INSERT INTO %1$s(%3, %4$s, %5$s, %6$s, %7$s) VALUES %9$s",
             TABLE_NAME,
-            ID,
+            ROUTE_NUMBER,
             CITY_1,
             CITY_2,
             ROUTE_COLOR,
@@ -194,7 +194,7 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
     }
 
     public static String columnNames() {
-        return String.join(",",ID,CITY_1,CITY_2,ROUTE_COLOR,ROUTE_LENGTH);
+        return String.join(",",ROUTE_NUMBER,CITY_1,CITY_2,ROUTE_COLOR,ROUTE_LENGTH);
     }
 
     String id;

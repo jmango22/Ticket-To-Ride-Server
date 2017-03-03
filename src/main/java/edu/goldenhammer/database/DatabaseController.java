@@ -2,6 +2,8 @@ package edu.goldenhammer.database;
 
 import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
+import edu.goldenhammer.server.Serializer;
+import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -588,13 +590,13 @@ public class DatabaseController implements IDatabaseController {
 
         for (String player_name : players) {
             for (int i = 0; i < INITIAL_TRAIN_CARD_COUNT; i++) {
-                DatabaseTrainCard trainCard = drawRandomTrainCard(game_name);
+                DatabaseTrainCard trainCard = getRandomTrainCard(game_name);
                 assignTrainCardToPlayer(trainCard, player_name);
             }
         }
     }
 
-    private DatabaseTrainCard drawRandomTrainCard(String game_name) {
+    public DatabaseTrainCard getRandomTrainCard(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT * FROM" +
                     "(SELECT * FROM %1$s" +
@@ -613,10 +615,17 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
             ResultSet resultSet = statement.executeQuery();
+
+            DatabaseTrainCard card = null;
             if(resultSet.next()){
-                DatabaseTrainCard card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-                return card;
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
+            else if(reshuffleTrainCardDiscardPile(game_name)) {
+                resultSet = statement.executeQuery();
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            return card;
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -639,6 +648,266 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1, player_name);
             statement.setString(2, train_card.getGameID());
             statement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public DatabaseDestinationCard getRandomDestinationCard(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM" +
+                            "(SELECT * FROM %1$s" +
+                            "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
+                            "AND %6$s = NULL" +
+                            "AND %7$s = false)" +
+                            "ORDER BY random() LIMIT 1",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabaseDestinationCard.DISCARDED);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            DatabaseDestinationCard card = null;
+            if(resultSet.next()) {
+                card = DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet);
+            }
+            else if(reshuffleDestinationCardDiscardPile(game_name)) {
+                resultSet = statement.executeQuery();
+                card = DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet);
+            }
+            return card;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean reshuffleTrainCardDiscardPile(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = false" +
+                            "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
+                    DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.DISCARDED,
+                    DatabaseTrainCard.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            return (statement.executeUpdate() > 0);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean reshuffleDestinationCardDiscardPile(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = false" +
+                    "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.DISCARDED,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            return (statement.executeUpdate() > 0);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addCommand(BaseCommand command, String game_name, String player_name,
+                              boolean visibleToSelf, boolean visibleToAll) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s) VALUES (\n" +
+                            "(SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" +
+                            "(SELECT %10$s FROM %11$s WHERE %12$s = ?),\n" +
+                            " ?, ?, ?);",
+                    DatabaseCommand.TABLE_NAME,
+                    DatabaseCommand.GAME_ID,
+                    DatabaseCommand.PLAYER_ID,
+                    DatabaseCommand.METADATA,
+                    DatabaseCommand.VISIBLE_TO_SELF,
+                    DatabaseCommand.VISIBLE_TO_ALL,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, player_name);
+            statement.setString(3, Serializer.serialize(command));
+            statement.setBoolean(4, visibleToSelf);
+            statement.setBoolean(5, visibleToAll);
+
+            return (statement.executeUpdate() != 0);
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM %1$s" +
+                    "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
+                    "AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)" +
+                            "AND %10$s = ?)" +
+                        "OR %11$s = ?)" +
+                    "AND %12$s > ?;",
+                    DatabaseCommand.TABLE_NAME,
+
+                    DatabaseCommand.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseCommand.PLAYER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseCommand.VISIBLE_TO_SELF,
+                    DatabaseCommand.VISIBLE_TO_ALL,
+                    DatabaseCommand.COMMAND_ID
+                    );
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, player_name);
+            statement.setBoolean(3, true);
+            statement.setBoolean(4, true);
+            statement.setInt(5, lastCommandID);
+
+            ResultSet resultSet = statement.executeQuery();
+            return getCommandsFromResultSet(resultSet);
+        } catch(SQLException ex) {
+        ex.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    //Still need to implement
+    private List<BaseCommand> getCommandsFromResultSet(ResultSet resultSet) throws SQLException {
+        return new ArrayList<>();
+    }
+
+    public void initializePlayerTurn(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.PLAYER_TURN,
+                    DatabaseGame.GAME_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, 1);
+            statement.setString(2, game_name);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void nextTurn(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s =\n" +
+                    "(SELECT %3$s FROM %4$s WHERE %5$s = ?)",
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                int playerCount = resultSet.getInt(1);
+                int currentPlayer = getCurrentPlayerTurn(game_name);
+                if(currentPlayer++ == playerCount) {
+                    currentPlayer = 1;
+                }
+
+                sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.PLAYER_TURN,
+                        DatabaseGame.GAME_NAME);
+                statement = connection.prepareStatement(sqlString);
+                statement.setInt(1, currentPlayer);
+                statement.setString(2, game_name);
+
+                statement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private int getCurrentPlayerTurn(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
+                    DatabaseGame.PLAYER_TURN,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(DatabaseGame.PLAYER_TURN);
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean claimRoute(String game_name, String username, int route_number) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s\n" +
+                    "SET %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                    "WHERE %6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)\n" +
+                    "AND %10$s = ?",
+                    DatabaseClaimedRoute.TABLE_NAME,
+
+                    DatabaseClaimedRoute.PLAYER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseClaimedRoute.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseClaimedRoute.ROUTE_ID);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, username);
+            statement.setString(2, game_name);
+            statement.setInt(3, route_number);
+
+            return (statement.executeUpdate() == 1);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
