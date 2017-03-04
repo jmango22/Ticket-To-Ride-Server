@@ -64,5 +64,6 @@ public class ServerCommunicator {
         server.createContext("/login", new LoginHandler());
         server.createContext("/playgame", new PlayGameHandler());
         server.createContext("/register", new RegisterHandler());
+        server.createContext("/getcommands", new GetCommandsHandler());
     }
 }

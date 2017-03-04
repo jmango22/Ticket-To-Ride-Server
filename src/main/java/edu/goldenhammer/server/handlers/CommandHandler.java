@@ -16,7 +16,9 @@ public class CommandHandler extends HandlerBase {
             String pkg = "edu.goldenhammer.server.commands";//c.getPackage().getName();
             BaseCommand baseCommand = Serializer.deserializeCommand(
                     requestBody, pkg/* + ".Server"*/);
-            Results result = baseCommand.execute();
+            Results result = new Results();
+            result.setResponseCode(200);
+            result.setMessage(requestBody);
             sendResponse(httpExchange, result);
         } catch (Exception ex) {
             ex.printStackTrace();
