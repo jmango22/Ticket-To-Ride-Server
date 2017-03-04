@@ -866,9 +866,14 @@ public class DatabaseController implements IDatabaseController {
         return new ArrayList<>();
     }
 
-    //Still need to implement
     private List<BaseCommand> getCommandsFromResultSet(ResultSet resultSet) throws SQLException {
-        return new ArrayList<>();
+        List<BaseCommand> commands = new ArrayList<>();
+
+        while(resultSet.next()) {
+            commands.add(DatabaseCommand.buildCommandFromResultSet(resultSet));
+        }
+
+        return commands;
     }
 
     private int getCurrentPlayerTurn(String game_name) {
@@ -876,7 +881,7 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-        return -1;
+        return 1;
     }
 
     public boolean claimRoute(String game_name, String username, int route_number) {
