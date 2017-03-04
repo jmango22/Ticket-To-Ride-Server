@@ -99,103 +99,27 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     }
 
     public static String getAllDestinations() {
-        String formattedDestination =
-                getFormattedDestination(DatabaseCity.AMON_SUL, DatabaseCity.CROSSINGS_OF_POROS, 12) +
-                getFormattedDestination(DatabaseCity.AMON_SUL, DatabaseCity.DOL_GULDUR, 6) +
-                getFormattedDestination(DatabaseCity.AMON_SUL, DatabaseCity.FALLS_OF_RAUROS, 9) +
-                getFormattedDestination(DatabaseCity.AMON_SUL, DatabaseCity.LORIEN, 4) +
-                getFormattedDestination(DatabaseCity.BREE, DatabaseCity.DAGORLAD_BATTLE_PLAINS, 10) +
-                getFormattedDestination(DatabaseCity.BREE, DatabaseCity.EDHELLOND, 9) +
-                getFormattedDestination(DatabaseCity.BREE, DatabaseCity.ERECH, 8) +
-                getFormattedDestination(DatabaseCity.BREE, DatabaseCity.MINAS_MORGUL, 12) +
-                getFormattedDestination(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.ASH_MOUNTAINS, 8) +
-                getFormattedDestination(DatabaseCity.CROSSINGS_OF_POROS, DatabaseCity.THE_LONELY_MOUNTAIN, 11) +
-                getFormattedDestination(DatabaseCity.EDHELLOND, DatabaseCity.FALLS_OF_RAUROS, 5) +
-                getFormattedDestination(DatabaseCity.EDORAS, DatabaseCity.EAST_BIGHT, 6) +
-                getFormattedDestination(DatabaseCity.EDORAS, DatabaseCity.MINAS_MORGUL, 4) +
-                getFormattedDestination(DatabaseCity.EDORAS, DatabaseCity.SEA_OF_RHUN, 10) +
-                getFormattedDestination(DatabaseCity.ERECH, DatabaseCity.DAGORLAD_BATTLE_PLAINS, 5) +
-                getFormattedDestination(DatabaseCity.ERECH, DatabaseCity.IRON_HILLS, 14) +
-                getFormattedDestination(DatabaseCity.ERECH, DatabaseCity.MINAS_MORGUL, 6) +
-                getFormattedDestination(DatabaseCity.ERYN_VORN, DatabaseCity.ASH_MOUNTAINS, 16) +
-                getFormattedDestination(DatabaseCity.ERYN_VORN, DatabaseCity.DOL_GULDUR, 9) +
-                getFormattedDestination(DatabaseCity.ERYN_VORN, DatabaseCity.EAST_BIGHT, 10) +
-                getFormattedDestination(DatabaseCity.ERYN_VORN, DatabaseCity.THE_LONELY_MOUNTAIN, 13) +
-                getFormattedDestination(DatabaseCity.ETTENMOORS, DatabaseCity.EDHELLOND, 10) +
-                getFormattedDestination(DatabaseCity.ETTENMOORS, DatabaseCity.HELMS_DEEP, 8) +
-                getFormattedDestination(DatabaseCity.ETTENMOORS, DatabaseCity.SEA_OF_NURNEN, 15) +
-                getFormattedDestination(DatabaseCity.ETTENMOORS, DatabaseCity.SEA_OF_RHUN, 13) +
-                getFormattedDestination(DatabaseCity.FANGORN, DatabaseCity.BARAD_DUR, 6) +
-                getFormattedDestination(DatabaseCity.FANGORN, DatabaseCity.SEA_OF_RHUN, 10) +
-                getFormattedDestination(DatabaseCity.FORLINDON, DatabaseCity.BARAD_DUR, 18) +
-                getFormattedDestination(DatabaseCity.FORLINDON, DatabaseCity.EAST_BIGHT, 14) +
-                getFormattedDestination(DatabaseCity.FORLINDON, DatabaseCity.RAS_MORTHIL, 14) +
-                getFormattedDestination(DatabaseCity.FORLINDON, DatabaseCity.SEA_OF_NURNEN, 23) +
-                getFormattedDestination(DatabaseCity.GREY_HAVENS, DatabaseCity.ASH_MOUNTAINS, 18) +
-                getFormattedDestination(DatabaseCity.GREY_HAVENS, DatabaseCity.DAGORLAD_BATTLE_PLAINS, 14) +
-                getFormattedDestination(DatabaseCity.GREY_HAVENS, DatabaseCity.EMYN_MUIL, 13) +
-                getFormattedDestination(DatabaseCity.GREY_HAVENS, DatabaseCity.RIVENDELL, 7) +
-                getFormattedDestination(DatabaseCity.HARLINDON, DatabaseCity.IRON_HILLS, 18) +
-                getFormattedDestination(DatabaseCity.HARLINDON, DatabaseCity.ISENGARD, 8) +
-                getFormattedDestination(DatabaseCity.HARLINDON, DatabaseCity.LORIEN, 9) +
-                getFormattedDestination(DatabaseCity.HARLINDON, DatabaseCity.SEA_OF_NURNEN, 20) +
-                getFormattedDestination(DatabaseCity.HELMS_DEEP, DatabaseCity.EMYN_MUIL, 4) +
-                getFormattedDestination(DatabaseCity.HELMS_DEEP, DatabaseCity.THE_LONELY_MOUNTAIN, 11) +
-                getFormattedDestination(DatabaseCity.HOBBITON, DatabaseCity.ASH_MOUNTAINS, 16) +
-                getFormattedDestination(DatabaseCity.HOBBITON, DatabaseCity.BARAD_DUR, 16) +
-                getFormattedDestination(DatabaseCity.HOBBITON, DatabaseCity.DOL_GULDUR, 9) +
-                getFormattedDestination(DatabaseCity.HOBBITON, DatabaseCity.ISENGARD, 7) +
-                getFormattedDestination(DatabaseCity.HOBBITON, DatabaseCity.THE_LONELY_MOUNTAIN, 11) +
-                getFormattedDestination(DatabaseCity.IRON_HILLS, DatabaseCity.SEA_OF_NURNEN, 13) +
-                getFormattedDestination(DatabaseCity.ISENGARD, DatabaseCity.BARAD_DUR, 9) +
-                getFormattedDestination(DatabaseCity.ISENGARD, DatabaseCity.MINAS_TIRITH, 6) +
-                getFormattedDestination(DatabaseCity.ISENGARD, DatabaseCity.THE_LONELY_MOUNTAIN, 11) +
-                getFormattedDestination(DatabaseCity.LAKE_EVENDIM, DatabaseCity.EDORAS, 11) +
-                getFormattedDestination(DatabaseCity.LAKE_EVENDIM, DatabaseCity.FALLS_OF_RAUROS, 12) +
-                getFormattedDestination(DatabaseCity.LAKE_EVENDIM, DatabaseCity.FANGORN, 9) +
-                getFormattedDestination(DatabaseCity.LAKE_EVENDIM, DatabaseCity.HELMS_DEEP, 9) +
-                getFormattedDestination(DatabaseCity.LAKE_EVENDIM, DatabaseCity.IRON_HILLS, 14) +
-                getFormattedDestination(DatabaseCity.LOND_DAER, DatabaseCity.CROSSINGS_OF_POROS, 11) +
-                getFormattedDestination(DatabaseCity.LOND_DAER, DatabaseCity.EAST_BIGHT, 10) +
-                getFormattedDestination(DatabaseCity.LOND_DAER, DatabaseCity.LORIEN, 7) +
-                getFormattedDestination(DatabaseCity.LOND_DAER, DatabaseCity.RIVENDELL, 7) +
-                getFormattedDestination(DatabaseCity.LORIEN, DatabaseCity.MINAS_MORGUL, 7) +
-                getFormattedDestination(DatabaseCity.MINAS_TIRITH, DatabaseCity.BARAD_DUR, 3) +
-                getFormattedDestination(DatabaseCity.MINAS_TIRITH, DatabaseCity.IRON_HILLS, 14) +
-                getFormattedDestination(DatabaseCity.MORIAS_GATE, DatabaseCity.EAST_BIGHT, 5) +
-                getFormattedDestination(DatabaseCity.MORIAS_GATE, DatabaseCity.FANGORN, 4) +
-                getFormattedDestination(DatabaseCity.MORIAS_GATE, DatabaseCity.MINAS_TIRITH, 8) +
-                getFormattedDestination(DatabaseCity.RAS_MORTHIL, DatabaseCity.ASH_MOUNTAINS, 13) +
-                getFormattedDestination(DatabaseCity.RAS_MORTHIL, DatabaseCity.DOL_GULDUR, 10) +
-                getFormattedDestination(DatabaseCity.RAS_MORTHIL, DatabaseCity.MORIAS_GATE, 8) +
-                getFormattedDestination(DatabaseCity.RAS_MORTHIL, DatabaseCity.SEA_OF_RHUN, 16) +
-                getFormattedDestination(DatabaseCity.RIVENDELL, DatabaseCity.EMYN_MUIL, 6) +
-                getFormattedDestination(DatabaseCity.RIVENDELL, DatabaseCity.FALLS_OF_RAUROS, 7) +
-                getFormattedDestination(DatabaseCity.THARBAD, DatabaseCity.EDHELLOND, 7) +
-                getFormattedDestination(DatabaseCity.THARBAD, DatabaseCity.EMYN_MUIL, 7) +
-                getFormattedDestination(DatabaseCity.THARBAD, DatabaseCity.FALLS_OF_RAUROS, 8) +
-                getFormattedDestination(DatabaseCity.THARBAD, DatabaseCity.SEA_OF_RHUN, 15) +
-                getFormattedDestination(DatabaseCity.DAGORLAD_BATTLE_PLAINS, DatabaseCity.THE_LONELY_MOUNTAIN, 8);
+        String formattedDestination = "";
+        for(int i = 0; i < MAX_DESTINATION_CARDS; i++) {
+            formattedDestination += getFormattedDestination();
+        }
         return formattedDestination.substring(0, formattedDestination.length() - 2);
     }
 
-    private static String getFormattedDestination(String startCity, String endCity, int points) {
-        return String.format("(%1$s, %2$s, %3$s, %4$s),\n",
+    private static String getFormattedDestination() {
+        return String.format("(%1$s, %2$s, %3$s, ?),\n",
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
                         DatabaseGame.ID,
                         DatabaseGame.TABLE_NAME,
                         DatabaseGame.GAME_NAME),
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
                         DatabaseCity.ID,
                         DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME,
-                        startCity),
-                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = '%4$s')",
+                        DatabaseCity.NAME),
+                String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
                         DatabaseCity.ID,
                         DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME,
-                        endCity),
-                points
+                        DatabaseCity.NAME)
         );
     }
     public static DatabaseDestinationCard buildDestinationCardFromResultSet(ResultSet resultSet) throws SQLException {

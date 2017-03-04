@@ -9,5 +9,4 @@ public interface IDatabaseGame {
     String getID();
     String getName();
     Boolean isStarted();
-    int getPlayerTurn();
 }

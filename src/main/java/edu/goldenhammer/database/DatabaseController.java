@@ -5,6 +5,8 @@ import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +14,7 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 /**
@@ -60,6 +63,8 @@ public class DatabaseController implements IDatabaseController {
         createTable(DatabaseTrainCard.CREATE_STMT);
         createTable(DatabaseCommand.CREATE_STMT);
         createTable(DatabaseMessage.CREATE_STMT);
+        initializeCities();
+        initializeRoutes();
     }
 
     private void createTable(String sqlStatementString) {
@@ -574,12 +579,21 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseDestinationCard.getAllDestinations());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS; i++) {
+            Scanner destinations = new Scanner(new File("/src/res/destinations.txt"));
+            for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
+                String destination = destinations.nextLine();
+                String[] vars = destination.split(",");
                 statement.setString(i + 1, game_name);
+                statement.setString(i + 2, vars[0]);
+                statement.setString(i + 3, vars[1]);
+                statement.setInt(i + 4, Integer.parseInt(vars[2]));
             }
             statement.execute();
 
         } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        catch(FileNotFoundException ex) {
             ex.printStackTrace();
         }
     }
@@ -593,6 +607,51 @@ public class DatabaseController implements IDatabaseController {
                 DatabaseTrainCard trainCard = getRandomTrainCard(game_name);
                 assignTrainCardToPlayer(trainCard, player_name);
             }
+        }
+    }
+
+    private void initializeCities() {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = DatabaseCity.INSERT_STMT;
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            String pathName = System.getProperty("user.dir") + "/src/main/res/cities.txt";
+            Scanner cities = new Scanner(new File(pathName));
+            for (int i = 0; i < DatabaseCity.CITY_COUNT * 3; i += 3) {
+                String city = cities.nextLine();
+                String[] vars = city.split(",");
+
+                statement.setString(i + 1, vars[0]); //setting city name
+                statement.setInt(i + 2, Integer.parseInt(vars[1])); //point x
+                statement.setInt(i + 3, Integer.parseInt(vars[2])); //point y
+            }
+            statement.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch(FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void initializeRoutes() {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = DatabaseRoute.INSERT_STMT;
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            String pathName = System.getProperty("user.dir") + "/src/main/res/routes.txt";
+            Scanner routes = new Scanner(new File(pathName));
+            for (int i = 0; i < DatabaseRoute.ROUTE_COUNT * 5; i += 5) {
+                String route = routes.nextLine();
+                String[] vars = route.split(",");
+
+                statement.setInt(i + 1, i + 1); //routeID
+                statement.setString(i + 2, vars[0]); //city1
+                statement.setString(i + 3, vars[1]); //city2
+                statement.setString(i + 4, vars[2]); //color
+                statement.setInt(i + 5, Integer.parseInt(vars[3])); //points
+            }
+            statement.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch(FileNotFoundException ex) {
         }
     }
 
@@ -729,16 +788,17 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    public boolean addCommand(BaseCommand command, String game_name, String player_name,
+    public boolean addCommand(BaseCommand command, String game_name, String player_name, String command_type,
                               boolean visibleToSelf, boolean visibleToAll) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s) VALUES (\n" +
-                            "(SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" +
-                            "(SELECT %10$s FROM %11$s WHERE %12$s = ?),\n" +
-                            " ?, ?, ?);",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
+                            "(SELECT %8$s FROM %9$s WHERE %10$s = ?),\n" +
+                            "(SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
+                            " ?, ?, ?, ?);",
                     DatabaseCommand.TABLE_NAME,
                     DatabaseCommand.GAME_ID,
                     DatabaseCommand.PLAYER_ID,
+                    DatabaseCommand.COMMAND_TYPE,
                     DatabaseCommand.METADATA,
                     DatabaseCommand.VISIBLE_TO_SELF,
                     DatabaseCommand.VISIBLE_TO_ALL,
@@ -754,9 +814,10 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
             statement.setString(2, player_name);
-            statement.setString(3, Serializer.serialize(command));
-            statement.setBoolean(4, visibleToSelf);
-            statement.setBoolean(5, visibleToAll);
+            statement.setString(3, command_type);
+            statement.setString(4, Serializer.serialize(command));
+            statement.setBoolean(5, visibleToSelf);
+            statement.setBoolean(6, visibleToAll);
 
             return (statement.executeUpdate() != 0);
         } catch(SQLException ex) {
@@ -787,7 +848,7 @@ public class DatabaseController implements IDatabaseController {
 
                     DatabaseCommand.VISIBLE_TO_SELF,
                     DatabaseCommand.VISIBLE_TO_ALL,
-                    DatabaseCommand.COMMAND_ID
+                    DatabaseCommand.COMMAND_NUMBER
                     );
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
@@ -810,72 +871,8 @@ public class DatabaseController implements IDatabaseController {
         return new ArrayList<>();
     }
 
-    public void initializePlayerTurn(String game_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.PLAYER_TURN,
-                    DatabaseGame.GAME_NAME);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setInt(1, 1);
-            statement.setString(2, game_name);
-            statement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void nextTurn(String game_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s =\n" +
-                    "(SELECT %3$s FROM %4$s WHERE %5$s = ?)",
-                    DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.GAME_ID,
-
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            ResultSet resultSet = statement.executeQuery();
-
-            if(resultSet.next()) {
-                int playerCount = resultSet.getInt(1);
-                int currentPlayer = getCurrentPlayerTurn(game_name);
-                if(currentPlayer++ == playerCount) {
-                    currentPlayer = 1;
-                }
-
-                sqlString = String.format("UPDATE %1$s SET %2$s = ? WHERE %3$s = ?",
-                        DatabaseGame.TABLE_NAME,
-                        DatabaseGame.PLAYER_TURN,
-                        DatabaseGame.GAME_NAME);
-                statement = connection.prepareStatement(sqlString);
-                statement.setInt(1, currentPlayer);
-                statement.setString(2, game_name);
-
-                statement.executeUpdate();
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     private int getCurrentPlayerTurn(String game_name) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
-                    DatabaseGame.PLAYER_TURN,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME);
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-                return resultSet.getInt(DatabaseGame.PLAYER_TURN);
-            }
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
