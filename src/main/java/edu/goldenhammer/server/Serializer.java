@@ -21,8 +21,6 @@ public class Serializer {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         String commandName = jsonObject.get("name").getAsString();
-        StringBuilder sb = new StringBuilder(commandName);
-        commandName = sb.replace(0, 1, sb.substring(0, 1).toUpperCase()).toString();
 
         String className = packagePrefix + commandName + "Command";
 
