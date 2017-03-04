@@ -1,5 +1,6 @@
 package edu.goldenhammer.server.handlers;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
@@ -37,16 +38,20 @@ public abstract class HandlerBase implements HttpHandler {
     }
 
     protected boolean isAuthorized(HttpExchange exchange) {
-        String access_token = exchange.getRequestHeaders().get("Authorization").get(0);
-        String username = exchange.getRequestHeaders().get("Username").get(0);
-        DatabaseController dbc = DatabaseController.getInstance();
-        IDatabasePlayer player = dbc.getPlayerInfo(username);
-        if(player == null) {
-            return false;
+        try {
+            String access_token = exchange.getRequestHeaders().get("Authorization").get(0);
+            String username = exchange.getRequestHeaders().get("Username").get(0);
+            DatabaseController dbc = DatabaseController.getInstance();
+            IDatabasePlayer player = dbc.getPlayerInfo(username);
+            if (player == null) {
+                return false;
+            } else {
+                return access_token.equals(player.getAccessToken());
+            }
+        } catch(NullPointerException ex) {
+            ex.printStackTrace();
         }
-        else {
-            return access_token.equals(player.getAccessToken());
-        }
+        return false;
     }
 
     protected Results getInvalidAuthorizationResults() {
