@@ -29,7 +29,7 @@ public class DatabaseCommand implements IDatabaseCommand{
                     "%6$s VARCHAR(200) NOT NULL," +
                     "%7$s BOOLEAN NOT NULL," +
                     "%8$s BOOLEAN NOT NULL," +
-                    "PRIMARY KEY(%2$s, $3$s)," +
+                    "PRIMARY KEY(%2$s, %3$s)," +
                     "FOREIGN KEY(%3$s)" +
                     "   REFERENCES %9$s" +
                     "   ON DELETE CASCADE," +
