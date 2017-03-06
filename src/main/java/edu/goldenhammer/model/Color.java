@@ -8,15 +8,15 @@ public enum Color {
 
     public static Color getPlayerColorFromNumber(int colorNumber) {
         switch(colorNumber) {
-            case 1:
+            case 0:
                 return BLUE;
-            case 2:
+            case 1:
                 return RED;
-            case 3:
+            case 2:
                 return GREEN;
-            case 4:
+            case 3:
                 return YELLOW;
-            case 5:
+            case 4:
                 return BLACK;
             default:
                 return null;
