@@ -9,20 +9,23 @@ public class PlayerOverview {
     private int destCards;
     private int player;
     private String username;
+    private int points;
 
     public PlayerOverview() {
         color = null;
         pieces = -1;
         destCards = -1;
         player = -1;
+        points = -1;
     }
 
-    public PlayerOverview(Color color, int pieces, int destCards, int player, String username) {
+    public PlayerOverview(Color color, int pieces, int destCards, int player, String username, int points) {
         this.color = color;
         this.pieces = pieces;
         this.destCards = destCards;
         this.player = player;
         this.username = username;
+        this.points = points;
     }
 
     public Color getColor() {
@@ -63,5 +66,13 @@ public class PlayerOverview {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

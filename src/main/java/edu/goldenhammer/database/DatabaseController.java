@@ -479,8 +479,9 @@ public class DatabaseController implements IDatabaseController {
                 int destCards = getDestinationCardCount(resultSet.getInt(DatabaseParticipants.USER_ID));
                 int player = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
                 String username = resultSet.getString(DatabasePlayer.USERNAME);
+                int points = resultSet.getInt(DatabaseParticipants.POINTS);
 
-                players.add(new PlayerOverview(color, pieces, destCards, player, username));
+                players.add(new PlayerOverview(color, pieces, destCards, player, username, points));
             }
             return players;
         } catch(SQLException ex) {
