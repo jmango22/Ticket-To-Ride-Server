@@ -447,10 +447,10 @@ public class DatabaseController implements IDatabaseController {
 
     private List<PlayerOverview> getPlayerOverviews(String game_name) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %4$s\n" +
-                            "FROM %5$s INNER JOIN (SELECT %8$s FROM %9$s)\n" +
-                            "ON %5$s.%6$s = %9$s.%7$s\n" +
-                            "WHERE %10$s IN (SELECT %11$s FROM %12$s WHERE %13$s = ?)",
+            String sqlString = String.format("SELECT %5$s.%1$s, %5$s.%2$s, %5$s.%3$s, %5$s.%4$s, usernames.%8$s\n" +
+                            "FROM %5$s INNER JOIN (SELECT %7$s, %8$s FROM %9$s) AS usernames\n" +
+                            "ON %5$s.%6$s = usernames.%7$s\n" +
+                            "WHERE %5$s.%10$s IN (SELECT %11$s FROM %12$s WHERE %13$s = ?)",
                     DatabaseParticipants.USER_ID,
                     DatabaseParticipants.PLAYER_NUMBER,
                     DatabaseParticipants.POINTS,
@@ -476,7 +476,7 @@ public class DatabaseController implements IDatabaseController {
             while(resultSet.next()) {
                 Color color = Color.getPlayerColorFromNumber(resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER));
                 int pieces = resultSet.getInt(DatabaseParticipants.TRAINS_LEFT);
-                int destCards = getDestinationCardCount(resultSet.getString(DatabaseParticipants.USER_ID));
+                int destCards = getDestinationCardCount(resultSet.getInt(DatabaseParticipants.USER_ID));
                 int player = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
                 String username = resultSet.getString(DatabasePlayer.USERNAME);
 
@@ -489,14 +489,14 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
-    public int getDestinationCardCount(String player_id) {
+    public int getDestinationCardCount(int player_id) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = ?",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.PLAYER_ID);
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, player_id);
+            statement.setInt(1, player_id);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
                 return resultSet.getInt(1);
@@ -566,7 +566,7 @@ public class DatabaseController implements IDatabaseController {
     private List<TrainCard> getTrainCards(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s \n" +
-                    "WHERE %3$s = null\n" +
+                    "WHERE %3$s IS NULL\n" +
                     "AND %4$s = false\n" +
                     "AND %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?);",
                     DatabaseTrainCard.TRAIN_TYPE,
@@ -798,6 +798,8 @@ public class DatabaseController implements IDatabaseController {
                 PreparedStatement statement = connection.prepareStatement(sqlString);
                 statement.setInt(1, i);
                 statement.setInt(2, DatabaseParticipants.MAX_TRAIN_COUNT);
+                statement.setString(3, game_name);
+                statement.setString(4, players.get(i));
                 statement.executeUpdate();
 
             }
@@ -808,15 +810,17 @@ public class DatabaseController implements IDatabaseController {
 
     private void initializeTrainCards(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES %4$s",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
                     DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.ID,
                     DatabaseTrainCard.GAME_ID,
                     DatabaseTrainCard.TRAIN_TYPE,
                     DatabaseTrainCard.getAllTrainCards());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             for(int i = 0; i < ((DatabaseTrainCard.MAX_COLORED_CARDS * 8) + DatabaseTrainCard.MAX_WILD_CARDS); i++) {
-                statement.setString(i + 1, game_name);
+                statement.setInt(i * 2 + 1, i);
+                statement.setString(i * 2 + 2, game_name);
             }
             statement.execute();
 
@@ -836,7 +840,8 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseDestinationCard.getAllDestinations());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            Scanner destinations = new Scanner(new File("/src/res/destinations.txt"));
+            String pathName = System.getProperty("user.dir") + "/src/main/res/destinations.txt";
+            Scanner destinations = new Scanner(new File(pathName));
             for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
                 String destination = destinations.nextLine();
                 String[] vars = destination.split(",");
@@ -883,7 +888,6 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
         } catch(FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -893,6 +897,7 @@ public class DatabaseController implements IDatabaseController {
         try(Connection connection = session.getConnection()) {
             String sqlString = DatabaseRoute.INSERT_STMT;
             PreparedStatement statement = connection.prepareStatement(sqlString);
+
             String pathName = System.getProperty("user.dir") + "/src/main/res/routes.txt";
             Scanner routes = new Scanner(new File(pathName));
             for (int i = 0; i < DatabaseRoute.ROUTE_COUNT * 5; i += 5) {
@@ -907,19 +912,18 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
         } catch(FileNotFoundException ex) {
+            ex.printStackTrace();
         }
     }
 
     public DatabaseTrainCard getRandomTrainCard(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM" +
-                    "(SELECT * FROM %1$s" +
-                        "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                        "AND %6$s = NULL" +
-                        "AND %7$s = false)" +
-                    "ORDER BY random() LIMIT 1",
+            String sqlString = String.format("SELECT * FROM (SELECT * FROM %1$s\n" +
+                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                            "              AND %6$s IS NULL\n" +
+                            "              AND %7$s = false\n" +
+                            ") as newTable ORDER BY random() LIMIT 1",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
                     DatabaseGame.ID,

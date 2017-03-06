@@ -7,6 +7,7 @@ Bree,Edhellond,9
 Bree,Erech,8
 Bree,Minas Morgul,12
 Crossings of Poros,Ash Mountains,8
+Crossings of Poros,The Lonely Mountain,11
 Edhellond,Falls of Rauros,5
 Edoras,East Bight,6
 Edoras,Minas Morgul,4
@@ -24,7 +25,7 @@ Ettenmoors,Sea of Nurnen,15
 Ettenmoors,Sea of Rhun,13
 Fangorn,Barad Dur,6
 Fangorn,Sea of Rhun,10
-Forlindon,barad Dur,18
+Forlindon,Barad Dur,18
 Forlindon,East Bight,14
 Forlindon,Ras Morthil,14
 Forlindon,Sea of Nurnen,23
@@ -55,7 +56,7 @@ Lake Evendim,Iron Hills,14
 Lond Daer,Crossings of Poros,11
 Lond Daer,East Bight,10
 Lond Daer,Lorien,7
-Lond Dear,Rivendell,7
+Lond Daer,Rivendell,7
 Lorien,Minas Morgul,7
 Minas Tirith,Barad Dur,3
 Minas Tirith,Iron Hills,14
@@ -63,12 +64,13 @@ Moria's Gate,East Bight,5
 Moria's Gate,Fangorn,4
 Moria's Gate,Minas Tirith,8
 Ras Morthil,Ash Mountains,13
-Ras Morthil,Moria's Gate,
+Ras Morthil,Dol Guldur,10
+Ras Morthil,Moria's Gate,8
 Ras Morthil,Sea of Rhun,16
 Rivendell,Emyn Muil,6
 Rivendell,Falls of Rauros,7
 Tharbad,Edhellond,7
 Tharbad,Emyn Muil,7
 Tharbad,Falls of Rauros,8
-Tharbad,Sea of Rhun 15
+Tharbad,Sea of Rhun,15
 Dagorlad (Battle Plains),The Lonely Mountain,8
