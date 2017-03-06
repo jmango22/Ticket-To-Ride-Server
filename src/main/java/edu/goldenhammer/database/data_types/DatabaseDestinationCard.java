@@ -16,6 +16,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     public static final String CITY_2 = "city_2";
     public static final String DISCARDED = "discarded";
     public static final String POINTS = "points";
+    public static final String DRAWN = "drawn";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
                     "%2$s SERIAL NOT NULL,\n" +
@@ -25,18 +26,19 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                     "%6$s INTEGER NOT NULL,\n" +
                     "%7$s BOOLEAN NOT NULL DEFAULT false,\n" +
                     "%8$s INTEGER NOT NULL," +
+                    "%9$s BOOLEAN NOT NULL DEFAULT false," +
                     "PRIMARY KEY(%2$s),\n" +
                     "FOREIGN KEY(%3$s)" +
-                    "   REFERENCES %9$s" +
-                    "   ON DELETE CASCADE,\n" +
-                    "FOREIGN KEY(%4$s)" +
                     "   REFERENCES %10$s" +
                     "   ON DELETE CASCADE,\n" +
-                    "FOREIGN KEY (%5$s)" +
+                    "FOREIGN KEY(%4$s)" +
                     "   REFERENCES %11$s" +
                     "   ON DELETE CASCADE,\n" +
+                    "FOREIGN KEY (%5$s)" +
+                    "   REFERENCES %12$s" +
+                    "   ON DELETE CASCADE,\n" +
                     "FOREIGN KEY (%6$s)" +
-                    "   REFERENCES %11$s" +
+                    "   REFERENCES %12$s" +
                     "   ON DELETE CASCADE\n" +
                     ");",
             TABLE_NAME,
@@ -47,13 +49,14 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             CITY_2,
             DISCARDED,
             POINTS,
+            DRAWN,
             DatabaseGame.TABLE_NAME,
             DatabasePlayer.TABLE_NAME,
             DatabaseCity.TABLE_NAME
     );
 
     public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
-                                   String playerID, boolean discarded, int points) {
+                                   String playerID, boolean discarded, int points, boolean drawn) {
         this.destinationCardID = destinationCardID;
         this.gameID = gameID;
         this.playerID = playerID;
@@ -61,6 +64,7 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
         this.city2 = city2;
         this.discarded = discarded;
         this.points = points;
+        this.drawn = drawn;
     }
 
     @Override
@@ -98,6 +102,11 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
         return points;
     }
 
+    @Override
+    public boolean isDrawn() {
+        return drawn;
+    }
+
     public static String getAllDestinations() {
         String formattedDestination = "";
         for(int i = 0; i < MAX_DESTINATION_CARDS; i++) {
@@ -130,7 +139,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                 resultSet.getInt(CITY_2),
                 resultSet.getString(PLAYER_ID),
                 resultSet.getBoolean(DISCARDED),
-                resultSet.getInt(POINTS)
+                resultSet.getInt(POINTS),
+                resultSet.getBoolean(DRAWN)
         );
     }
     
@@ -141,4 +151,5 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     private int city2;
     private boolean discarded;
     private int points;
+    private boolean drawn;
 }

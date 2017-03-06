@@ -17,12 +17,12 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     public static final String TABLE_NAME = "train_card";
     public static final String CREATE_STMT = String.format(
             "CREATE TABLE IF NOT EXISTS %1$s (\n" +
-                    "    %2$s SERIAL NOT NULL,\n" +
+                    "    %2$s INTEGER NOT NULL,\n" +
                     "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER,\n" +
                     "    %5$s VARCHAR(10),\n" +
                     "    %6$s BOOLEAN NOT NULL DEFAULT false,\n" +
-                    "    PRIMARY KEY(%2$s),\n" +
+                    "    PRIMARY KEY(%2$s, %3$s),\n" +
                     "    FOREIGN KEY(%4$s)\n" +
                     "      REFERENCES %7$s\n" +
                     "      ON DELETE CASCADE,\n" +
@@ -78,7 +78,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         String sqlString = "";
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < MAX_COLORED_CARDS; j++) {
-                sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = ?), ",
+                sqlString += String.format("(?, (SELECT %1$s FROM %2$s WHERE %3$s = ?), ",
                         DatabaseGame.ID,
                         DatabaseGame.TABLE_NAME,
                         DatabaseGame.GAME_NAME
@@ -114,7 +114,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         }
 
         for(int i = 0; i < MAX_WILD_CARDS; i++) {
-            sqlString += String.format("((SELECT %1$s FROM %2$s WHERE %3$s = ?), 'wild')",
+            sqlString += String.format("(?, (SELECT %1$s FROM %2$s WHERE %3$s = ?), 'wild')",
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME

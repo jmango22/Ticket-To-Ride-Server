@@ -5,6 +5,7 @@ import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -413,14 +414,8 @@ public class DatabaseController implements IDatabaseController {
     public IGameModel playGame(String game_name) {
         try (Connection connection = session.getConnection()) {
             //get the information to make the GameModel object from the database
-            String sqlString = String.format("SELECT %1$s, %2$s FROM %3$s NATURAL JOIN %4$s WHERE %5$s IN" +
-                            "(SELECT %6$s FROM %7$s WHERE %8$s = ?)",
-                    DatabaseGame.columnNames(),
-                    DatabaseParticipants.PLAYER_NUMBER,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.GAME_ID,
-                    DatabaseGame.ID,
+            String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
+                    DatabaseGame.STARTED,
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME);
             PreparedStatement statement = connection.prepareStatement(sqlString);
@@ -432,14 +427,277 @@ public class DatabaseController implements IDatabaseController {
                 if(!resultSet.getBoolean(DatabaseGame.STARTED)){
                     initializeGame(game_name);
                 }
-                GameModel gameModel = new GameModel(resultSet.getString(DatabaseGame.ID),
-                        resultSet.getString(DatabaseGame.GAME_NAME),
-                        true,
-                        players);
+                IGameModel gameModel = getGameModel(game_name);
                 return gameModel;
             }
         } catch(SQLException e){
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    public IGameModel getGameModel(String game_name) {
+        List<PlayerOverview> players = getPlayerOverviews(game_name);
+        List<DestinationCard> destinationDeck = getDestinationCards(game_name);
+        List<TrainCard> trainCardDeck = getTrainCards(game_name);
+        Map map = getMap(game_name);
+        GameName gameName = new GameName(game_name);
+        return new GameModel(players, destinationDeck, trainCardDeck, map, gameName);
+    }
+
+    private List<PlayerOverview> getPlayerOverviews(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %5$s.%1$s, %5$s.%2$s, %5$s.%3$s, %5$s.%4$s, usernames.%8$s\n" +
+                            "FROM %5$s INNER JOIN (SELECT %7$s, %8$s FROM %9$s) AS usernames\n" +
+                            "ON %5$s.%6$s = usernames.%7$s\n" +
+                            "WHERE %5$s.%10$s IN (SELECT %11$s FROM %12$s WHERE %13$s = ?)",
+                    DatabaseParticipants.USER_ID,
+                    DatabaseParticipants.PLAYER_NUMBER,
+                    DatabaseParticipants.POINTS,
+                    DatabaseParticipants.TRAINS_LEFT,
+
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.USER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.USERNAME,
+
+                    DatabasePlayer.TABLE_NAME,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+
+                    DatabaseGame.GAME_NAME
+                    );
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<PlayerOverview> players = new ArrayList<>();
+            while(resultSet.next()) {
+                Color color = Color.getPlayerColorFromNumber(resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER));
+                int pieces = resultSet.getInt(DatabaseParticipants.TRAINS_LEFT);
+                int destCards = getDestinationCardCount(resultSet.getInt(DatabaseParticipants.USER_ID));
+                int player = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+                String username = resultSet.getString(DatabasePlayer.USERNAME);
+                int points = resultSet.getInt(DatabaseParticipants.POINTS);
+
+                players.add(new PlayerOverview(color, pieces, destCards, player, username, points));
+            }
+            return players;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public int getDestinationCardCount(int player_id) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = ?",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.PLAYER_ID);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, player_id);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    private List<DestinationCard> getDestinationCards(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s.%2$s,\n" +
+                            "city1.%9$s AS city1_point_x," +
+                            "city1.%10$s AS city1_point_y,\n" +
+                            "city1.%11$s AS city1_name,\n" +
+                            "%1$s.%3$s,\n" +
+                            "city2.%9$s AS city2_point_x,\n" +
+                            "city2.%10$s AS city2_point_y,\n" +
+                            "city2.%11$s AS city2_name, \n" +
+                            "%1$s.%4$s \n" +
+                            "FROM %1$s\n" +
+                            "INNER JOIN %7$s AS city1 ON %1$s.%2$s = city1.%8$s \n" +
+                            "INNER JOIN %7$s AS city2 ON %1$s.%3$s = city2.%8$s \n" +
+                            "WHERE %5$s = ? AND %6$s = ?",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.CITY_1,
+                    DatabaseDestinationCard.CITY_2,
+                    DatabaseDestinationCard.POINTS,
+                    DatabaseDestinationCard.DISCARDED,
+                    DatabaseDestinationCard.DRAWN,
+
+                    DatabaseCity.TABLE_NAME,
+                    DatabaseCity.ID,
+                    DatabaseCity.POINT_X,
+                    DatabaseCity.POINT_Y,
+                    DatabaseCity.NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, false);
+            statement.setBoolean(2, false);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<DestinationCard> destinationCards = new ArrayList<>();
+            while(resultSet.next()) {
+                String name_1 = resultSet.getString("city1_name");
+                int x_location_1 = resultSet.getInt("city1_point_x");
+                int y_location_1 = resultSet.getInt("city1_point_y");
+
+                String name_2 = resultSet.getString("city2_name");
+                int x_location_2 = resultSet.getInt("city2_point_x");
+                int y_location_2 = resultSet.getInt("city2_point_y");
+
+                City city1 = new City(x_location_1, y_location_1, name_1);
+                City city2 = new City(x_location_2, y_location_2, name_2);
+
+                int pointsWorth = resultSet.getInt(DatabaseDestinationCard.POINTS);
+                destinationCards.add(new DestinationCard(city1, city2, pointsWorth));
+            }
+            return destinationCards;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<TrainCard> getTrainCards(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s \n" +
+                    "WHERE %3$s IS NULL\n" +
+                    "AND %4$s = false\n" +
+                    "AND %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?);",
+                    DatabaseTrainCard.TRAIN_TYPE,
+                    DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.PLAYER_ID,
+                    DatabaseTrainCard.DISCARDED,
+                    DatabaseTrainCard.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<TrainCard> trainCards = new ArrayList<>();
+            while(resultSet.next()) {
+                Color color = Color.getTrainCardColorFromString(resultSet.getString(DatabaseTrainCard.TRAIN_TYPE));
+                trainCards.add(new TrainCard(color));
+            }
+            return trainCards;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private Map getMap(String game_name) {
+        List<Track> tracks = getTracks(game_name);
+        List<City> cities = getCities();
+
+        return new Map(tracks, cities);
+    }
+
+    private List<Track> getTracks(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s.%3$s,\n" +
+                            "city1.%8$s AS city1_point_x, city1.%9$s AS city1_point_y, city1.%10$s AS city1_name,\n" +
+                            "%1$s.%4$s,\n" +
+                            "city2.%8$s AS city2_point_x, city2.%9$s AS city2_point_y, city2.%10$s AS city2_name,\n" +
+                            "%1$s.%5$s, %1$s.%22$s, route_player_numbers.%18$s FROM %1$s\n" +
+                            "INNER JOIN %6$s AS city1 ON %1$s.%3$s = city1.%7$s \n" +
+                            "INNER JOIN %6$s AS city2 ON %1$s.%4$s = city2.%7$s\n" +
+                            "LEFT JOIN (SELECT %11$s.%12$s, %11$s.%13$s,\n" +
+                            "\t%11$s.%14$s, player_numbers.%18$s FROM %11$s\n" +
+                            "\tINNER JOIN (SELECT %15$s.%16$s, %15$s.%17$s, %15$s.%18$s FROM %15$s\n" +
+                            "\t\tWHERE %16$s = (SELECT %20$s FROM %19$s WHERE %21$s = ?))\n" +
+                            "\t AS player_numbers\n" +
+                            "\t ON %11$s.%12$s = player_numbers.%16$s\n" +
+                            "\t AND %11$s.%13$s = player_numbers.%17$s)\n" +
+                            "AS route_player_numbers\n" +
+                            "ON route_player_numbers.%14$s = %1$s.%2$s;",
+                    DatabaseRoute.TABLE_NAME, //1
+                    DatabaseRoute.ROUTE_NUMBER,
+                    DatabaseRoute.CITY_1,
+                    DatabaseRoute.CITY_2,
+                    DatabaseRoute.ROUTE_LENGTH,
+
+                    DatabaseCity.TABLE_NAME, //6
+                    DatabaseCity.ID,
+                    DatabaseCity.POINT_X,
+                    DatabaseCity.POINT_Y,
+                    DatabaseCity.NAME,
+
+                    DatabaseClaimedRoute.TABLE_NAME, //11
+                    DatabaseClaimedRoute.GAME_ID,
+                    DatabaseClaimedRoute.PLAYER_ID,
+                    DatabaseClaimedRoute.ROUTE_ID,
+
+                    DatabaseParticipants.TABLE_NAME, //15
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseParticipants.USER_ID,
+                    DatabaseParticipants.PLAYER_NUMBER,
+
+                    DatabaseGame.TABLE_NAME, //19
+                    DatabaseGame.ID,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseRoute.ROUTE_COLOR);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<Track> tracks = new ArrayList<>();
+            while(resultSet.next()) {
+                int location1x = resultSet.getInt("city1_point_x");
+                int location1y = resultSet.getInt("city1_point_y");
+                String cityName1 = resultSet.getString("city1_name");
+                int location2x = resultSet.getInt("city2_point_x");
+                int location2y = resultSet.getInt("city2_point_y");
+                String cityName2 = resultSet.getString("city2_name");
+
+                City city1 = new City(location1x, location1y, cityName1);
+                City city2 = new City(location2x, location2y, cityName2);
+
+                int length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
+                Color color = Color.getTrackColorFromString(resultSet.getString(DatabaseRoute.ROUTE_COLOR));
+                int owner = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+
+                tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y));
+            }
+            return tracks;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<City> getCities() {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM %1$s",
+                    DatabaseCity.TABLE_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<City> cities = new ArrayList<>();
+            while(resultSet.next()) {
+                int x_location = resultSet.getInt(DatabaseCity.POINT_X);
+                int y_location = resultSet.getInt(DatabaseCity.POINT_Y);
+                String name = resultSet.getString(DatabaseCity.NAME);
+
+                cities.add(new City(x_location, y_location, name));
+            }
+            return cities;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -541,6 +799,8 @@ public class DatabaseController implements IDatabaseController {
                 PreparedStatement statement = connection.prepareStatement(sqlString);
                 statement.setInt(1, i);
                 statement.setInt(2, DatabaseParticipants.MAX_TRAIN_COUNT);
+                statement.setString(3, game_name);
+                statement.setString(4, players.get(i));
                 statement.executeUpdate();
 
             }
@@ -551,15 +811,17 @@ public class DatabaseController implements IDatabaseController {
 
     private void initializeTrainCards(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s) VALUES %4$s",
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
                     DatabaseTrainCard.TABLE_NAME,
+                    DatabaseTrainCard.ID,
                     DatabaseTrainCard.GAME_ID,
                     DatabaseTrainCard.TRAIN_TYPE,
                     DatabaseTrainCard.getAllTrainCards());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             for(int i = 0; i < ((DatabaseTrainCard.MAX_COLORED_CARDS * 8) + DatabaseTrainCard.MAX_WILD_CARDS); i++) {
-                statement.setString(i + 1, game_name);
+                statement.setInt(i * 2 + 1, i);
+                statement.setString(i * 2 + 2, game_name);
             }
             statement.execute();
 
@@ -579,7 +841,8 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseDestinationCard.getAllDestinations());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            Scanner destinations = new Scanner(new File("/src/res/destinations.txt"));
+            String pathName = System.getProperty("user.dir") + "/src/main/res/destinations.txt";
+            Scanner destinations = new Scanner(new File(pathName));
             for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
                 String destination = destinations.nextLine();
                 String[] vars = destination.split(",");
@@ -626,7 +889,6 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
         } catch(FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -636,6 +898,7 @@ public class DatabaseController implements IDatabaseController {
         try(Connection connection = session.getConnection()) {
             String sqlString = DatabaseRoute.INSERT_STMT;
             PreparedStatement statement = connection.prepareStatement(sqlString);
+
             String pathName = System.getProperty("user.dir") + "/src/main/res/routes.txt";
             Scanner routes = new Scanner(new File(pathName));
             for (int i = 0; i < DatabaseRoute.ROUTE_COUNT * 5; i += 5) {
@@ -650,19 +913,18 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
         } catch(FileNotFoundException ex) {
+            ex.printStackTrace();
         }
     }
 
     public DatabaseTrainCard getRandomTrainCard(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM" +
-                    "(SELECT * FROM %1$s" +
-                        "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                        "AND %6$s = NULL" +
-                        "AND %7$s = false)" +
-                    "ORDER BY random() LIMIT 1",
+            String sqlString = String.format("SELECT * FROM (SELECT * FROM %1$s\n" +
+                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                            "              AND %6$s IS NULL\n" +
+                            "              AND %7$s = false\n" +
+                            ") as newTable ORDER BY random() LIMIT 1",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
                     DatabaseGame.ID,
@@ -866,9 +1128,14 @@ public class DatabaseController implements IDatabaseController {
         return new ArrayList<>();
     }
 
-    //Still need to implement
     private List<BaseCommand> getCommandsFromResultSet(ResultSet resultSet) throws SQLException {
-        return new ArrayList<>();
+        List<BaseCommand> commands = new ArrayList<>();
+
+        while(resultSet.next()) {
+            commands.add(DatabaseCommand.buildCommandFromResultSet(resultSet));
+        }
+
+        return commands;
     }
 
     private int getCurrentPlayerTurn(String game_name) {
@@ -876,7 +1143,7 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-        return -1;
+        return 1;
     }
 
     public boolean claimRoute(String game_name, String username, int route_number) {

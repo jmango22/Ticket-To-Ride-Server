@@ -1,5 +1,12 @@
 package edu.goldenhammer.database.data_types;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import edu.goldenhammer.server.commands.BaseCommand;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by seanjib on 2/22/2017.
  */
@@ -22,7 +29,7 @@ public class DatabaseCommand implements IDatabaseCommand{
                     "%6$s VARCHAR(200) NOT NULL," +
                     "%7$s BOOLEAN NOT NULL," +
                     "%8$s BOOLEAN NOT NULL," +
-                    "PRIMARY KEY(%2$s, $3$s)," +
+                    "PRIMARY KEY(%2$s, %3$s)," +
                     "FOREIGN KEY(%3$s)" +
                     "   REFERENCES %9$s" +
                     "   ON DELETE CASCADE," +
@@ -89,6 +96,32 @@ public class DatabaseCommand implements IDatabaseCommand{
     public static String columnNames() {
         return  String.join(",", COMMAND_NUMBER, GAME_ID, PLAYER_ID,
                 METADATA, VISIBLE_TO_SELF, VISIBLE_TO_ALL);
+    }
+
+    public static BaseCommand buildCommandFromResultSet(ResultSet resultSet) throws SQLException{
+        String commandName = resultSet.getString(COMMAND_TYPE);
+        StringBuilder sb = new StringBuilder(commandName);
+        commandName = sb.replace(0, 1, sb.substring(0, 1).toUpperCase()).toString();
+        String packagePrefix = "edu.goldenhammer.server.commands";
+        String className = packagePrefix + commandName + "Command";
+
+        BaseCommand command = null;
+        try {
+            Class c = null;
+            try {
+                c = Class.forName(className);
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
+            }
+
+            String metadata = resultSet.getString(METADATA);
+
+            Gson gson = new Gson();
+            command = (BaseCommand)gson.fromJson(metadata, c);
+        } catch (JsonSyntaxException ex) {
+            ex.printStackTrace();
+        }
+        return command;
     }
 
     private String commandNumber;
