@@ -26,7 +26,7 @@ public class DatabaseCommand implements IDatabaseCommand{
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER NOT NULL," +
                     "%5$s VARCHAR(30) NOT NULL," +
-                    "%6$s VARCHAR(200) NOT NULL," +
+                    "%6$s VARCHAR(1000) NOT NULL," +
                     "%7$s BOOLEAN NOT NULL," +
                     "%8$s BOOLEAN NOT NULL," +
                     "PRIMARY KEY(%2$s, %3$s)," +

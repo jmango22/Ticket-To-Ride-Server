@@ -1,8 +1,14 @@
 package edu.goldenhammer.server.commands;
 
+import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
 import edu.goldenhammer.model.DestinationCard;
+import edu.goldenhammer.model.Hand;
 import edu.goldenhammer.server.Results;
+import edu.goldenhammer.server.Serializer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +22,24 @@ public class ReturnDestCardsCommand extends BaseCommand {
     }
 
     public Results execute() {
-        return new Results();
+        IDatabaseController dbc = DatabaseController.getInstance();
+        Results results = new Results();
+        try {
+            if(dbc.returnDestCards(getGameName(), getPlayerName(), toReturn)) {
+                results.setResponseCode(200);
+                Serializer serializer = new Serializer();
+                results.setMessage(serializer.serialize(this));
+                addToDatabase(true, false);
+            }
+            else {
+                results.setResponseCode(400);
+                results.setAndSerializeMessage("Error: You cannot return those cards");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            results.setResponseCode(400);
+            results.setAndSerializeMessage("Error: Invalid input");
+        }
+        return results;
     }
 }
