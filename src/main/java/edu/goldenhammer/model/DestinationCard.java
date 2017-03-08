@@ -20,6 +20,18 @@ public class DestinationCard implements Serializable{
         this.pointsWorth = pointsWorth;
     }
 
+    public City getCity1() {
+        return city1;
+    }
+
+    public City getCity2() {
+        return city2;
+    }
+
+    public int getPointsWorth() {
+        return pointsWorth;
+    }
+
     public static DestinationCard parseDatabaseDestinationCard(DatabaseDestinationCard databaseDestinationCard) {
         IDatabaseController dbc = DatabaseController.getInstance();
         City city1 = City.parseDatabaseCity(dbc.getCity(databaseDestinationCard.getCity1()));

@@ -5,7 +5,6 @@ import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -1245,7 +1244,8 @@ public class DatabaseController implements IDatabaseController {
 
     public void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
+            String sqlString = String.format("INSERT INTO %1$s(%14$s,%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
+                            "?," +
                             "(SELECT %8$s FROM %9$s WHERE %10$s = ?),\n" +
                             "(SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
                             " ?, ?, ?, ?);",
@@ -1263,19 +1263,160 @@ public class DatabaseController implements IDatabaseController {
 
                     DatabasePlayer.ID,
                     DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME);
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseCommand.COMMAND_NUMBER);
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, cmd.getGameName());
-            statement.setString(2, cmd.getPlayerName());
-            statement.setString(3, cmd.getName());
-            statement.setString(4, Serializer.serialize(cmd));
-            statement.setBoolean(5, visibleToSelf);
-            statement.setBoolean(6, visibleToAll);
+            statement.setInt(1, cmd.getCommandNumber());
+            statement.setString(2, cmd.getGameName());
+            statement.setString(3, cmd.getPlayerName());
+            statement.setString(4, cmd.getName());
+            statement.setString(5, Serializer.serialize(cmd));
+            statement.setBoolean(6, visibleToSelf);
+            statement.setBoolean(7, visibleToAll);
 
             statement.execute();
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public boolean returnDestCards(String gameName, String playerName, List<DestinationCard> destinationCards) {
+        if(destinationCards.size() == 1 && getDrawnDestCardCount(gameName, playerName) == 3) {
+            return returnSingleDestCard(gameName, playerName, destinationCards.get(0));
+        }
+        else if(destinationCards.size() == 2 && getDrawnDestCardCount(gameName, playerName) == 3){
+            try (Connection connection = session.getConnection()) {
+                String sqlString = String.format("UPDATE %1$s SET %2$s = null, %3$s = ?, %4$s = ?\n" +
+                        "WHERE %2$s = (SELECT %5$s FROM %6$s WHERE %7$s = ?)\n" +
+                        "AND %8$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
+                        "AND ((%12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
+                        "   AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?))\n" +
+                        "OR (%12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
+                        "   AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)))\n" +
+                        "AND %3$s = ?;\n" +
+                        "UPDATE %1$s SET %3$s = ?, %4$s = ?",
+                        DatabaseDestinationCard.TABLE_NAME,
+                        DatabaseDestinationCard.PLAYER_ID,
+                        DatabaseDestinationCard.DRAWN,
+                        DatabaseDestinationCard.DISCARDED,
+
+                        DatabasePlayer.ID, //5
+                        DatabasePlayer.TABLE_NAME,
+                        DatabasePlayer.USERNAME,
+
+                        DatabaseDestinationCard.GAME_ID, //8
+
+                        DatabaseGame.ID, //9
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME,
+
+                        DatabaseDestinationCard.CITY_1, //12
+                        DatabaseDestinationCard.CITY_2,
+
+                        DatabaseCity.ID, //14
+                        DatabaseCity.TABLE_NAME,
+                        DatabaseCity.NAME);
+                PreparedStatement statement = connection.prepareStatement(sqlString);
+                statement.setBoolean(1, false);
+                statement.setBoolean(2, true);
+                statement.setString(3, playerName);
+                statement.setString(4, gameName);
+                statement.setString(5, destinationCards.get(0).getCity1().getName());
+                statement.setString(6, destinationCards.get(0).getCity2().getName());
+                statement.setString(7, destinationCards.get(1).getCity1().getName());
+                statement.setString(8, destinationCards.get(1).getCity2().getName());
+                statement.setBoolean(9, true);
+
+                return statement.executeUpdate() == 2;
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private boolean returnSingleDestCard(String gameName, String playerName, DestinationCard destinationCard) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = null, %3$s = ?, %4$s = ?\n" +
+                    "WHERE %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
+                    "AND %2$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
+                    "AND %12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
+                    "AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
+                    "AND %3$s = ?;",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabaseDestinationCard.DRAWN,
+                    DatabaseDestinationCard.DISCARDED,
+                    DatabaseDestinationCard.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseDestinationCard.CITY_1,
+                    DatabaseDestinationCard.CITY_2,
+
+                    DatabaseCity.ID,
+                    DatabaseCity.TABLE_NAME,
+                    DatabaseCity.NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, false);
+            statement.setBoolean(2, true);
+            statement.setString(3, gameName);
+            statement.setString(4, playerName);
+            statement.setString(5, destinationCard.getCity1().getName());
+            statement.setString(6, destinationCard.getCity2().getName());
+            statement.setBoolean(7, true);
+
+            return statement.executeUpdate() == 1;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private int getDrawnDestCardCount(String gameName, String playerName) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM %1$s\n" +
+                    "WHERE %2$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
+                    "AND %3$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
+                    "AND %4$s = ?" +
+                    "AND %5$s = ?",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseDestinationCard.DISCARDED,
+                    DatabaseDestinationCard.DRAWN,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, playerName);
+            statement.setString(2, gameName);
+            statement.setBoolean(3, false);
+            statement.setBoolean(4, true);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            int drawnCardCount = 0;
+            while(resultSet.next()) {
+                ++drawnCardCount;
+            }
+            return drawnCardCount;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return -1;
     }
 }

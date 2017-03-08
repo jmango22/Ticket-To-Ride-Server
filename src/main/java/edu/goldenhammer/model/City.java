@@ -13,6 +13,10 @@ public class City implements Serializable{
     private double y_location;
     private String name;
 
+    public String getName() {
+        return name;
+    }
+
     public City(double x_location, double y_location, String name) {
         this.x_location = x_location;
         this.y_location = y_location;

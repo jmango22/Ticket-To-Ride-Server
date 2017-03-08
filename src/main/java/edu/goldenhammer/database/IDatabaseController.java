@@ -3,6 +3,7 @@ package edu.goldenhammer.database;
 import edu.goldenhammer.database.data_types.DatabaseCity;
 import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
 import edu.goldenhammer.database.data_types.DatabaseTrainCard;
+import edu.goldenhammer.model.DestinationCard;
 import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.model.IGameModel;
@@ -29,4 +30,5 @@ public interface IDatabaseController {
     DatabaseCity getCity(int cityID);
     boolean hasDestinationCards(String gameName, String playerName);
     void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);
+    boolean returnDestCards(String gameName, String playerName, List<DestinationCard> destinationCards);
 }
