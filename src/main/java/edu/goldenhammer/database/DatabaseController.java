@@ -487,6 +487,28 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    public int getDestinationCardCount(String player_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, player_name);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
     public int getDestinationCardCount(int player_id) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = ?",
@@ -1286,7 +1308,9 @@ public class DatabaseController implements IDatabaseController {
         if(destinationCards.size() == 1 && getDrawnDestCardCount(gameName, playerName) == 3) {
             return returnSingleDestCard(gameName, playerName, destinationCards.get(0));
         }
-        else if(destinationCards.size() == 2 && getDrawnDestCardCount(gameName, playerName) == 3){
+        else if(destinationCards.size() == 2
+                && getDrawnDestCardCount(gameName, playerName) == 3
+                && getDestinationCardCount(playerName) > 3){
             try (Connection connection = session.getConnection()) {
                 String sqlString = String.format("UPDATE %1$s SET %2$s = null, %3$s = ?, %4$s = ?\n" +
                         "WHERE %2$s = (SELECT %5$s FROM %6$s WHERE %7$s = ?)\n" +
