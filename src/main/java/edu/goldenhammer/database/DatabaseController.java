@@ -1104,44 +1104,6 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    public boolean addCommand(BaseCommand command, String game_name, String player_name, String command_type,
-                              boolean visibleToSelf, boolean visibleToAll) {
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
-                            "(SELECT %8$s FROM %9$s WHERE %10$s = ?),\n" +
-                            "(SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
-                            " ?, ?, ?, ?);",
-                    DatabaseCommand.TABLE_NAME,
-                    DatabaseCommand.GAME_ID,
-                    DatabaseCommand.PLAYER_ID,
-                    DatabaseCommand.COMMAND_TYPE,
-                    DatabaseCommand.METADATA,
-                    DatabaseCommand.VISIBLE_TO_SELF,
-                    DatabaseCommand.VISIBLE_TO_ALL,
-
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME,
-
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            statement.setString(2, player_name);
-            statement.setString(3, command_type);
-            statement.setString(4, Serializer.serialize(command));
-            statement.setBoolean(5, visibleToSelf);
-            statement.setBoolean(6, visibleToAll);
-
-            return (statement.executeUpdate() != 0);
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT * FROM %1$s" +
@@ -1279,5 +1241,41 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return true;
+    }
+
+    public void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
+                            "(SELECT %8$s FROM %9$s WHERE %10$s = ?),\n" +
+                            "(SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
+                            " ?, ?, ?, ?);",
+                    DatabaseCommand.TABLE_NAME,
+                    DatabaseCommand.GAME_ID,
+                    DatabaseCommand.PLAYER_ID,
+                    DatabaseCommand.COMMAND_TYPE,
+                    DatabaseCommand.METADATA,
+                    DatabaseCommand.VISIBLE_TO_SELF,
+                    DatabaseCommand.VISIBLE_TO_ALL,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, cmd.getGameName());
+            statement.setString(2, cmd.getPlayerName());
+            statement.setString(3, cmd.getName());
+            statement.setString(4, Serializer.serialize(cmd));
+            statement.setBoolean(5, visibleToSelf);
+            statement.setBoolean(6, visibleToAll);
+
+            statement.execute();
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }

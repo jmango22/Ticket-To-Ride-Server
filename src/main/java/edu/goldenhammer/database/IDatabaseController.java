@@ -7,6 +7,7 @@ import edu.goldenhammer.model.GameList;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.model.IGameModel;
 import edu.goldenhammer.model.TrainCard;
+import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.util.List;
 
@@ -27,4 +28,5 @@ public interface IDatabaseController {
     DatabaseDestinationCard drawRandomDestinationCard(String gameName, String playerName);
     DatabaseCity getCity(int cityID);
     boolean hasDestinationCards(String gameName, String playerName);
+    void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);
 }
