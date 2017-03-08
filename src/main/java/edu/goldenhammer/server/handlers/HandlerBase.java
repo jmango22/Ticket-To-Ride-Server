@@ -4,13 +4,16 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
+import edu.goldenhammer.model.PlayerOverview;
 import edu.goldenhammer.server.Results;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,6 +61,23 @@ public abstract class HandlerBase implements HttpHandler {
         Results results = new Results();
         results.setResponseCode(500);
         results.setAndSerializeMessage("Error: invalid username or invalid access token.");
+
+        return results;
+    }
+
+    protected boolean isInGame(HttpExchange exchange) {
+        String game_name = exchange.getRequestHeaders().get("gamename").get(0);
+        String username = exchange.getRequestHeaders().get("username").get(0);
+        DatabaseController dbc = DatabaseController.getInstance();
+        List<String> players = dbc.getPlayers(game_name);
+        boolean containsUsername = players.contains(username);
+        return containsUsername;
+    }
+
+    protected Results getNotInGameResults() {
+        Results results = new Results();
+        results.setResponseCode(400);
+        results.setAndSerializeMessage("Error: you have not joined that game.");
 
         return results;
     }

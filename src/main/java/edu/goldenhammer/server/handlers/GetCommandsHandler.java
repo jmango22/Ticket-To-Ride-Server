@@ -21,6 +21,9 @@ public class GetCommandsHandler extends HandlerBase {
             if(!isAuthorized(exchange)) {
                 results = getInvalidAuthorizationResults();
             }
+            else if(!isInGame(exchange)) {
+                results = getNotInGameResults();
+            }
             else {
                 DatabaseController dbc = DatabaseController.getInstance();
                 List<BaseCommand> commandList;
