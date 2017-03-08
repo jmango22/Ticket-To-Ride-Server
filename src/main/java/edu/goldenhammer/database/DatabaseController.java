@@ -1296,7 +1296,9 @@ public class DatabaseController implements IDatabaseController {
                         "OR (%12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
                         "   AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)))\n" +
                         "AND %3$s = ?;\n" +
-                        "UPDATE %1$s SET %3$s = ?, %4$s = ?",
+                        "UPDATE %1$s SET %3$s = ?\n" +
+                                "WHERE %2$s = (SELECT %5$s FROM %6$s WHERE %7$s = ?)\n" +
+                                "AND %8$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?);\n",
                         DatabaseDestinationCard.TABLE_NAME,
                         DatabaseDestinationCard.PLAYER_ID,
                         DatabaseDestinationCard.DRAWN,
@@ -1328,6 +1330,9 @@ public class DatabaseController implements IDatabaseController {
                 statement.setString(7, destinationCards.get(1).getCity1().getName());
                 statement.setString(8, destinationCards.get(1).getCity2().getName());
                 statement.setBoolean(9, true);
+                statement.setBoolean(10, false);
+                statement.setString(11, playerName);
+                statement.setString(12, gameName);
 
                 return statement.executeUpdate() == 2;
             } catch (SQLException ex) {
@@ -1344,7 +1349,10 @@ public class DatabaseController implements IDatabaseController {
                     "AND %2$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
                     "AND %12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
                     "AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
-                    "AND %3$s = ?;",
+                    "AND %3$s = ?;" +
+                            "UPDATE %1$s SET %3$s = ?\n" +
+                            "WHERE %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
+                            "AND %2$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?);\n",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.PLAYER_ID,
                     DatabaseDestinationCard.DRAWN,
@@ -1373,6 +1381,9 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(5, destinationCard.getCity1().getName());
             statement.setString(6, destinationCard.getCity2().getName());
             statement.setBoolean(7, true);
+            statement.setBoolean(8, false);
+            statement.setString(9, gameName);
+            statement.setString(10, playerName);
 
             return statement.executeUpdate() == 1;
         } catch (SQLException ex) {
