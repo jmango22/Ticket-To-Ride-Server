@@ -6,7 +6,10 @@ import java.io.Serializable;
 
 public abstract class BaseCommand implements Serializable {
     private String name;
+    private int playerNumber;
     private int commandNumber;
+    private String gameName;
+    private String playerName;
 
     public String getName() {
         return name;
@@ -25,4 +28,28 @@ public abstract class BaseCommand implements Serializable {
     }
 
     public abstract Results execute();
+
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+
+    public void setPlayerNumber(int playerNumber) {
+        this.playerNumber = playerNumber;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
 }

@@ -1,11 +1,12 @@
 package edu.goldenhammer.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by seanjib on 3/2/2017.
  */
-public class Hand {
+public class Hand implements Serializable{
     private List<DestinationCard> destinationCards;
     private List<TrainCard> trainCards;
     private DrawnDestinationCards drawnDestinationCards;
