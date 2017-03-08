@@ -26,4 +26,5 @@ public interface IDatabaseController {
     DatabaseTrainCard drawRandomTrainCard(String gameName, String playerName);
     DatabaseDestinationCard drawRandomDestinationCard(String gameName, String playerName);
     DatabaseCity getCity(int cityID);
+    boolean hasDestinationCards(String gameName, String playerName);
 }

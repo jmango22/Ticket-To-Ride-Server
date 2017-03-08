@@ -1254,4 +1254,30 @@ public class DatabaseController implements IDatabaseController {
         }
         return null;
     }
+
+    public boolean hasDestinationCards(String gameName, String playerName) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
+                            "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
+                            "AND %7$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?);\n",
+                    DatabaseDestinationCard.ID,
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, playerName);
+            statement.setString(2, gameName);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return true;
+    }
 }

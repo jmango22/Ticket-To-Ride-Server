@@ -30,14 +30,21 @@ public class InitializeHandCommand extends BaseCommand {
         Results results = new Results();
         hand = null;
         try {
-            hand = new Hand(new ArrayList<>(), drawTrainCards(dbc), drawDestinationCards(dbc));
-            results.setResponseCode(200);
+            if(!dbc.hasDestinationCards(getGameName(), getPlayerName())) {
+                hand = new Hand(new ArrayList<>(), drawTrainCards(dbc), drawDestinationCards(dbc));
+                results.setResponseCode(200);
+                Serializer serializer = new Serializer();
+                results.setMessage(serializer.serialize(this));
+            }
+            else {
+                results.setResponseCode(400);
+                results.setMessage("Error: You have already drawn your initial cards!");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             results.setResponseCode(400);
+            results.setMessage("Error: Invalid input!");
         }
-        Serializer serializer = new Serializer();
-        results.setMessage(serializer.serialize(this));
         return results;
     }
 
