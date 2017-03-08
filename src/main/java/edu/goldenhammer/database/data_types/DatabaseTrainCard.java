@@ -40,6 +40,12 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
             DatabasePlayer.TABLE_NAME,
             DatabaseGame.TABLE_NAME
     );
+    public static final String INSERT_STMT = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s) VALUES %5$s",
+            DatabaseTrainCard.TABLE_NAME,
+            DatabaseTrainCard.ID,
+            DatabaseTrainCard.GAME_ID,
+            DatabaseTrainCard.TRAIN_TYPE,
+            DatabaseTrainCard.getAllTrainCards());
 
     public DatabaseTrainCard(String id,String gameID, String playerID,
                              String trainType, boolean discarded) {

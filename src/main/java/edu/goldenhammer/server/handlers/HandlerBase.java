@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.data_types.IDatabaseGame;
 import edu.goldenhammer.database.data_types.IDatabasePlayer;
 import edu.goldenhammer.model.PlayerOverview;
@@ -44,7 +45,7 @@ public abstract class HandlerBase implements HttpHandler {
         try {
             String access_token = exchange.getRequestHeaders().get("Authorization").get(0);
             String username = exchange.getRequestHeaders().get("Username").get(0);
-            DatabaseController dbc = DatabaseController.getInstance();
+            IDatabaseController dbc = DatabaseController.getInstance();
             IDatabasePlayer player = dbc.getPlayerInfo(username);
             if (player == null) {
                 return false;
@@ -68,7 +69,7 @@ public abstract class HandlerBase implements HttpHandler {
     protected boolean isInGame(HttpExchange exchange) {
         String game_name = exchange.getRequestHeaders().get("gamename").get(0);
         String username = exchange.getRequestHeaders().get("username").get(0);
-        DatabaseController dbc = DatabaseController.getInstance();
+        IDatabaseController dbc = DatabaseController.getInstance();
         List<String> players = dbc.getPlayers(game_name);
         boolean containsUsername = players.contains(username);
         return containsUsername;

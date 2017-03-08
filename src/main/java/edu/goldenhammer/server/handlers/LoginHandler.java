@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
@@ -23,7 +24,7 @@ public class LoginHandler extends HandlerBase {
             String username = credentials.get("username").getAsString();
             String password = credentials.get("password").getAsString();
 
-            DatabaseController dbc = DatabaseController.getInstance();
+            IDatabaseController dbc = DatabaseController.getInstance();
             boolean success = dbc.login(username, password);
 
 

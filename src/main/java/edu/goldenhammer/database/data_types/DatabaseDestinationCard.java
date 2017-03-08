@@ -8,6 +8,7 @@ import java.sql.SQLException;
  */
 public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     public static final int MAX_DESTINATION_CARDS = 76;
+    public static final String FILE_PATH = System.getProperty("user.dir") + "/src/main/res/destinations.txt";
     public static final String TABLE_NAME = "destination_card";
     public static final String ID = "destination_card_id";
     public static final String GAME_ID = "game_id";
@@ -54,6 +55,14 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             DatabasePlayer.TABLE_NAME,
             DatabaseCity.TABLE_NAME
     );
+    public static final String INSERT_STMT = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s, %5$s)" +
+                    "\nVALUES %6$s",
+            DatabaseDestinationCard.TABLE_NAME,
+            DatabaseDestinationCard.GAME_ID,
+            DatabaseDestinationCard.CITY_1,
+            DatabaseDestinationCard.CITY_2,
+            DatabaseDestinationCard.POINTS,
+            DatabaseDestinationCard.getAllDestinations());
 
     public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
                                    String playerID, boolean discarded, int points, boolean drawn) {
