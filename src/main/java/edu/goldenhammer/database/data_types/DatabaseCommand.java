@@ -102,7 +102,7 @@ public class DatabaseCommand implements IDatabaseCommand{
         String commandName = resultSet.getString(COMMAND_TYPE);
         StringBuilder sb = new StringBuilder(commandName);
         commandName = sb.replace(0, 1, sb.substring(0, 1).toUpperCase()).toString();
-        String packagePrefix = "edu.goldenhammer.server.commands";
+        String packagePrefix = "edu.goldenhammer.server.commands.";
         String className = packagePrefix + commandName + "Command";
 
         BaseCommand command = null;
