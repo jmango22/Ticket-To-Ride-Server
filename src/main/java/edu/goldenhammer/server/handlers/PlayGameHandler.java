@@ -10,7 +10,7 @@ import edu.goldenhammer.server.Serializer;
  * Created by seanjib on 2/5/2017.
  */
 public class PlayGameHandler extends HandlerBase {
-    public void handle(HttpExchange exchange) {
+    public synchronized void handle(HttpExchange exchange) {
         try {
             DatabaseController dbc = DatabaseController.getInstance();
             Results results = new Results();

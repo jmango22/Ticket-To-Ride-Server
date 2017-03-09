@@ -21,11 +21,13 @@ public abstract class BaseCommand implements Serializable {
         return commandNumber;
     }
 
+
+
     protected final void setName(String name) {
         this.name = name;
     }
 
-    protected final void setCommandNumber(int commandNumber) {
+    public final void setCommandNumber(int commandNumber) {
         this.commandNumber = commandNumber;
     }
 

@@ -2,9 +2,11 @@ package edu.goldenhammer.server;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 
 import com.sun.net.httpserver.*;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.handlers.*;
 
 /**
@@ -41,6 +43,9 @@ public class ServerCommunicator {
         DatabaseController c = DatabaseController.getInstance();
 //        c.joinGame("dk","ghteam");
 //        c.leaveGame("dk","ghteam");
+//        DatabaseController dbc = DatabaseController.getInstance();
+//        List<BaseCommand> commandList;
+//        commandList = dbc.getCommandsSinceLastCommand("just", "devon1", 0);
         String portNumber = "8082";//args[0];
         new ServerCommunicator().run(portNumber);
 //        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();

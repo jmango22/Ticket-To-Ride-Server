@@ -3,6 +3,7 @@ package edu.goldenhammer.database.data_types;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import edu.goldenhammer.server.commands.BaseCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -98,11 +99,11 @@ public class DatabaseCommand implements IDatabaseCommand{
                 METADATA, VISIBLE_TO_SELF, VISIBLE_TO_ALL);
     }
 
-    public static BaseCommand buildCommandFromResultSet(ResultSet resultSet) throws SQLException{
+    public static BaseCommand buildCommandFromResultSet(ResultSet resultSet, String player_name) throws SQLException{
         String commandName = resultSet.getString(COMMAND_TYPE);
         StringBuilder sb = new StringBuilder(commandName);
         commandName = sb.replace(0, 1, sb.substring(0, 1).toUpperCase()).toString();
-        String packagePrefix = "edu.goldenhammer.server.commands";
+        String packagePrefix = "edu.goldenhammer.server.commands.";
         String className = packagePrefix + commandName + "Command";
 
         BaseCommand command = null;
@@ -118,6 +119,11 @@ public class DatabaseCommand implements IDatabaseCommand{
 
             Gson gson = new Gson();
             command = (BaseCommand)gson.fromJson(metadata, c);
+            command.setPlayerNumber(resultSet.getInt("player_number"));
+            if(command instanceof InitializeHandCommand &&!command.getPlayerName().equals(player_name) && !resultSet.getBoolean(VISIBLE_TO_ALL)){
+                InitializeHandCommand handCommand = (InitializeHandCommand) command;
+                handCommand.hide();
+            }
         } catch (JsonSyntaxException ex) {
             ex.printStackTrace();
         }
