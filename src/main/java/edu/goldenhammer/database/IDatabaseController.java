@@ -23,10 +23,16 @@ public interface IDatabaseController {
     List<String> getPlayers(String gameID);
     Boolean leaveGame(String player, String gameID);
     IGameModel playGame(String gameID);
+    IGameModel getGameModel(String game_name);
+    int getDestinationCardCount(String player_name);
+    int getDestinationCardCount(int player_id);
+    List<TrainCard> getTrainCards(String game_name);
     void setAccessToken(String userID, String accessToken);
     void maybeDropGame(String gameName);
     DatabaseTrainCard drawRandomTrainCard(String gameName, String playerName);
     DatabaseDestinationCard drawRandomDestinationCard(String gameName, String playerName);
+    List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID);
+    boolean claimRoute(String game_name, String username, int route_number);
     DatabaseCity getCity(int cityID);
     boolean hasDestinationCards(String gameName, String playerName);
     void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);

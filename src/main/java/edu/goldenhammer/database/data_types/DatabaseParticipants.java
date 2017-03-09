@@ -38,6 +38,24 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
             TRAINS_LEFT,
             DatabasePlayer.TABLE_NAME,
             DatabaseGame.TABLE_NAME);
+    public static final String INITIALIZE_STMT = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?" +
+                    " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)" +
+                    " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?);",
+            DatabaseParticipants.TABLE_NAME,
+            DatabaseParticipants.PLAYER_NUMBER,
+            DatabaseParticipants.POINTS,
+            DatabaseParticipants.TRAINS_LEFT,
+
+            DatabaseParticipants.GAME_ID,
+            DatabaseGame.ID,
+            DatabaseGame.TABLE_NAME,
+            DatabaseGame.GAME_NAME,
+
+            DatabaseParticipants.USER_ID,
+            DatabasePlayer.ID,
+            DatabasePlayer.TABLE_NAME,
+            DatabasePlayer.USERNAME
+    );
 
     public DatabaseParticipants(String playerID, String gameID, int playerNumber, int points, int trainsLeft) {
         this.playerID = playerID;
