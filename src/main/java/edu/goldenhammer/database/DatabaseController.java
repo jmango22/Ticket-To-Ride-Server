@@ -345,16 +345,19 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
 
             //get the information to make the GameModel object from the database
-            String sqlString = String.format("SELECT %1$s,%2$s FROM %3$s NATURAL JOIN %4$s\n" +
-                            "WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)",
-                    DatabasePlayer.ID,
-                    DatabasePlayer.USERNAME,
+            String sqlString = String.format("SELECT %1$s.%2$s FROM %1$s\n" +
+                            "INNER JOIN %3$s ON %1$s.%4$s = %3$s.%5$s\n" +
+                            "INNER JOIN (SELECT %6$s FROM %7$s WHERE %8$s = ?) as game_ids\n" +
+                            "   ON %3$s.%9$s = game_ids.%6$s;",
                     DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
                     DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.GAME_ID,
+                    DatabasePlayer.ID,
+                    DatabaseParticipants.USER_ID,
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME);
+                    DatabaseGame.GAME_NAME,
+                    DatabaseParticipants.GAME_ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1,game_name);
             ResultSet resultSet = statement.executeQuery();
@@ -982,7 +985,7 @@ public class DatabaseController implements IDatabaseController {
 
     private boolean reshuffleTrainCardDiscardPile(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = false" +
+            String sqlString = String.format("UPDATE %1$s SET %2$s = false\n" +
                             "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.DISCARDED,
@@ -1023,12 +1026,12 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM %1$s" +
-                    "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                    "AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)" +
-                            "AND %10$s = ?)" +
-                        "OR %11$s = ?)" +
-                    "AND %12$s > ?;",
+            String sqlString = String.format("SELECT * FROM %1$s\n" +
+                    "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                    "AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)\n" +
+                            "AND %10$s = ?)\n" +
+                        "OR %11$s = ?)\n" +
+                    "AND %12$s > ?;\n",
                     DatabaseCommand.TABLE_NAME,
 
                     DatabaseCommand.GAME_ID,
@@ -1220,10 +1223,7 @@ public class DatabaseController implements IDatabaseController {
                         "   AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?))\n" +
                         "OR (%12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
                         "   AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)))\n" +
-                        "AND %3$s = ?;\n" +
-                        "UPDATE %1$s SET %3$s = ?\n" +
-                                "WHERE %2$s = (SELECT %5$s FROM %6$s WHERE %7$s = ?)\n" +
-                                "AND %8$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?);\n",
+                        "AND %3$s = ?;\n",
                         DatabaseDestinationCard.TABLE_NAME,
                         DatabaseDestinationCard.PLAYER_ID,
                         DatabaseDestinationCard.DRAWN,
@@ -1255,11 +1255,10 @@ public class DatabaseController implements IDatabaseController {
                 statement.setString(7, destinationCards.get(1).getCity1().getName());
                 statement.setString(8, destinationCards.get(1).getCity2().getName());
                 statement.setBoolean(9, true);
-                statement.setBoolean(10, false);
-                statement.setString(11, playerName);
-                statement.setString(12, gameName);
 
-                return statement.executeUpdate() == 2;
+                boolean returnValue = statement.executeUpdate() == 2;
+                addDestinationCardsToHand(gameName, playerName);
+                return returnValue;
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -1272,12 +1271,9 @@ public class DatabaseController implements IDatabaseController {
             String sqlString = String.format("UPDATE %1$s SET %2$s = null, %3$s = ?, %4$s = ?\n" +
                     "WHERE %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
                     "AND %2$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
-                    "AND %12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
-                    "AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)" +
-                    "AND %3$s = ?;" +
-                            "UPDATE %1$s SET %3$s = ?\n" +
-                            "WHERE %5$s = (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
-                            "AND %2$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?);\n",
+                    "AND %12$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
+                    "AND %13$s = (SELECT %14$s FROM %15$s WHERE %16$s = ?)\n" +
+                    "AND %3$s = ?;",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.PLAYER_ID,
                     DatabaseDestinationCard.DRAWN,
@@ -1306,15 +1302,39 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(5, destinationCard.getCity1().getName());
             statement.setString(6, destinationCard.getCity2().getName());
             statement.setBoolean(7, true);
-            statement.setBoolean(8, false);
-            statement.setString(9, gameName);
-            statement.setString(10, playerName);
 
-            return statement.executeUpdate() == 1;
+            boolean returnValue = statement.executeUpdate() == 1;
+            addDestinationCardsToHand(gameName, playerName);
+            return returnValue;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    private void addDestinationCardsToHand(String game_name, String player_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE %1$s SET %2$s = ?\n" +
+                            "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
+                            "AND %7$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?);,",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.DRAWN,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME
+                    );
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, false);
+            statement.setString(2, game_name);
+            statement.setString(3, player_name);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private int getDrawnDestCardCount(String gameName, String playerName) {
