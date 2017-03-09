@@ -48,6 +48,9 @@ public class InitializeHandCommand extends BaseCommand {
         }
         return results;
     }
+    public void hide(){
+        hand = new Hand();
+    }
 
     private List<TrainCard> drawTrainCards(IDatabaseController dbc) {
         List<TrainCard> trainCards = new ArrayList<>();

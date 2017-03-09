@@ -1,6 +1,7 @@
 package edu.goldenhammer.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,5 +16,10 @@ public class Hand implements Serializable{
         this.destinationCards = destinationCards;
         this.trainCards = trainCards;
         this.drawnDestinationCards = drawnDestinationCards;
+    }
+    public Hand(){
+        this.destinationCards = new ArrayList<>();
+        this.trainCards = new ArrayList<>();
+        this.drawnDestinationCards = new DrawnDestinationCards(new ArrayList<>());
     }
 }

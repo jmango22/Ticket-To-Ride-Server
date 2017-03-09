@@ -4,6 +4,7 @@ import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -772,7 +773,7 @@ public class DatabaseController implements IDatabaseController {
         initializeParticipants(game_name);
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
-        //initializePlayerTrainCards(game_name);
+        initializeHands(game_name);
         setGameStarted(game_name);
     }
 
@@ -789,6 +790,19 @@ public class DatabaseController implements IDatabaseController {
 
         } catch(SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void initializeHands(String game_name) {
+        List<String> players = getPlayers(game_name);
+        int commandNumber = 0;
+        for(String player : players) {
+            BaseCommand command = new InitializeHandCommand();
+            command.setGameName(game_name);
+            command.setCommandNumber(commandNumber);
+            commandNumber++;
+            command.setPlayerName(player);
+            command.execute();
         }
     }
 
@@ -1124,15 +1138,15 @@ public class DatabaseController implements IDatabaseController {
         }
         return false;
     }
-
+//    SELECT * FROM commandWHERE game_id = (SELECT game_id FROM game WHERE name = ?)AND ((player_id = (SELECT user_id FROM player WHERE username = ?)AND visible_to_self = ?)OR visible_to_all = ?)AND command_number > ?;
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM %1$s" +
-                    "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                    "AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)" +
-                            "AND %10$s = ?)" +
-                        "OR %11$s = ?)" +
-                    "AND %12$s > ?;",
+            String sqlString = String.format("(SELECT * FROM %1$s natural join participants where user_id=player_id" +
+                    " and %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
+//                    " AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)" +
+//                            " AND %10$s = ?)" +
+//                        " OR %11$s = ?)" +
+                    " AND %12$s >= ? order by command_number);",
                     DatabaseCommand.TABLE_NAME,
 
                     DatabaseCommand.GAME_ID,
@@ -1152,24 +1166,24 @@ public class DatabaseController implements IDatabaseController {
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
-            statement.setString(2, player_name);
-            statement.setBoolean(3, true);
-            statement.setBoolean(4, true);
-            statement.setInt(5, lastCommandID);
+//            statement.setString(2, player_name);
+//            statement.setBoolean(3, true);
+//            statement.setBoolean(4, true);
+            statement.setInt(2, lastCommandID);
 
             ResultSet resultSet = statement.executeQuery();
-            return getCommandsFromResultSet(resultSet);
+            return getCommandsFromResultSet(resultSet, player_name);
         } catch(SQLException ex) {
         ex.printStackTrace();
         }
         return new ArrayList<>();
     }
 
-    private List<BaseCommand> getCommandsFromResultSet(ResultSet resultSet) throws SQLException {
+    private List<BaseCommand> getCommandsFromResultSet(ResultSet resultSet, String player_name) throws SQLException {
         List<BaseCommand> commands = new ArrayList<>();
 
         while(resultSet.next()) {
-            commands.add(DatabaseCommand.buildCommandFromResultSet(resultSet));
+            commands.add(DatabaseCommand.buildCommandFromResultSet(resultSet, player_name));
         }
 
         return commands;
