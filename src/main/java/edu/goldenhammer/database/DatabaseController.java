@@ -5,6 +5,7 @@ import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.InitializeHandCommand;
+import sun.nio.cs.US_ASCII;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1467,5 +1468,87 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return -1;
+    }
+
+    @Override
+    public boolean postMessage(String game_name, String player_name, String message) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%2$s, %3$s, %4$s)" +
+                            "VALUES ((SELECT %5$s FROM %6$s WHERE %7$s = ?)," +
+                            "(SELECT %8$s FROM %9$s WHERE %10$s = ?), ?)",
+                    DatabaseMessage.TABLE_NAME,
+                    DatabaseMessage.GAME_ID,
+                    DatabaseMessage.PLAYER_ID,
+                    DatabaseMessage.MESSAGE,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, player_name);
+            statement.setString(3, message);
+
+            return statement.executeUpdate() == 1;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public List<DatabaseMessage> getMessages(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM %1$s\n" +
+                            "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?);",
+                    DatabaseMessage.TABLE_NAME,
+                    DatabaseMessage.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<DatabaseMessage> messages = new ArrayList<>();
+            while(resultSet.next()) {
+                messages.add(DatabaseMessage.parseResultSetRow(resultSet));
+            }
+
+            return messages;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String getUsername(String player_id) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
+                            "WHERE %3$s = ?;",
+                    DatabasePlayer.USERNAME,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.ID);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, Integer.parseInt(player_id));
+
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                return resultSet.getString(DatabasePlayer.USERNAME);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 }

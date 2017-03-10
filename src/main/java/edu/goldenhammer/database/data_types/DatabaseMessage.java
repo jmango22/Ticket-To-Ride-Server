@@ -1,5 +1,8 @@
 package edu.goldenhammer.database.data_types;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * Created by seanjib on 2/22/2017.
  */
@@ -65,6 +68,14 @@ public class DatabaseMessage implements IDatabaseMessage {
 
     public static String columnNames() {
         return String.join(",", ID, GAME_ID, PLAYER_ID, MESSAGE);
+    }
+
+    public static DatabaseMessage parseResultSetRow(ResultSet resultSet) throws SQLException{
+        String id = resultSet.getString(ID);
+        String game_id = resultSet.getString(GAME_ID);
+        String player_id = resultSet.getString(PLAYER_ID);
+        String message = resultSet.getString(MESSAGE);
+        return new DatabaseMessage(id, game_id, player_id, message);
     }
 
     private String messageID;
