@@ -26,7 +26,7 @@ public interface IDatabaseController {
     DatabaseDestinationCard drawRandomDestinationCard(String gameName, String playerName);
     DatabaseCity getCity(int cityID);
     boolean hasDestinationCards(String gameName, String playerName);
-    void addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);
+    boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);
     boolean returnDestCards(String gameName, String playerName, List<DestinationCard> destinationCards);
     boolean postMessage(String game_name, String player_name, String message);
     List<DatabaseMessage> getMessages(String game_name);
