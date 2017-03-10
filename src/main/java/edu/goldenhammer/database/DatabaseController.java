@@ -690,6 +690,9 @@ public class DatabaseController implements IDatabaseController {
                 int length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
                 Color color = Color.getTrackColorFromString(resultSet.getString(DatabaseRoute.ROUTE_COLOR));
                 int owner = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+                if(resultSet.wasNull()) {
+                    owner = -1;
+                }
 
                 tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y));
             }
