@@ -45,4 +45,9 @@ public class ReturnDestCardsCommand extends BaseCommand {
         }
         return results;
     }
+
+    @Override
+    public void hide(){
+        toReturn = new ArrayList<>();
+    }
 }
