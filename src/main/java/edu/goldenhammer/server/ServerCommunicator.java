@@ -70,5 +70,7 @@ public class ServerCommunicator {
         server.createContext("/playgame", new PlayGameHandler());
         server.createContext("/register", new RegisterHandler());
         server.createContext("/getcommands", new GetCommandsHandler());
+        server.createContext("/getmessages", new GetMessagesHandler());
+        server.createContext("/postmessage", new PostMessageHandler());
     }
 }
