@@ -22,7 +22,7 @@ public abstract class BaseCommand implements Serializable {
     }
 
 
-
+    public void hide(){}
     protected final void setName(String name) {
         this.name = name;
     }

@@ -5,7 +5,6 @@ import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.InitializeHandCommand;
-import sun.nio.cs.US_ASCII;
 
 import java.io.File;
 import java.io.FileNotFoundException;

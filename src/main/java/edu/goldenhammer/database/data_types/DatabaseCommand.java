@@ -120,9 +120,8 @@ public class DatabaseCommand implements IDatabaseCommand{
             Gson gson = new Gson();
             command = (BaseCommand)gson.fromJson(metadata, c);
             command.setPlayerNumber(resultSet.getInt("player_number"));
-            if(command instanceof InitializeHandCommand &&!command.getPlayerName().equals(player_name) && !resultSet.getBoolean(VISIBLE_TO_ALL)){
-                InitializeHandCommand handCommand = (InitializeHandCommand) command;
-                handCommand.hide();
+            if(!command.getPlayerName().equals(player_name) && !resultSet.getBoolean(VISIBLE_TO_ALL)){
+                command.hide();
             }
         } catch (JsonSyntaxException ex) {
             ex.printStackTrace();
