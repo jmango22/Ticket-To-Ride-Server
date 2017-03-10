@@ -21,11 +21,14 @@ public class ReturnDestCardsCommand extends BaseCommand {
         setName("ReturnDestCards");
     }
 
-    public Results execute() {
+    //TODO: make this synchronized for part 1. make sure it's the right command number. if not, change it.
+    public  Results execute() {
         IDatabaseController dbc = DatabaseController.getInstance();
         Results results = new Results();
         try {
-            if(dbc.returnDestCards(getGameName(), getPlayerName(), toReturn)) {
+            if(toReturn.size() == 0 || dbc.returnDestCards(getGameName(), getPlayerName(), toReturn)) {
+                //TODO: do checking to make sure this adds. If it doesn't make sure it reverses what it did.
+                dbc.addCommand(this, true, false);
                 results.setResponseCode(200);
                 Serializer serializer = new Serializer();
                 results.setMessage(serializer.serialize(this));
