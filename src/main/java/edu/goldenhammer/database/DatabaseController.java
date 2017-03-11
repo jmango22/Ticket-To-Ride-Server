@@ -162,7 +162,7 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames(String player_user_name) {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %15$s FROM %4$s NATURAL JOIN %5$s\n" +
+            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %15 FROM %4$s NATURAL JOIN %5$s\n" +
                             "NATURAL JOIN %6$s WHERE %7$s IN (SELECT %8$s FROM %9$s\n" +
                             "WHERE %10$s IN (SELECT %11$s FROM %12$s WHERE %13$s=?)) ORDER BY %14$s",
                     DatabaseParticipants.columnNames(),
@@ -1286,15 +1286,15 @@ public class DatabaseController implements IDatabaseController {
         return true;
     }
 
-    public synchronized boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
+    private boolean addFirstCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("INSERT INTO %1$s(%14$s,%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
-                            "?," +
-                            "(SELECT %8$s FROM %9$s WHERE %10$s = ?),\n" +
-                            "(SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
-                            " ?, ?, ?, ?)" +
-                            "WHERE EXISTS (SELECT * FROM %1$s WHERE %14$s = ?\n" +
-                            "       AND %2$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?));",
+                            "   ?,\n" +
+                            "   (SELECT %8$s FROM %9$s WHERE %10$s = ?" +
+                            "       AND NOT EXISTS (SELECT * FROM %1$s WHERE %14$s = ?\n" +
+                            "           AND %2$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?))),\n" +
+                            "   (SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
+                            "   ?,\n ?,\n ?,\n ?);",
                     DatabaseCommand.TABLE_NAME,
                     DatabaseCommand.GAME_ID,
                     DatabaseCommand.PLAYER_ID,
@@ -1316,13 +1316,61 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setInt(1, cmd.getCommandNumber());
             statement.setString(2, cmd.getGameName());
-            statement.setString(3, cmd.getPlayerName());
-            statement.setString(4, cmd.getName());
-            statement.setString(5, Serializer.serialize(cmd));
-            statement.setBoolean(6, visibleToSelf);
-            statement.setBoolean(7, visibleToAll);
-            statement.setInt(8, cmd.getCommandNumber() - 1);
-            statement.setString(9, cmd.getGameName());
+            statement.setInt(3, cmd.getCommandNumber());
+            statement.setString(4, cmd.getGameName());
+            statement.setString(5, cmd.getPlayerName());
+            statement.setString(6, cmd.getName());
+            statement.setString(7, Serializer.serialize(cmd));
+            statement.setBoolean(8, visibleToSelf);
+            statement.setBoolean(9, visibleToAll);
+
+            return statement.executeUpdate() == 1;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public synchronized boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
+        if(cmd.getCommandNumber() == 0) {
+            return addFirstCommand(cmd, visibleToSelf, visibleToAll);
+        }
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("INSERT INTO %1$s(%14$s,%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
+                            "   ?,\n" +
+                            "   (SELECT %8$s FROM %9$s WHERE %10$s = ?" +
+                            "       AND EXISTS (SELECT * FROM %1$s WHERE %14$s = ?\n" +
+                            "           AND %2$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?))),\n" +
+                            "   (SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
+                            "   ?,\n ?,\n ?,\n ?);",
+                    DatabaseCommand.TABLE_NAME,
+                    DatabaseCommand.GAME_ID,
+                    DatabaseCommand.PLAYER_ID,
+                    DatabaseCommand.COMMAND_TYPE,
+                    DatabaseCommand.METADATA,
+                    DatabaseCommand.VISIBLE_TO_SELF,
+                    DatabaseCommand.VISIBLE_TO_ALL,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseCommand.COMMAND_NUMBER);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, cmd.getCommandNumber());
+            statement.setString(2, cmd.getGameName());
+            statement.setInt(3, cmd.getCommandNumber() - 1);
+            statement.setString(4, cmd.getGameName());
+            statement.setString(5, cmd.getPlayerName());
+            statement.setString(6, cmd.getName());
+            statement.setString(7, Serializer.serialize(cmd));
+            statement.setBoolean(8, visibleToSelf);
+            statement.setBoolean(9, visibleToAll);
 
             return statement.executeUpdate() == 1;
         } catch(SQLException ex) {
