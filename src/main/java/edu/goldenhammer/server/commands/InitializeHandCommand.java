@@ -39,12 +39,12 @@ public class InitializeHandCommand extends BaseCommand {
             }
             else {
                 results.setResponseCode(400);
-                results.setMessage("Error: You have already drawn your initial cards!");
+                results.setAndSerializeMessage("Error: You have already drawn your initial cards!");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             results.setResponseCode(400);
-            results.setMessage("Error: Invalid input!");
+            results.setAndSerializeMessage("Error: Invalid input!");
         }
         return results;
     }
