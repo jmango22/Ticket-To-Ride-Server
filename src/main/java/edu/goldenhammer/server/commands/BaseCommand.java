@@ -31,6 +31,14 @@ public abstract class BaseCommand implements Serializable {
         this.commandNumber = commandNumber;
     }
 
+    public boolean validate() {
+        return true;
+    }
+
+    public boolean endTurn() {
+        return true;
+    }
+
     public abstract Results execute();
 
     public int getPlayerNumber() {
