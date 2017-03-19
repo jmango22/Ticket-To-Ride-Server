@@ -1611,4 +1611,102 @@ public class DatabaseController implements IDatabaseController {
         }
         return null;
     }
+
+    @Override
+    public List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number) {
+        List<DatabaseDestinationCard> cards = getDestinationCards(game_name, username, commandNumber, player_number);
+        if(cards != null && cards.size() < 3) {
+            reshuffleDestinationCardDiscardPile(game_name);
+            cards = getDestinationCards(game_name, username, commandNumber, player_number);
+        }
+        return cards;
+    }
+
+    private List<DatabaseDestinationCard> getDestinationCards(String game_name, String username, int commandNumber, int player_number) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "UPDATE %1$s SET %2$s = ?,\n" +
+                    "%3$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" +
+                    "WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
+                    "AND %3$s IS NULL\n" +
+                    "AND %5$s = ?\n" +
+                    "AND EXISTS (SELECT * FROM (\n" +
+                    "       SELECT count(*) FROM %1$s\n" +
+                    "       WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
+                    "       AND %3$s IS NULL\n" +
+                    "       AND %5$s = ?) AS dest_card_count WHERE count >= ?)\n" +
+                    "AND %6$s IN (\n" +
+                    "   SELECT %6$s FROM %1$s\n" +
+                    "   WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
+                    "   AND %3$s IS NULL\n" +
+                    "   ORDER BY random()\n" +
+                    "   LIMIT 3)\n" +
+                    "AND NOT EXISTS (" +
+                            "SELECT * FROM commands\n" +
+                            "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
+                            "AND command_number = ?)\n" +
+                    "AND EXISTS (\n" +
+                            "SELECT * FROM commands\n" +
+                            "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
+                            "AND command_number = ?\n" +
+                            "AND player_number IN (\n" +
+                            "       SELECT player_number FROM participants\n" +
+                            "       WHERE player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
+                            "       AND game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "       AND (player_number = ? - 1\n" +
+                            "           OR player_number = ? + (\n" +
+                            "               SELECT player_number FROM participants\n" +
+                            "               WHERE game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "               ORDER BY player_number DESC\n" +
+                            "               LIMIT 1)\n" +
+                            ")\n" +
+                            "AND command_type = ?)\n" +
+                    "RETURNING *\n" +
+                    ");",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.DRAWN,
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabaseDestinationCard.GAME_ID,
+                    DatabaseDestinationCard.DISCARDED,
+                    DatabaseDestinationCard.ID,
+
+                    DatabasePlayer.ID,
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME
+                    );
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setBoolean(1, true);
+            statement.setString(2, username);
+            statement.setString(3,game_name);
+            statement.setBoolean(4,false);
+            statement.setString(5, game_name);
+            statement.setBoolean(6,false);
+            statement.setInt(7,3);
+            statement.setString(8,game_name);
+            statement.setString(9, game_name);
+            statement.setInt(10, commandNumber);
+            statement.setString(11, game_name);
+            statement.setInt(12, commandNumber - 1);
+            statement.setString(13, username);
+            statement.setString(14, game_name);
+            statement.setInt(15, player_number);
+            statement.setInt(16, player_number);
+            statement.setString(17, game_name);
+            statement.setString(18, "EndTurn");
+
+            ResultSet resultSet = statement.executeQuery();
+            List<DatabaseDestinationCard> cards = new ArrayList<>();
+            while(resultSet.next()) {
+                cards.add(DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet));
+            }
+            return cards;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }

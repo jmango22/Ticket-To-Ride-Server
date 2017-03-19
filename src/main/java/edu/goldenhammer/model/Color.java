@@ -33,7 +33,7 @@ public enum Color {
                 return ORANGE;
             case "yellow":
                 return YELLOW;
-            case"green":
+            case "green":
                 return GREEN;
             case "blue":
                 return BLUE;
