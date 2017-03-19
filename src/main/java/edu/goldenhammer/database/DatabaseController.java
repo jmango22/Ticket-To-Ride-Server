@@ -1626,41 +1626,41 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(
                     "UPDATE %1$s SET %2$s = ?,\n" +
-                    "%3$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" +
-                    "WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
-                    "AND %3$s IS NULL\n" +
-                    "AND %5$s = ?\n" +
-                    "AND EXISTS (SELECT * FROM (\n" +
+                    "%3$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" + //player id
+                    "WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" + //game id
+                    "AND %3$s IS NULL\n" + //player id is null
+                    "AND %5$s = ?\n" + //not discarded
+                    "AND EXISTS (SELECT * FROM (\n" + //make sure there are three destination cards left in the deck
                     "       SELECT count(*) FROM %1$s\n" +
                     "       WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
                     "       AND %3$s IS NULL\n" +
                     "       AND %5$s = ?) AS dest_card_count WHERE count >= ?)\n" +
-                    "AND %6$s IN (\n" +
+                    "AND %6$s IN (\n" + //select three random destination card ids to update
                     "   SELECT %6$s FROM %1$s\n" +
                     "   WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
                     "   AND %3$s IS NULL\n" +
                     "   ORDER BY random()\n" +
                     "   LIMIT 3)\n" +
-                    "AND NOT EXISTS (" +
+                    "AND NOT EXISTS (" + //make sure the command number has not been used yet
                             "SELECT * FROM commands\n" +
                             "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
                             "AND command_number = ?)\n" +
-                    "AND EXISTS (\n" +
+                    "AND EXISTS (\n" + //make sure the last command was the previous player's end turn command
                             "SELECT * FROM commands\n" +
                             "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
                             "AND command_number = ?\n" +
-                            "AND player_number IN (\n" +
+                            "AND player_number IN (\n" + //find the previous player number
                             "       SELECT player_number FROM participants\n" +
                             "       WHERE player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
                             "       AND game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
-                            "       AND (player_number = ? - 1\n" +
-                            "           OR player_number = ? + (\n" +
+                            "       AND (player_number = ? - 1\n" + //player number can be either the number minus one
+                            "           OR player_number = ? + (\n" +//or the total number of participants, if player zero
                             "               SELECT player_number FROM participants\n" +
                             "               WHERE game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
-                            "               ORDER BY player_number DESC\n" +
-                            "               LIMIT 1)\n" +
+                            "               ORDER BY player_number DESC\n" + //make sure the highest number (the total
+                            "               LIMIT 1)\n" +                    //number of participants) is on top
                             ")\n" +
-                            "AND command_type = ?)\n" +
+                            "AND command_type = ?)\n" + //command type needs to be EndTurn
                     "RETURNING *\n" +
                     ");",
                     DatabaseDestinationCard.TABLE_NAME,
