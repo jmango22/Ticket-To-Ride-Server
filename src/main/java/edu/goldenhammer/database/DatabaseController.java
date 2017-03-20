@@ -1712,6 +1712,7 @@ public class DatabaseController implements IDatabaseController {
         }
         return null;
     }
+
 //    with card as (select * from train_card
 //            where game_id in (select game_id from game where name='aaaa')
 //    and player_id in (select user_id from player where username='devon')
@@ -1776,5 +1777,6 @@ public class DatabaseController implements IDatabaseController {
             e.printStackTrace();
         }
         return null;
+
     }
 }
