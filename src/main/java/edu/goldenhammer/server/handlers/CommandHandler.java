@@ -1,11 +1,14 @@
 package edu.goldenhammer.server.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
+
+import edu.goldenhammer.server.CommandManager;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.io.IOException;
+import java.util.List;
 
 public class CommandHandler extends HandlerBase {
     @Override
@@ -28,12 +31,14 @@ public class CommandHandler extends HandlerBase {
                 String player_name = httpExchange.getRequestHeaders().get("username").get(0);
                 baseCommand.setGameName(game_name);
                 baseCommand.setPlayerName(player_name);
-                results = baseCommand.execute();
+
+                CommandManager comManager = new CommandManager();
+                comManager.addCommand(baseCommand);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             results.setResponseCode(500);
-            results.setMessage("Error: an error occured.");
+            results.setMessage("Error: an error occurred.");
         }
         sendResponse(httpExchange, results);
     }
