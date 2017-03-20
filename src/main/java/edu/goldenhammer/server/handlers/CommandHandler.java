@@ -8,6 +8,7 @@ import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.io.IOException;
+import java.util.List;
 
 public class CommandHandler extends HandlerBase {
     @Override
@@ -31,9 +32,8 @@ public class CommandHandler extends HandlerBase {
                 baseCommand.setGameName(game_name);
                 baseCommand.setPlayerName(player_name);
 
-                CommandManager comManager = new CommandManager(baseCommand);
-
-                results = baseCommand.execute();
+                CommandManager comManager = new CommandManager();
+                comManager.addCommand(baseCommand);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

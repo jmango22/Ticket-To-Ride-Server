@@ -1199,6 +1199,7 @@ public class DatabaseController implements IDatabaseController {
 
     private int getCurrentPlayerTurn(String game_name) {
         try (Connection connection = session.getConnection()) {
+
         } catch(SQLException ex) {
             ex.printStackTrace();
         }

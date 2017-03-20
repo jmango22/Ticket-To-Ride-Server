@@ -3,6 +3,8 @@ package edu.goldenhammer.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
@@ -16,12 +18,6 @@ import edu.goldenhammer.server.commands.EndTurnCommand;
 
 public class CommandManager {
 
-    /*
-    public CommandManager(BaseCommand baseCommand) {
-        this.baseCommand = baseCommand;
-    }
-    */
-
     /**
      * Add the basecommand, and then validate and execute
      * Check command type,
@@ -29,13 +25,11 @@ public class CommandManager {
      * @return all the commands, such as base command, and endturn, null if not allowed
      */
 
-    //Add the basecommand, and then validate and execute
-    //Returns all the
     public List<BaseCommand> addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
             List<BaseCommand> executed = new ArrayList<>();
 
-            if(currentPlayerTurn(command.getPlayerName())) {
+            if(currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
@@ -55,7 +49,12 @@ public class CommandManager {
 
     //Tests that it's the current players turn.
     //Check the last EndTurnCommands player number and see what player is next.
-    private boolean currentPlayerTurn(String player_name) {
-        return true;
+    private boolean currentPlayerTurn(int playerNumber, String game_name) {
+        DatabaseController dbc = DatabaseController.getInstance();
+        //This doesn't work yet... The getCurrentPlayerTurn doesn't return a real player number yet. It needs to be written.
+        if(dbc.getCurrentPlayerTurn(game_name) == playerNumber) {
+            return true;
+        }
+        return false;
     }
 }
