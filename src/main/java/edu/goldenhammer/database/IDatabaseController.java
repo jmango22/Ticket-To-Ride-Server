@@ -1,10 +1,7 @@
 package edu.goldenhammer.database;
 
 import edu.goldenhammer.database.data_types.*;
-import edu.goldenhammer.model.DestinationCard;
-import edu.goldenhammer.model.GameList;
-import edu.goldenhammer.model.IGameModel;
-import edu.goldenhammer.model.TrainCard;
+import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.util.List;
@@ -31,5 +28,7 @@ public interface IDatabaseController {
     boolean postMessage(String game_name, String player_name, String message);
     List<DatabaseMessage> getMessages(String game_name);
     String getUsername(String player_id);
+
     List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number);
+    boolean discardCard(String gameName, String playerName, Color color);
 }
