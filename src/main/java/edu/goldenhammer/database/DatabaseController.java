@@ -1779,4 +1779,13 @@ public class DatabaseController implements IDatabaseController {
         return null;
 
     }
+    public boolean playerHasCards(int wildCount, int nonWildCount, Color color, String gameName) {
+        try (Connection connection = session.getConnection()) {
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
