@@ -14,6 +14,14 @@ public class TrainCard implements Serializable{
         this.color = color;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public static TrainCard parseDatabaseTrainCard(DatabaseTrainCard databaseTrainCard) {
         Color color = Color.getTrainCardColorFromString(databaseTrainCard.getTrainType());
         return new TrainCard(color);

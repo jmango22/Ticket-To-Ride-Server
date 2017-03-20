@@ -13,8 +13,9 @@ public class Track {
     private double location1y;
     private double location2x;
     private double location2y;
+    private int route_number;
 
-    public Track(City city1, City city2, int length, Color color, int owner, double location1x, double location1y, double location2x, double location2y) {
+    public Track(City city1, City city2, int length, Color color, int owner, double location1x, double location1y, double location2x, double location2y, int route_number) {
         this.city1 = city1;
         this.city2 = city2;
         this.length = length;
@@ -24,5 +25,46 @@ public class Track {
         this.location1y = location1y;
         this.location2x = location2x;
         this.location2y = location2y;
+        this.route_number = route_number;
+    }
+
+    public int getRoute_number() {
+        return route_number;
+    }
+
+    public City getCity1() {
+        return city1;
+    }
+
+    public City getCity2() {
+        return city2;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public int getOwner() {
+        return owner;
+    }
+
+    public double getLocation1x() {
+        return location1x;
+    }
+
+    public double getLocation1y() {
+        return location1y;
+    }
+
+    public double getLocation2x() {
+        return location2x;
+    }
+
+    public double getLocation2y() {
+        return location2y;
     }
 }

@@ -4,6 +4,7 @@ import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
+import edu.goldenhammer.server.commands.EndTurnCommand;
 import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 import java.io.File;
@@ -415,28 +416,30 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public IGameModel playGame(String game_name) {
-        try (Connection connection = session.getConnection()) {
-            //get the information to make the GameModel object from the database
-            String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
-                    DatabaseGame.STARTED,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME);
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1,game_name);
-            ResultSet resultSet = statement.executeQuery();
+        synchronized(Lock.getInstance().getLock(game_name)) {
+            try (Connection connection = session.getConnection()) {
+                //get the information to make the GameModel object from the database
+                String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
+                        DatabaseGame.STARTED,
+                        DatabaseGame.TABLE_NAME,
+                        DatabaseGame.GAME_NAME);
+                PreparedStatement statement = connection.prepareStatement(sqlString);
+                statement.setString(1, game_name);
+                ResultSet resultSet = statement.executeQuery();
 
-            List<String> players = getPlayers(game_name);
-            if(resultSet.next() && players.size() > 1) {
-                if(!resultSet.getBoolean(DatabaseGame.STARTED)){
-                    initializeGame(game_name);
+                List<String> players = getPlayers(game_name);
+                if (resultSet.next() && players.size() > 1) {
+                    if (!resultSet.getBoolean(DatabaseGame.STARTED)) {
+                        initializeGame(game_name);
+                    }
+                    IGameModel gameModel = getGameModel(game_name);
+                    return gameModel;
                 }
-                IGameModel gameModel = getGameModel(game_name);
-                return gameModel;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch(SQLException e){
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public IGameModel getGameModel(String game_name) {
@@ -628,13 +631,13 @@ public class DatabaseController implements IDatabaseController {
         return new Map(tracks, cities);
     }
 
-    private List<Track> getTracks(String game_name) {
+    public List<Track> getTracks(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s.%3$s,\n" +
                             "city1.%8$s AS city1_point_x, city1.%9$s AS city1_point_y, city1.%10$s AS city1_name,\n" +
                             "%1$s.%4$s,\n" +
                             "city2.%8$s AS city2_point_x, city2.%9$s AS city2_point_y, city2.%10$s AS city2_name,\n" +
-                            "%1$s.%5$s, %1$s.%22$s, route_player_numbers.%18$s FROM %1$s\n" +
+                            "%1$s.%5$s, %1$s.%22$s, route_player_numbers.%18$s, route.route_number FROM %1$s\n" +
                             "INNER JOIN %6$s AS city1 ON %1$s.%3$s = city1.%7$s \n" +
                             "INNER JOIN %6$s AS city2 ON %1$s.%4$s = city2.%7$s\n" +
                             "LEFT JOIN (SELECT %11$s.%12$s, %11$s.%13$s,\n" +
@@ -690,7 +693,7 @@ public class DatabaseController implements IDatabaseController {
 
                 City city1 = new City(location1x, location1y, cityName1);
                 City city2 = new City(location2x, location2y, cityName2);
-
+                int route_number = resultSet.getInt("route_number");
                 int length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
                 Color color = Color.getTrackColorFromString(resultSet.getString(DatabaseRoute.ROUTE_COLOR));
                 int owner = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
@@ -698,7 +701,7 @@ public class DatabaseController implements IDatabaseController {
                     owner = -1;
                 }
 
-                tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y));
+                tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y, route_number));
             }
             return tracks;
         } catch(SQLException ex) {
@@ -1610,5 +1613,72 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return null;
+    }
+
+//    with card as (select * from train_card
+//            where game_id in (select game_id from game where name='aaaa')
+//    and player_id in (select user_id from player where username='devon')
+//    and train_type='yellow'
+//    Limit 1
+//    FOR UPDATE)
+//    update train_card t set discarded = true, player_id = null
+//    from card
+//    where t.train_card_id = card.train_card_id
+//    and t.game_id = card.game_id;
+    @Override
+    public boolean discardCard(String gameName, String playerName, Color color) {
+        try (Connection connection = session.getConnection()) {
+            color.toString();
+            String sqlString = String.format("" +
+                    "with card as (select * from train_card\n" +
+                    "      where game_id in (select game_id from game where name=?)\n" +
+                    "      and player_id in (select user_id from player where username=?)\n" +
+                    "      and train_type=?\n" +
+                    "      Limit 1\n" +
+                    "      FOR UPDATE)\n" +
+                    "    update train_card t set discarded = true, player_id = null\n" +
+                    "      from card\n" +
+                    "      where t.train_card_id = card.train_card_id\n" +
+                    "      and t.game_id = card.game_id");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, gameName);
+            statement.setString(2, playerName);
+            statement.setString(3, color.toString().toLowerCase());
+            return statement.executeUpdate() == 1;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public EndTurnCommand getEndTurnCommand(String gameName, int commandNumber, String playerName) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("with current_player as (select * from participants where \n" +
+                    "\tgame_id in (select game_id from game where name=?)\n" +
+                    "\tand user_id in (select user_id from player where username='devon' limit 1)\n" +
+                    "), max_player as (select max(player_number) as max from participants\n" +
+                    "    where game_id in (select game_id from game where name=?))\n" +
+                    "select player_number as previous, mod(player_number + 1,max + 1) as next from  max_player, current_player\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, gameName);
+            statement.setString(2, gameName);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                EndTurnCommand command = new EndTurnCommand();
+                command.setPlayerName(playerName);
+                command.setGameName(gameName);
+                command.setCommandNumber(commandNumber);
+                command.setNextPlayer(resultSet.getInt("next"));
+                int previous = resultSet.getInt("previous");
+                command.setPreviousPlayer(previous);
+                command.setPlayerNumber(previous);
+                return command;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }
