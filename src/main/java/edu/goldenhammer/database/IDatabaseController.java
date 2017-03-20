@@ -31,4 +31,5 @@ public interface IDatabaseController {
     boolean postMessage(String game_name, String player_name, String message);
     List<DatabaseMessage> getMessages(String game_name);
     String getUsername(String player_id);
+    List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number);
 }

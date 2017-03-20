@@ -4,7 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by seanjib on 2/22/2017.
+ * This class contains the attributes and methods needed to retrieve destination card information from the database
+ * and to store it in the database. It has all the SQL code needed to create the table in the database and to insert
+ * new destination card values inside.
  */
 public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     public static final int MAX_DESTINATION_CARDS = 76;
@@ -55,6 +57,20 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             DatabaseCity.TABLE_NAME
     );
 
+    /**
+     * Constructor for a destination card.
+     * @pre no null values, empty strings, or cities that do not exist.
+     * @post a new destination card is generated as it is stored in the database.
+     * @param destinationCardID The id - from 1 to 76 - of the destination card
+     * @param gameID the id of the current game
+     * @param city1 the id of the first city listed by the card
+     * @param city2 the id of the second city listed by the card
+     * @param playerID - the id of the player to whom the card belongs (-1 by default)
+     * @param discarded - whether or not the card has been discarded
+     * @param points - the point value associated with completion of the destination
+     * @param drawn - used during the first phase of drawing destination cards. This indicates
+     *              that the card has been drawn, but not yet permanently assigned to the player.
+     */
     public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
                                    String playerID, boolean discarded, int points, boolean drawn) {
         this.destinationCardID = destinationCardID;
@@ -107,6 +123,16 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
         return drawn;
     }
 
+    /**
+     * See getFormattedDestination for formatting directions. This function returns a string containing
+     * 76 formatted lines of SQL - one for each card to be inserted in the database.
+     *
+     * @pre none
+     * @post a full string of formatted, ready-to-use SQL code is generated. Each variable must still be
+     * assigned after making a prepared statement. See documentation in getFormattedDestination for details.
+     * No changes to any classes or variables.
+     * @return a string of SQL for a prepared statement
+     */
     public static String getAllDestinations() {
         String formattedDestination = "";
         for(int i = 0; i < MAX_DESTINATION_CARDS; i++) {
@@ -115,6 +141,17 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
         return formattedDestination.substring(0, formattedDestination.length() - 2);
     }
 
+    /**
+     * Gets a single line of SQL insertion code to enter a single destination card into the database. There are
+     * four values that need to be inserted into the PreparedStatement generated from this:
+     * -The game name, as a String
+     * -The first city name, as a String
+     * -The second city name, as a String
+     * -The point value of the card, as an int
+     * @pre none
+     * @post no changes to any classes or variables
+     * @return a fully-formatted SQL line
+     */
     private static String getFormattedDestination() {
         return String.format("(%1$s, %2$s, %3$s, ?),\n",
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
@@ -131,6 +168,17 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
                         DatabaseCity.NAME)
         );
     }
+
+    /**
+     *
+     * @param resultSet the result of a SELECT query to the table destination_card
+     * @return a new DatabaseDestinationCard that matches the information pulled from the database
+     * @pre the ResultSet is not null; it currently points to a row pulled from the destination_card table;
+     * the ResultSet includes all columns in the destination_card table
+     * @post a new DatabaseDestinationCard is generated and returned with attributes set to the values from
+     * the input ResultSet
+     * @throws SQLException
+     */
     public static DatabaseDestinationCard buildDestinationCardFromResultSet(ResultSet resultSet) throws SQLException {
         return new DatabaseDestinationCard(
                 resultSet.getString(ID),
