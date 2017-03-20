@@ -33,7 +33,7 @@ public class CommandHandler extends HandlerBase {
                 baseCommand.setPlayerName(player_name);
 
                 CommandManager comManager = new CommandManager();
-                comManager.addCommand(baseCommand);
+                results = comManager.addCommand(baseCommand);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
