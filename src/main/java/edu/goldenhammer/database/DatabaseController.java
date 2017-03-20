@@ -1197,12 +1197,41 @@ public class DatabaseController implements IDatabaseController {
         return commands;
     }
 
-    private int getCurrentPlayerTurn(String game_name) {
+    public int getCurrentPlayerTurn(String game_name) {
         try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
+                            "WHERE %3$s IN (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
+                            "AND %7$s IN (SELECT %8$s FROM %9$s\n" +
+                                "WHERE %10$s IN (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
+                                "AND %11$s = ?\n" +
+                                "ORDER BY %12$s DESC\n" +
+                                "LIMIT 1);\n",
+                    DatabaseParticipants.PLAYER_NUMBER,
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.GAME_ID,
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+                    DatabaseParticipants.USER_ID,
+                    DatabaseCommand.PLAYER_ID,
+                    DatabaseCommand.TABLE_NAME,
+                    DatabaseCommand.GAME_ID,
+                    DatabaseCommand.COMMAND_TYPE,
+                    DatabaseCommand.COMMAND_NUMBER);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, game_name);
+            statement.setString(3, "EndTurn");
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                return resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+            }
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-        return 1;
+        return 0;
     }
 
     public boolean claimRoute(String game_name, String username, int route_number) {
