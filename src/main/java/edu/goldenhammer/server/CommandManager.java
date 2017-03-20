@@ -25,25 +25,24 @@ public class CommandManager {
      * @return all the commands, such as base command, and endturn, null if not allowed
      */
 
-    public List<BaseCommand> addCommand(BaseCommand command) {
+    public Results addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
-            List<BaseCommand> executed = new ArrayList<>();
+            List<Results> executed = new ArrayList<>();
+            Results result = new Results();
 
             if(currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
                 if (command.validate()) {
-                    command.execute();
-                    executed.add(command);
+                    result = command.execute();
                     if (command.endTurn()) {
                         EndTurnCommand endTurn = new EndTurnCommand();
                         endTurn.setGameName(command.getGameName());
                         endTurn.setCommandNumber(command.getCommandNumber()+1);
                         endTurn.setPlayerNumber(command.getPlayerNumber());
                         endTurn.execute();
-                        executed.add(endTurn);
                     }
                 }
             }
-            return executed;
+            return result;
         }
     }
 
