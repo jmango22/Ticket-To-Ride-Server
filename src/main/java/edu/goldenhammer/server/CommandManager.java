@@ -3,6 +3,8 @@ package edu.goldenhammer.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
@@ -25,32 +27,27 @@ public class CommandManager {
      * @return all the commands, such as base command, and endturn, null if not allowed
      */
 
-    public Results addCommand(BaseCommand command) {
+    public List<BaseCommand> addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
-            List<Results> executed = new ArrayList<>();
-            Results result = new Results();
+            List<BaseCommand> executed = new ArrayList<>();
 
             if(currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
                 if (command.validate()) {
-                    result = command.execute();
+                    command.execute();
+                    executed.add(command);
                     if (command.endTurn()) {
-                        EndTurnCommand endTurn = new EndTurnCommand();
-                        endTurn.setGameName(command.getGameName());
-                        endTurn.setCommandNumber(command.getCommandNumber()+1);
-                        endTurn.setPlayerNumber(command.getPlayerNumber());
+                        EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber()+1, command.getPlayerName());
                         endTurn.execute();
+                        executed.add(endTurn);
                     }
                 }
             }
-            return result;
+            return executed;
         }
     }
 
-    //Tests that it's the current players turn.
-    //Check the last EndTurnCommands player number and see what player is next.
     private boolean currentPlayerTurn(int playerNumber, String game_name) {
         DatabaseController dbc = DatabaseController.getInstance();
-        //This doesn't work yet... The getCurrentPlayerTurn doesn't return a real player number yet. It needs to be written.
         if(dbc.getCurrentPlayerTurn(game_name) == playerNumber) {
             return true;
         }
