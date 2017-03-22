@@ -3,6 +3,8 @@ package edu.goldenhammer.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
@@ -34,10 +36,7 @@ public class CommandManager {
                     command.execute();
                     executed.add(command);
                     if (command.endTurn()) {
-                        EndTurnCommand endTurn = new EndTurnCommand();
-                        endTurn.setGameName(command.getGameName());
-                        endTurn.setCommandNumber(command.getCommandNumber()+1);
-                        endTurn.setPlayerNumber(command.getPlayerNumber());
+                        EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber()+1, command.getPlayerName());
                         endTurn.execute();
                         executed.add(endTurn);
                     }
