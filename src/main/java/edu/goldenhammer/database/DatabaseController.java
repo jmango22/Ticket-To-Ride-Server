@@ -633,7 +633,8 @@ public class DatabaseController implements IDatabaseController {
 
     public List<Track> getTracks(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s.%3$s,\n" +
+            String sqlString = String.format(
+                    "with tracks as (SELECT %1$s.%3$s,\n" +
                             "city1.%8$s AS city1_point_x, city1.%9$s AS city1_point_y, city1.%10$s AS city1_name,\n" +
                             "%1$s.%4$s,\n" +
                             "city2.%8$s AS city2_point_x, city2.%9$s AS city2_point_y, city2.%10$s AS city2_name,\n" +
@@ -648,7 +649,9 @@ public class DatabaseController implements IDatabaseController {
                             "\t ON %11$s.%12$s = player_numbers.%16$s\n" +
                             "\t AND %11$s.%13$s = player_numbers.%17$s)\n" +
                             "AS route_player_numbers\n" +
-                            "ON route_player_numbers.%14$s = %1$s.%2$s;",
+                            "ON route_player_numbers.%14$s = %1$s.%2$s)" +
+                        "select *, (select (count(*)=1) as second from tracks t2 where t1.route_number > t2.route_number and t1.city_1=t2.city_1 and t1.city_2=t2.city_2)\n" +
+                        "from tracks t1;",
                     DatabaseRoute.TABLE_NAME, //1
                     DatabaseRoute.ROUTE_NUMBER,
                     DatabaseRoute.CITY_1,
@@ -695,13 +698,14 @@ public class DatabaseController implements IDatabaseController {
                 City city2 = new City(location2x, location2y, cityName2);
                 int route_number = resultSet.getInt("route_number");
                 int length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
+                boolean second = resultSet.getBoolean("second");
                 Color color = Color.getTrackColorFromString(resultSet.getString(DatabaseRoute.ROUTE_COLOR));
                 int owner = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
                 if(resultSet.wasNull()) {
                     owner = -1;
                 }
 
-                tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y, route_number));
+                tracks.add(new Track(city1, city2, length, color, owner, location1x, location1y, location2x, location2y, route_number, second));
             }
             return tracks;
         } catch(SQLException ex) {
