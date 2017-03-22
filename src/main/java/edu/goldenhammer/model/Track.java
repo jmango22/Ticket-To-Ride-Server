@@ -14,8 +14,9 @@ public class Track {
     private double location2x;
     private double location2y;
     private int route_number;
+    private boolean secondTrack;
 
-    public Track(City city1, City city2, int length, Color color, int owner, double location1x, double location1y, double location2x, double location2y, int route_number) {
+    public Track(City city1, City city2, int length, Color color, int owner, double location1x, double location1y, double location2x, double location2y, int route_number, boolean secondTrack) {
         this.city1 = city1;
         this.city2 = city2;
         this.length = length;
@@ -26,6 +27,15 @@ public class Track {
         this.location2x = location2x;
         this.location2y = location2y;
         this.route_number = route_number;
+        this.secondTrack = secondTrack;
+    }
+
+    public boolean isSecondTrack() {
+        return secondTrack;
+    }
+
+    public void setSecondTrack(boolean secondTrack) {
+        this.secondTrack = secondTrack;
     }
 
     public int getRoute_number() {
