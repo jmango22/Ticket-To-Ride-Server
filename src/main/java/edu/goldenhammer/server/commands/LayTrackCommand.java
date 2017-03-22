@@ -37,7 +37,7 @@ public class LayTrackCommand extends BaseCommand {
         }
         if(cards.length != track.getLength())
             return false;
-
+//TODO: finish validating the cards
         List<Track> tracks = dbc.getTracks(getGameName());
 
         for(Track _track: tracks) {
