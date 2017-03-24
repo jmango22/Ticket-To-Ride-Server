@@ -873,6 +873,28 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
 
+            initializeSlots(String game_name);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void initializeSlots(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH random_cards AS (" +
+                            "   SELECT train_card_id FROM train_card" +
+                            "   WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                            "   AND discarded = false" +
+                            "   AND player_id IS NULL" +
+                            "   ORDER BY random()" +
+                            "   LIMIT 5)," +
+                            "cards_and_slots AS (SELECT row_number() over() as slot, * FROM random_cards)" +
+                    "UPDATE train_card SET train_card.slot = cards_and_slots.slot" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                    "AND train_card.train_card_id = cards_and_slots.train_card_id;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -1001,6 +1023,7 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    @Override
     public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
@@ -1036,6 +1059,49 @@ public class DatabaseController implements IDatabaseController {
             }
             else if(reshuffleTrainCardDiscardPile(game_name)) {
                 resultSet = statement.executeQuery();
+                resultSet.next();
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            return card;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
+                    "WHERE slot = ?\n" +
+                    "AND game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND EXISTS (\n" +
+                        "UPDATE train_card SET slot = ?" +
+                        "WHERE train_card_id IN (" +
+                        "               SELECT train_card_id FROM (SELECT train_card_id FROM train_card\n" +
+                        "              WHERE game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
+                        "              AND player_id IS NULL\n" +
+                        "              AND discarded = false\n" +
+                        ") as newTable ORDER BY random() LIMIT 1)\n" +
+                    ")" +
+                    "RETURNING *");
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, player_name);
+            statement.setInt(2, slot);
+            statement.setString(3, game_name);
+            statement.setInt(4, slot);
+            statement.setString(5, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            DatabaseTrainCard card = null;
+            if(resultSet.next()){
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            else if(reshuffleTrainCardDiscardPile(game_name)) {
+                resultSet = statement.executeQuery();
+                resultSet.next();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
             return card;
@@ -1083,6 +1149,7 @@ public class DatabaseController implements IDatabaseController {
             }
             else if(reshuffleDestinationCardDiscardPile(game_name)) {
                 resultSet = statement.executeQuery();
+                resultSet.next();
                 card = DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet);
             }
             return card;

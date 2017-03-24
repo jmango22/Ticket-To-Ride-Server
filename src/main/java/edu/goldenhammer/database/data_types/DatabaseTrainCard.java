@@ -14,6 +14,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     public static final String GAME_ID = "game_id";
     public static final String PLAYER_ID = "player_id";
     public static final String TRAIN_TYPE = "train_type";
+    public static final String SLOT = "slot";
     public static final String DISCARDED = "discarded";
     public static final String TABLE_NAME = "train_card";
     public static final String CREATE_STMT = String.format(
@@ -22,13 +23,14 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
                     "    %3$s INTEGER NOT NULL,\n" +
                     "    %4$s INTEGER,\n" +
                     "    %5$s VARCHAR(10),\n" +
-                    "    %6$s BOOLEAN NOT NULL DEFAULT false,\n" +
+                    "    %6$s INTEGER,\n" +
+                    "    %7$s BOOLEAN NOT NULL DEFAULT false,\n" +
                     "    PRIMARY KEY(%2$s, %3$s),\n" +
                     "    FOREIGN KEY(%4$s)\n" +
-                    "      REFERENCES %7$s\n" +
+                    "      REFERENCES %8$s\n" +
                     "      ON DELETE CASCADE,\n" +
                     "    FOREIGN KEY(%3$s)\n" +
-                    "      REFERENCES %8$s\n" +
+                    "      REFERENCES %9$s\n" +
                     "      ON DELETE CASCADE\n" +
                     ");",
             TABLE_NAME,
@@ -36,17 +38,19 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
             GAME_ID,
             PLAYER_ID,
             TRAIN_TYPE,
+            SLOT,
             DISCARDED,
             DatabasePlayer.TABLE_NAME,
             DatabaseGame.TABLE_NAME
     );
 
     public DatabaseTrainCard(String id,String gameID, String playerID,
-                             String trainType, boolean discarded) {
+                             String trainType, int slot, boolean discarded) {
         this.id = id;
         this.gameID = gameID;
         this.playerID = playerID;
         this.trainType = trainType;
+        this.slot = slot;
         this.discarded = discarded;
     }
 
@@ -68,6 +72,11 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     @Override
     public String getTrainType() {
         return trainType;
+    }
+
+    @Override
+    public int getSlot() {
+        return slot;
     }
 
     @Override
@@ -136,6 +145,7 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
                 resultSet.getString(GAME_ID),
                 resultSet.getString(PLAYER_ID),
                 resultSet.getString(TRAIN_TYPE),
+                resultSet.getInt(SLOT),
                 resultSet.getBoolean(DISCARDED)
         );
     }
@@ -144,5 +154,6 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
     private String gameID;
     private String playerID;
     private String trainType;
+    private int slot;
     private boolean discarded;
 }
