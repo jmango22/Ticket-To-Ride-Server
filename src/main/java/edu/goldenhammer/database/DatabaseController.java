@@ -1778,6 +1778,16 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
+    public boolean allHandsInitialized(String gameName) {
+        try (Connection connection = session.getConnection()) {
+
+        } catch( Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public EndTurnCommand getEndTurnCommand(String gameName, int commandNumber, String playerName) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("with current_player as (select * from participants where \n" +

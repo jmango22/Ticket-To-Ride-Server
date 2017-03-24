@@ -47,4 +47,9 @@ public class DrawDestCardsCommand extends BaseCommand {
         }
         return cards;
     }
+
+    @Override
+    public boolean endTurn() {
+        return false;
+    }
 }

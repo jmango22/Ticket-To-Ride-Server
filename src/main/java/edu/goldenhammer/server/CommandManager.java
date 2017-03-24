@@ -10,6 +10,7 @@ import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 /**
  * Created by root on 3/15/17.
@@ -31,7 +32,7 @@ public class CommandManager {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
             List<BaseCommand> executed = new ArrayList<>();
 
-            if(currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
+            if(command instanceof InitializeHandCommand || currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);

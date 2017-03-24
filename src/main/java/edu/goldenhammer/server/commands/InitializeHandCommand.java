@@ -70,4 +70,9 @@ public class InitializeHandCommand extends BaseCommand {
         }
         return new DrawnDestinationCards(cards);
     }
+
+    @Override
+    public boolean endTurn() {
+        return super.endTurn();
+    }
 }
