@@ -39,6 +39,10 @@ public abstract class BaseCommand implements Serializable {
         return true;
     }
 
+    public boolean isEndOfGame() {
+        return false;
+    }
+
     public abstract Results execute();
 
     public int getPlayerNumber() {
