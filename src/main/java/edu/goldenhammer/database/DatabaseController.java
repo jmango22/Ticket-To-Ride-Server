@@ -133,7 +133,6 @@ public class DatabaseController implements IDatabaseController {
      */
     @Override
     public GameList getGames() {
-
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s " +
                             "NATURAL JOIN %6$s WHERE %7$s = false ORDER BY %8$s",
@@ -894,6 +893,8 @@ public class DatabaseController implements IDatabaseController {
                     "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
                     "AND train_card.train_card_id = cards_and_slots.train_card_id;");
             PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, game_name);
             statement.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -928,18 +929,6 @@ public class DatabaseController implements IDatabaseController {
         }
         catch(FileNotFoundException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    private void initializePlayerTrainCards(String game_name) {
-        final int INITIAL_TRAIN_CARD_COUNT = 4;
-        List<String> players = getPlayers(game_name);
-
-        for (String player_name : players) {
-            for (int i = 0; i < INITIAL_TRAIN_CARD_COUNT; i++) {
-                DatabaseTrainCard trainCard = getRandomTrainCard(game_name);
-                assignTrainCardToPlayer(trainCard, player_name);
-            }
         }
     }
 
@@ -986,41 +975,6 @@ public class DatabaseController implements IDatabaseController {
         } catch(FileNotFoundException ex) {
             ex.printStackTrace();
         }
-    }
-
-    public DatabaseTrainCard getRandomTrainCard(String game_name) {
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM (SELECT * FROM %1$s\n" +
-                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-                            "              AND %6$s IS NULL\n" +
-                            "              AND %7$s = false\n" +
-                            ") as newTable ORDER BY random() LIMIT 1",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.GAME_ID,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabaseTrainCard.DISCARDED);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            ResultSet resultSet = statement.executeQuery();
-
-            DatabaseTrainCard card = null;
-            if(resultSet.next()){
-                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-            }
-            else if(reshuffleTrainCardDiscardPile(game_name)) {
-                resultSet = statement.executeQuery();
-                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-            }
-            return card;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     @Override
@@ -1073,17 +1027,21 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
+            String sqlString = String.format("WITH selected_card AS" +
+                        "(SELECT train_card_id FROM train_card\n" +
+                        "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                        "AND " +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
                     "WHERE slot = ?\n" +
                     "AND game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
                     "AND EXISTS (\n" +
                         "UPDATE train_card SET slot = ?" +
                         "WHERE train_card_id IN (" +
                         "               SELECT train_card_id FROM (SELECT train_card_id FROM train_card\n" +
-                        "              WHERE game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
+                        "              WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
                         "              AND player_id IS NULL\n" +
                         "              AND discarded = false\n" +
-                        ") as newTable ORDER BY random() LIMIT 1)\n" +
+                        ") as newTable ORDER BY random() LIMIT 1 RETURNING *)\n" +
                     ")" +
                     "RETURNING *");
 
@@ -1157,28 +1115,6 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return null;
-    }
-
-    private boolean assignTrainCardToPlayer(DatabaseTrainCard train_card, String player_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = (" +
-                            "SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                            "WHERE %6$s = ?;",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseTrainCard.ID);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, player_name);
-            statement.setString(2, train_card.getGameID());
-            statement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     public boolean reshuffleTrainCardDiscardPile(String game_name) {
