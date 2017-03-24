@@ -134,7 +134,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public GameList getGames() {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s FROM %4$s NATURAL JOIN %5$s " +
+            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %7$s FROM %4$s NATURAL JOIN %5$s\n" +
                             "NATURAL JOIN %6$s WHERE %7$s = false ORDER BY %8$s",
                     DatabaseParticipants.columnNames(),
                     DatabaseGame.GAME_NAME,
