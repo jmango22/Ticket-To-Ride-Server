@@ -873,7 +873,7 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
 
-            initializeSlots(String game_name);
+            initializeSlots(game_name);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
