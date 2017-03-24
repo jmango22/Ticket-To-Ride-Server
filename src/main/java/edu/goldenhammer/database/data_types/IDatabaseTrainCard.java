@@ -10,6 +10,5 @@ public interface IDatabaseTrainCard extends Serializable {
     String getGameID();
     String getPlayerID();
     String getTrainType();
-    int getSlot();
     boolean isDiscarded();
 }
