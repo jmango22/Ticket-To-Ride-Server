@@ -1234,7 +1234,7 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-        return 0;
+        return -1;
     }
 
     public boolean claimRoute(String game_name, String username, int route_number) {
@@ -1781,7 +1781,22 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public boolean allHandsInitialized(String gameName) {
         try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "with initialize as (\n" +
+                            "select count(*) as count from command where game_id = (select game_id from game where name=?) and command_type='InitializeHand'\n" +
+                            "), returned as (\n" +
+                            "select count(*) as count from command where game_id = (select game_id from game where name=?) and command_type='ReturnDestCards'\n" +
+                            ")\n" +
+                    "select (i.count<=r.count AND i.count > 0) from initialize as i, returned as r"
+            );
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, gameName);
+            statement.setString(2, gameName);
+            ResultSet resultSet = statement.executeQuery();
 
+            if(resultSet.next()) {
+                return resultSet.getBoolean(1);
+            }
         } catch( Exception e) {
             e.printStackTrace();
         }
