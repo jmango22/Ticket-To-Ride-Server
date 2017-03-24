@@ -10,6 +10,7 @@ import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 /**
  * Created by root on 3/15/17.
@@ -48,7 +49,9 @@ public class CommandManager {
 
     private boolean currentPlayerTurn(int playerNumber, String game_name) {
         DatabaseController dbc = DatabaseController.getInstance();
-        if(dbc.getCurrentPlayerTurn(game_name) == playerNumber) {
+        int current_player = dbc.getCurrentPlayerTurn(game_name);
+        //-1 means that the not everyone has initialized their hands
+        if(current_player == playerNumber || current_player == -1) {
             return true;
         }
         return false;

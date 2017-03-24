@@ -50,4 +50,9 @@ public class ReturnDestCardsCommand extends BaseCommand {
     public void hide(){
         toReturn = new ArrayList<>();
     }
+
+    @Override
+    public boolean endTurn() {
+        return DatabaseController.getInstance().allHandsInitialized(getGameName());
+    }
 }
