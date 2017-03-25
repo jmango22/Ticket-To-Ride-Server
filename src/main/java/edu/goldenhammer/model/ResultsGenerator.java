@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 
 /**
@@ -30,6 +31,9 @@ public class ResultsGenerator {
         //From the GameModel get the Map Data
         Map endMap = endModel.getMap();
 
+        //All the Player Final Results
+        List<EndResult> results = new ArrayList<>();
+
         for(PlayerOverview player : players) {
             int playerId = 0;
             int builtTrainPoints = 0;
@@ -44,9 +48,21 @@ public class ResultsGenerator {
             //built Train points should be the same as the LeaderBoard Points...
             builtTrainPoints = player.getPoints();
 
-            //get more detailed Player information from the player's hand
-            //DatabasePlayer detailedPlayer = (DatabasePlayer)DatabaseController.getInstance().
+            //Get the TrackForest Object
+            TrackForest trackForest = new TrackForest(endMap.getTracks());
+
+            //get the player's Destination Cards
+            List<DatabaseDestinationCard> playerCards = DatabaseController.getInstance().getPlayerDestinationCards(endModel.getName().toString(), player.getPlayer());
+
+            //Go through the player's Destination Cards and see if they have completed it
+            for(DatabaseDestinationCard card : playerCards) {
+                //TODO : use the TrackForest to see if the destination complete or not.
+            }
+
+            total = builtTrainPoints + completedDestinations + incompleteDestinations + longestContinuousTrain;
+
+            EndResult currentPlayerResults = new EndResult(playerId, builtTrainPoints, completedDestinations, incompleteDestinations, longestContinuousTrain, total);
         }
-        return new ArrayList<>();
+        return results;
     }
 }

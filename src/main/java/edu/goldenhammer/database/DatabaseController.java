@@ -1562,6 +1562,40 @@ public class DatabaseController implements IDatabaseController {
         return -1;
     }
 
+    public List<DatabaseDestinationCard> getPlayerDestinationCards(String game_name, int player_id) {
+        List<DatabaseDestinationCard> playerDestCards = new ArrayList<>();
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT *" +
+                            "FROM %1$s" +
+                            "WHERE (%2$s = (SELECT %3$s FROM %4$s WHERE %5s = ?) AND %6$s = ? AND %7$s = ? AND %8$s = ?)",
+                    DatabaseDestinationCard.TABLE_NAME,
+                    DatabaseDestinationCard.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME,
+
+                    DatabaseDestinationCard.PLAYER_ID,
+                    DatabaseDestinationCard.DRAWN,
+                    DatabaseDestinationCard.DISCARDED);
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, Integer.toString(player_id));
+            statement.setString(3, "TRUE");
+            statement.setString(4, "FALSE");
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()) {
+                playerDestCards.add(DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return playerDestCards;
+    }
+
     @Override
     public boolean postMessage(String game_name, String player_name, String message) {
         try (Connection connection = session.getConnection()) {
