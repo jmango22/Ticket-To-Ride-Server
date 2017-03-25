@@ -19,7 +19,6 @@ public class DrawTrainCardCommand extends BaseCommand {
     private ArrayList<Color> bank;
     public Results execute() {
         IDatabaseController dbc = DatabaseController.getInstance();
-        drawnCard = card.getColor();
         Results results = new Results();
         results.setResponseCode(200);
         if(slot >= 0 && slot <= 4) {
