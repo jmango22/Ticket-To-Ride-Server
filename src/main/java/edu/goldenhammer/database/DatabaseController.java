@@ -1026,7 +1026,7 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, player_name);
             statement.setString(2, game_name);
-            statement.setString(2, game_name);
+            statement.setString(3, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             DatabaseTrainCard card = null;
