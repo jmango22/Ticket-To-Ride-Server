@@ -888,7 +888,7 @@ public class DatabaseController implements IDatabaseController {
                     "AND player_id IS NULL\n" +
                     "ORDER BY random()\n" +
                     "LIMIT 5),\n" +
-                    "card_and_slots AS (SELECT row_number() over() as slot, * FROM random_cards)\n" +
+                    "cards_and_slots AS (SELECT row_number() over() as slot, * FROM random_cards)\n" +
                     "UPDATE train_card SET slot = cards_and_slots.slot - 1\n" +
                     "FROM cards_and_slots\n" +
                     "WHERE game_id IN (SELECT game_id FROM game WHERE name=?)\n" +
