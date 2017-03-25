@@ -888,7 +888,7 @@ public class DatabaseController implements IDatabaseController {
                     "AND player_id IS NULL\n" +
                     "ORDER BY random()\n" +
                     "LIMIT 5),\n" +
-                    "card_and_slots AS (SELECT row_nmber() over() as slot, * FROM random_cards)\n" +
+                    "card_and_slots AS (SELECT row_number() over() as slot, * FROM random_cards)\n" +
                     "UPDATE train_card SET slot = cards_and_slots.slot - 1\n" +
                     "FROM cards_and_slots\n" +
                     "WHERE game_id IN (SELECT game_id FROM game WHERE name=?)\n" +
@@ -1020,6 +1020,55 @@ public class DatabaseController implements IDatabaseController {
             }
             return card;
 
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH selected_card AS\n" +
+                        "(SELECT train_card_id FROM train_card\n" +
+                        "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                        "AND slot = ?)\n" +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
+                    "FROM selected_card\n" +
+                    "WHERE train_card.train_card_id IN selected_card.train_card_id\n" +
+                    "AND EXISTS (\n" +
+                        "WITH random_card AS\n" +
+                            "(SELECT train_card_id FROM train_card\n" +
+                            "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                            "AND slot IS NULL" +
+                            "AND player_id IS NULL" +
+                            "AND discarded = false" +
+                            "ORDER BY random()" +
+                            "LIMIT 1)" +
+                        "UPDATE train_card SET slot = ?\n" +
+                        "FROM random_card\n" +
+                        "WHERE train_card.train_card_id IN random_card.train_card_id\n" +
+                        "RETURNING *)" +
+                    ")\n" +
+                    "RETURNING *;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setInt(2, slot);
+            statement.setString(3, player_name);
+            statement.setString(4, game_name);
+            statement.setInt(5, slot);
+            ResultSet resultSet = statement.executeQuery();
+
+            DatabaseTrainCard card = null;
+            if(resultSet.next()) {
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            else if(reshuffleTrainCardDiscardPile(game_name)) {
+                resultSet = statement.executeQuery();
+                resultSet.next();
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            return card;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
