@@ -163,7 +163,7 @@ public class DatabaseController implements IDatabaseController {
     public GameList getGames(String player_user_name) {
 
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %15 FROM %4$s NATURAL JOIN %5$s\n" +
+            String sqlString = String.format("SELECT %1$s, %2$s, %3$s, %15$s FROM %4$s NATURAL JOIN %5$s\n" +
                             "NATURAL JOIN %6$s WHERE %7$s IN (SELECT %8$s FROM %9$s\n" +
                             "WHERE %10$s IN (SELECT %11$s FROM %12$s WHERE %13$s=?)) ORDER BY %14$s",
                     DatabaseParticipants.columnNames(),
