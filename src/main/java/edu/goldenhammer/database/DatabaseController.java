@@ -872,8 +872,32 @@ public class DatabaseController implements IDatabaseController {
                 statement.setString(i * 2 + 2, game_name);
             }
             statement.execute();
+            initializeSlots(game_name);
 
         } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void initializeSlots(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH random_cards AS (\n" +
+                    "SELECT train_card_id FROM train_card\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND discarded = false\n" +
+                    "AND player_id IS NULL\n" +
+                    "ORDER BY random()\n" +
+                    "LIMIT 5),\n" +
+                    "card_and_slots AS (SELECT row_nmber() over() as slot, * FROM random_cards)\n" +
+                    "UPDATE train_card SET slot = cards_and_slots.slot - 1\n" +
+                    "FROM cards_and_slots\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name=?)\n" +
+                    "AND train_card.train_card_id = cards_and_slots.train_card_id;\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, game_name);
+            statement.execute();
+        } catch(SQLException ex) {
             ex.printStackTrace();
         }
     }
