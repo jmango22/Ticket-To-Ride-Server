@@ -1034,20 +1034,22 @@ public class DatabaseController implements IDatabaseController {
                         "AND slot = ?)\n" +
                     "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
                     "FROM selected_card\n" +
-                    "WHERE train_card.train_card_id IN selected_card.train_card_id\n" +
+                    "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
+                    "AND game_id IN (SELECT game_id FROM game WHERE name = ?" +
                     "AND EXISTS (\n" +
                         "WITH random_card AS\n" +
                             "(SELECT train_card_id FROM train_card\n" +
-                            "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
-                            "AND slot IS NULL" +
-                            "AND player_id IS NULL" +
-                            "AND discarded = false" +
-                            "ORDER BY random()" +
-                            "LIMIT 1)" +
+                            "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "AND slot IS NULL\n" +
+                            "AND player_id IS NULL\n" +
+                            "AND discarded = false\n" +
+                            "ORDER BY random()\n" +
+                            "LIMIT 1)\n" +
                         "UPDATE train_card SET slot = ?\n" +
                         "FROM random_card\n" +
-                        "WHERE train_card.train_card_id IN random_card.train_card_id\n" +
-                        "RETURNING *)" +
+                        "WHERE train_card.train_card_id = random_card.train_card_id\n" +
+                        "AND game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                        "RETURNING *)\n" +
                     ")\n" +
                     "RETURNING *;");
             PreparedStatement statement = connection.prepareStatement(sqlString);
@@ -1055,7 +1057,9 @@ public class DatabaseController implements IDatabaseController {
             statement.setInt(2, slot);
             statement.setString(3, player_name);
             statement.setString(4, game_name);
-            statement.setInt(5, slot);
+            statement.setString(5, game_name);
+            statement.setInt(6, slot);
+            statement.setString(7, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             DatabaseTrainCard card = null;
