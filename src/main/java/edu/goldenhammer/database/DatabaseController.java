@@ -1027,37 +1027,39 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("WITH selected_card AS\n" +
-                        "(SELECT train_card_id FROM train_card\n" +
-                        "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                        "AND slot = ?)\n" +
-                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
-                    "FROM selected_card\n" +
+            String sqlString = String.format(
+                    "WITH selected_card AS\n" +
+                    "\t(SELECT train_card_id FROM train_card\n" +
+                    "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "\tAND slot = ?),\n" +
+                    "random_card AS\n" +
+                    "    (SELECT train_card_id FROM train_card\n" +
+                    "     WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "     AND slot IS NULL\n" +
+                    "     AND player_id IS NULL\n" +
+                    "     AND discarded = false\n" +
+                    "     ORDER BY random()\n" +
+                    "     LIMIT 1),\n" +
+                    "new_slot_card AS \n" +
+                    "\t(UPDATE train_card SET slot = ?\n" +
+                    "     FROM random_card\n" +
+                    "     WHERE train_card.train_card_id = random_card.train_card_id\n" +
+                    "     AND game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "     RETURNING *)\n" +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?),\n" +
+                    "slot = NULL\n" +
+                    "FROM selected_card, new_slot_card\n" +
                     "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
-                    "AND game_id IN (SELECT game_id FROM game WHERE name = ?" +
-                    "AND EXISTS (\n" +
-                        "WITH random_card AS\n" +
-                            "(SELECT train_card_id FROM train_card\n" +
-                            "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                            "AND slot IS NULL\n" +
-                            "AND player_id IS NULL\n" +
-                            "AND discarded = false\n" +
-                            "ORDER BY random()\n" +
-                            "LIMIT 1)\n" +
-                        "UPDATE train_card SET slot = ?\n" +
-                        "FROM random_card\n" +
-                        "WHERE train_card.train_card_id = random_card.train_card_id\n" +
-                        "AND game_id IN (SELECT game_id FROM game WHERE name = ?)" +
-                        "RETURNING *)\n" +
-                    ")\n" +
-                    "RETURNING *;");
+                    "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND EXISTS (SELECT count(*) FROM new_slot_card)\n" +
+                    "RETURNING *");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
             statement.setInt(2, slot);
-            statement.setString(3, player_name);
-            statement.setString(4, game_name);
+            statement.setString(3, game_name);
+            statement.setInt(4, slot);
             statement.setString(5, game_name);
-            statement.setInt(6, slot);
+            statement.setString(6, player_name);
             statement.setString(7, game_name);
             ResultSet resultSet = statement.executeQuery();
 
