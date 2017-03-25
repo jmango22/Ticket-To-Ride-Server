@@ -26,7 +26,7 @@ Lond Daer,478,695
 Lorien,990,523
 Minas Morgul,1186,885
 Minas Tirith,1111,918
-Moria's Gate,835,517
+Moria's Gate,835,490
 Ras Morthil,495,977
 Rivendell,884,326
 Sea of Nurnen,1422,1030

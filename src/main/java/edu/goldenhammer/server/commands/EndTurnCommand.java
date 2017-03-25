@@ -1,5 +1,6 @@
 package edu.goldenhammer.server.commands;
 
+import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.server.Results;
 
 /**
@@ -14,6 +15,7 @@ public class EndTurnCommand extends BaseCommand {
 
     @Override
     public Results execute() {
+        DatabaseController.getInstance().addCommand(this,true,true);
         return new Results();
     }
 
