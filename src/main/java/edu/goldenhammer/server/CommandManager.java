@@ -9,6 +9,7 @@ import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
 import edu.goldenhammer.server.commands.BaseCommand;
+import edu.goldenhammer.server.commands.EndGameCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 import edu.goldenhammer.server.commands.InitializeHandCommand;
 
@@ -36,7 +37,10 @@ public class CommandManager {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
-                    if (command.endTurn()) {
+                    if(command.isEndOfGame()) {
+
+                    }
+                    else if (command.endTurn()) {
                         EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber()+1, command.getPlayerName());
                         endTurn.execute();
                         executed.add(endTurn);
