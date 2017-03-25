@@ -978,41 +978,6 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    public DatabaseTrainCard getRandomTrainCard(String game_name) {
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM (SELECT * FROM %1$s\n" +
-                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-                            "              AND %6$s IS NULL\n" +
-                            "              AND %7$s = false\n" +
-                            ") as newTable ORDER BY random() LIMIT 1",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.GAME_ID,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabaseTrainCard.DISCARDED);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            ResultSet resultSet = statement.executeQuery();
-
-            DatabaseTrainCard card = null;
-            if(resultSet.next()){
-                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-            }
-            else if(reshuffleTrainCardDiscardPile(game_name)) {
-                resultSet = statement.executeQuery();
-                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-            }
-            return card;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
     public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
