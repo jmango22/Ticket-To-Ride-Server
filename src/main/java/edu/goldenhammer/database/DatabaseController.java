@@ -1009,7 +1009,9 @@ public class DatabaseController implements IDatabaseController {
                             "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
                             "              AND %6$s IS NULL\n" +
                             "              AND %7$s = false\n" +
-                            ") as newTable ORDER BY random() LIMIT 1)\n" +
+                            ") " +
+                            "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?) " +
+                            "as newTable ORDER BY random() LIMIT 1)\n" +
                             "RETURNING *",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
@@ -1028,6 +1030,7 @@ public class DatabaseController implements IDatabaseController {
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, player_name);
             statement.setString(2, game_name);
+            statement.setString(3, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             DatabaseTrainCard card = null;
