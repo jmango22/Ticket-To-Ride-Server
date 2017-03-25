@@ -48,7 +48,7 @@ public class ServerCommunicator {
 //        commandList = dbc.getCommandsSinceLastCommand("just", "devon1", 0);
         dbc.getTracks("aaaa");
         String portNumber = "8082";//args[0];
-//        new ServerCommunicator().run(portNumber);
+        new ServerCommunicator().run(portNumber);
 //        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
 //        Connection conn = factory.getConnection();
 //        String sqlString = "select * from advisor";//String.format("SELECT %1$s FROM %2$s order by year ASC, semester ASC", "*", "students");
