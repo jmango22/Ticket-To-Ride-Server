@@ -933,18 +933,6 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    private void initializePlayerTrainCards(String game_name) {
-        final int INITIAL_TRAIN_CARD_COUNT = 4;
-        List<String> players = getPlayers(game_name);
-
-        for (String player_name : players) {
-            for (int i = 0; i < INITIAL_TRAIN_CARD_COUNT; i++) {
-                DatabaseTrainCard trainCard = getRandomTrainCard(game_name);
-                assignTrainCardToPlayer(trainCard, player_name);
-            }
-        }
-    }
-
     private void initializeCities() {
         try(Connection connection = session.getConnection()) {
             String sqlString = DatabaseCity.INSERT_STMT;
@@ -1117,28 +1105,6 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return null;
-    }
-
-    private boolean assignTrainCardToPlayer(DatabaseTrainCard train_card, String player_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = (" +
-                            "SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                            "WHERE %6$s = ?;",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseTrainCard.ID);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, player_name);
-            statement.setString(2, train_card.getGameID());
-            statement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     public boolean reshuffleTrainCardDiscardPile(String game_name) {
