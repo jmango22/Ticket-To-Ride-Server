@@ -73,6 +73,6 @@ public class InitializeHandCommand extends BaseCommand {
 
     @Override
     public boolean endTurn() {
-        return super.endTurn();
+        return false;
     }
 }
