@@ -55,8 +55,15 @@ public class ResultsGenerator {
             List<DatabaseDestinationCard> playerCards = DatabaseController.getInstance().getPlayerDestinationCards(endModel.getName().toString(), player.getPlayer());
 
             //Go through the player's Destination Cards and see if they have completed it
-            for(DatabaseDestinationCard card : playerCards) {
+            for(DatabaseDestinationCard databaseCard : playerCards) {
                 //TODO : use the TrackForest to see if the destination complete or not.
+                DestinationCard card = DestinationCard.parseDatabaseDestinationCard(databaseCard);
+                if(trackForest.connectedCities(card.getCity1(), card.getCity2(), player.getPlayer())) {
+                    completedDestinations = completedDestinations + card.getPointsWorth();
+                } else {
+                    incompleteDestinations = incompleteDestinations - card.getPointsWorth();
+                }
+
             }
 
             total = builtTrainPoints + completedDestinations + incompleteDestinations + longestContinuousTrain;

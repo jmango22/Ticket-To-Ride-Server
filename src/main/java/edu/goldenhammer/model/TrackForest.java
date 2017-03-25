@@ -60,6 +60,27 @@ public class TrackForest {
         return trees;
     }
 
+    public boolean connectedCities(City city1, City city2, int player_id) {
+        for(TrackTree tree : trees) {
+            if(tree.getPlayerNumber() == player_id) {
+                boolean connect1 = false;
+                boolean connect2 = false;
+                for(Track track : tree.getTracks()) {
+                    if(track.hasCity(city1)) {
+                        connect1 = true;
+                    }
+                    if(track.hasCity(city2)) {
+                        connect2 = true;
+                    }
+                }
+                if(connect1 && connect2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void generateForest(List<Track> tracks) {
         java.util.Map<Integer, List<Track>> playerTracks = playerToTracks(tracks);
         for(int player: playerTracks.keySet()) {

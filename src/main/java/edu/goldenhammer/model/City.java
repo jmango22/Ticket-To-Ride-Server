@@ -29,4 +29,18 @@ public class City implements Serializable{
         String name = databaseCity.getName();
         return new City(x_location, y_location, name);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null) {
+            return false;
+        } else if(!(o instanceof City)) {
+            return false;
+        } else {
+            if(((City) o).getName().equals(getName())) {
+                return true;
+            }
+            return false;
+        }
+    }
 }
