@@ -77,4 +77,11 @@ public class Track {
     public double getLocation2y() {
         return location2y;
     }
+
+    public boolean hasCity(City city) {
+        if(city1.equals(city) || city2.equals(city)) {
+            return true;
+        }
+        return false;
+    }
 }
