@@ -1004,13 +1004,13 @@ public class DatabaseController implements IDatabaseController {
     public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
-                            "WHERE %11$s = (" +
+                            "WHERE %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                            "and %11$s = (" +
                             "               SELECT %11$s FROM (SELECT %11$s FROM %1$s\n" +
                             "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
                             "              AND %6$s IS NULL\n" +
                             "              AND %7$s = false\n" +
                             ") " +
-                            "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?) " +
                             "as newTable ORDER BY random() LIMIT 1)\n" +
                             "RETURNING *",
                     DatabaseTrainCard.TABLE_NAME,
