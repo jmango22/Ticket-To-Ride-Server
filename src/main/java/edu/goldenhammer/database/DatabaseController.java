@@ -872,8 +872,32 @@ public class DatabaseController implements IDatabaseController {
                 statement.setString(i * 2 + 2, game_name);
             }
             statement.execute();
+            initializeSlots(game_name);
 
         } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void initializeSlots(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH random_cards AS (\n" +
+                    "SELECT train_card_id FROM train_card\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND discarded = false\n" +
+                    "AND player_id IS NULL\n" +
+                    "ORDER BY random()\n" +
+                    "LIMIT 5),\n" +
+                    "cards_and_slots AS (SELECT row_number() over() as slot, * FROM random_cards)\n" +
+                    "UPDATE train_card SET slot = cards_and_slots.slot - 1\n" +
+                    "FROM cards_and_slots\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name=?)\n" +
+                    "AND train_card.train_card_id = cards_and_slots.train_card_id;\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, game_name);
+            statement.execute();
+        } catch(SQLException ex) {
             ex.printStackTrace();
         }
     }
@@ -906,18 +930,6 @@ public class DatabaseController implements IDatabaseController {
         }
         catch(FileNotFoundException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    private void initializePlayerTrainCards(String game_name) {
-        final int INITIAL_TRAIN_CARD_COUNT = 4;
-        List<String> players = getPlayers(game_name);
-
-        for (String player_name : players) {
-            for (int i = 0; i < INITIAL_TRAIN_CARD_COUNT; i++) {
-                DatabaseTrainCard trainCard = getRandomTrainCard(game_name);
-                assignTrainCardToPlayer(trainCard, player_name);
-            }
         }
     }
 
@@ -966,23 +978,34 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    public DatabaseTrainCard getRandomTrainCard(String game_name) {
+    public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM (SELECT * FROM %1$s\n" +
-                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+            String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
+                            "WHERE %11$s IN (" +
+                            "               SELECT %11$s FROM %1$s\n" +
+                            "              WHERE %2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
                             "              AND %6$s IS NULL\n" +
                             "              AND %7$s = false\n" +
-                            ") as newTable ORDER BY random() LIMIT 1",
+                            "              ORDER BY random() LIMIT 1) " +
+                            "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?) " +
+                            "RETURNING *;",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
                     DatabaseGame.ID,
                     DatabaseGame.TABLE_NAME,
+
                     DatabaseGame.GAME_NAME,
                     DatabaseTrainCard.PLAYER_ID,
-                    DatabaseTrainCard.DISCARDED);
+                    DatabaseTrainCard.DISCARDED,
+                    DatabasePlayer.ID,
 
+                    DatabasePlayer.TABLE_NAME,
+                    DatabasePlayer.USERNAME,
+                    DatabaseTrainCard.ID);
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
+            statement.setString(1, player_name);
+            statement.setString(2, game_name);
+            statement.setString(3, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             DatabaseTrainCard card = null;
@@ -1001,48 +1024,55 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
-    public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
-                            "WHERE %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-                            "and %11$s = (" +
-                            "               SELECT %11$s FROM (SELECT %11$s FROM %1$s\n" +
-                            "              WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-                            "              AND %6$s IS NULL\n" +
-                            "              AND %7$s = false\n" +
-                            ") " +
-                            "as newTable ORDER BY random() LIMIT 1)\n" +
-                            "RETURNING *",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.GAME_ID,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-
-                    DatabaseGame.GAME_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabaseTrainCard.DISCARDED,
-                    DatabasePlayer.ID,
-
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseTrainCard.ID);
-
+    @Override
+    public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "WITH selected_card AS\n" +
+                    "\t(SELECT train_card_id FROM train_card\n" +
+                    "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "\tAND slot = ?),\n" +
+                    "random_card AS\n" +
+                    "    (SELECT train_card_id FROM train_card\n" +
+                    "     WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "     AND slot IS NULL\n" +
+                    "     AND player_id IS NULL\n" +
+                    "     AND discarded = false\n" +
+                    "     ORDER BY random()\n" +
+                    "     LIMIT 1),\n" +
+                    "new_slot_card AS \n" +
+                    "\t(UPDATE train_card SET slot = ?\n" +
+                    "     FROM random_card\n" +
+                    "     WHERE train_card.train_card_id = random_card.train_card_id\n" +
+                    "     AND game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "     RETURNING *)\n" +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?),\n" +
+                    "slot = NULL\n" +
+                    "FROM selected_card, new_slot_card\n" +
+                    "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
+                    "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND EXISTS (SELECT count(*) FROM new_slot_card)\n" +
+                    "RETURNING *");
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, player_name);
-            statement.setString(2, game_name);
+            statement.setString(1, game_name);
+            statement.setInt(2, slot);
             statement.setString(3, game_name);
+            statement.setInt(4, slot);
+            statement.setString(5, game_name);
+            statement.setString(6, player_name);
+            statement.setString(7, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             DatabaseTrainCard card = null;
-            if(resultSet.next()){
+            if(resultSet.next()) {
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
             else if(reshuffleTrainCardDiscardPile(game_name)) {
                 resultSet = statement.executeQuery();
+                resultSet.next();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
             return card;
-
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -1093,28 +1123,6 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
         return null;
-    }
-
-    private boolean assignTrainCardToPlayer(DatabaseTrainCard train_card, String player_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = (" +
-                            "SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                            "WHERE %6$s = ?;",
-                    DatabaseTrainCard.TABLE_NAME,
-                    DatabaseTrainCard.PLAYER_ID,
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseTrainCard.ID);
-
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, player_name);
-            statement.setString(2, train_card.getGameID());
-            statement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     public boolean reshuffleTrainCardDiscardPile(String game_name) {
