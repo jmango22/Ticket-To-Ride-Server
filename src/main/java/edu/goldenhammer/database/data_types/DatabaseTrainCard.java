@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class DatabaseTrainCard implements IDatabaseTrainCard {
     public static final int MAX_COLORED_CARDS = 12;
     public static final int MAX_WILD_CARDS = 14;
-    public static final int MAX_STARTING_CARDS = 4;
+    public static final int MAX_STARTING_CARDS = 5;
     public static final String ID = "train_card_id";
     public static final String GAME_ID = "game_id";
     public static final String PLAYER_ID = "player_id";

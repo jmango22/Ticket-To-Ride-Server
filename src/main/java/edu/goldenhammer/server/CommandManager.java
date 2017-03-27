@@ -32,8 +32,9 @@ public class CommandManager {
     public List<BaseCommand> addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
             List<BaseCommand> executed = new ArrayList<>();
+            int currentPlayer = currentPlayerTurn(command.getGameName());
 
-            if(currentPlayerTurn(command.getPlayerNumber(), command.getGameName())) {
+            if(currentPlayer == command.getPlayerNumber() || (currentPlayer == -1 && command instanceof InitializeHandCommand)) {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
@@ -53,13 +54,10 @@ public class CommandManager {
         }
     }
 
-    private boolean currentPlayerTurn(int playerNumber, String game_name) {
+    private int currentPlayerTurn(String game_name) {
         DatabaseController dbc = DatabaseController.getInstance();
         int current_player = dbc.getCurrentPlayerTurn(game_name);
         //-1 means that the not everyone has initialized their hands
-        if(current_player == playerNumber || current_player == -1) {
-            return true;
-        }
-        return false;
+        return current_player;
     }
 }
