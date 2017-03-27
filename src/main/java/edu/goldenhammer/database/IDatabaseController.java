@@ -20,10 +20,7 @@ public interface IDatabaseController {
     void setAccessToken(String userID, String accessToken);
     void maybeDropGame(String gameName);
     DatabaseTrainCard drawRandomTrainCard(String gameName, String playerName);
-<<<<<<< HEAD
     DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot);
-=======
->>>>>>> parent of beeb450... initializes the slots
     DatabaseDestinationCard drawRandomDestinationCard(String gameName, String playerName);
     DatabaseCity getCity(int cityID);
     boolean hasDestinationCards(String gameName, String playerName);

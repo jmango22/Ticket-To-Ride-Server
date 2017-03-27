@@ -17,6 +17,7 @@ public class DrawTrainCardCommand extends BaseCommand {
     private int slot;
     private Color drawnCard;
     private ArrayList<Color> bank;
+
     public Results execute() {
         IDatabaseController dbc = DatabaseController.getInstance();
         Results results = new Results();
@@ -27,6 +28,8 @@ public class DrawTrainCardCommand extends BaseCommand {
             results.setMessage(Serializer.serialize(this));
         } else if(slot == 5) {
             card = TrainCard.parseDatabaseTrainCard(dbc.drawRandomTrainCard(getGameName(), getPlayerName()));
+            drawnCard = card.getColor();
+            results.setMessage(Serializer.serialize(this));
         } else {
             results.setResponseCode(400);
             results.setAndSerializeMessage("Error: an error occurred while drawing a card from slot " + slot);
