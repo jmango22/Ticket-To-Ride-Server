@@ -38,6 +38,9 @@ public class DatabaseController implements IDatabaseController {
             singleton = new DatabaseController();
         return singleton;
     }
+    public static void setFirstInstance(int maxTrain) {
+        singleton = new DatabaseController(maxTrain);
+    }
 
 
     /**
@@ -46,9 +49,14 @@ public class DatabaseController implements IDatabaseController {
      * @post an instance of DatabaseController is returned with a connection to the SQL database
      */
     public DatabaseController(){
+        MAX_TRAIN=45;
         initializeDatabase();
     }
-
+    int MAX_TRAIN;
+    public DatabaseController(int maxTrain){
+        MAX_TRAIN=maxTrain;
+        initializeDatabase();
+    }
     private void initializeDatabase() {
         this.session = DatabaseConnectionFactory.getInstance();
         ensureTablesCreated();
@@ -846,7 +854,7 @@ public class DatabaseController implements IDatabaseController {
 
                 PreparedStatement statement = connection.prepareStatement(sqlString);
                 statement.setInt(1, i);
-                statement.setInt(2, DatabaseParticipants.MAX_TRAIN_COUNT);
+                statement.setInt(2, MAX_TRAIN);
                 statement.setString(3, game_name);
                 statement.setString(4, players.get(i));
                 statement.executeUpdate();

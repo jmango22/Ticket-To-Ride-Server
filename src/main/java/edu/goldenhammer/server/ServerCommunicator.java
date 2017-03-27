@@ -47,7 +47,13 @@ public class ServerCommunicator {
 //        List<BaseCommand> commandList;
 //        commandList = dbc.getCommandsSinceLastCommand("just", "devon1", 0);
 //        dbc.getTracks("aaaa");
+        int numTrains = 45;
         String portNumber = "8082";//args[0];
+        if(args.length > 0)
+            portNumber = args[0];
+        if(args.length > 1)
+            numTrains = Integer.parseInt(args[1]);
+        DatabaseController.setFirstInstance(numTrains);
         new ServerCommunicator().run(portNumber);
 //        DatabaseConnectionFactory factory = DatabaseConnectionFactory.getInstance();
 //        Connection conn = factory.getConnection();
