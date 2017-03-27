@@ -1879,7 +1879,14 @@ public class DatabaseController implements IDatabaseController {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return null;
+        EndTurnCommand res = new EndTurnCommand();
+        res.setPlayerName(playerName);
+        res.setCommandNumber(commandNumber);
+        res.setPreviousPlayer(-1);
+        res.setNextPlayer(0);
+        res.setGameName(gameName);
+        res.setPlayerName(playerName);
+        return res;
 
     }
     public boolean playerHasCards(int wildCount, int nonWildCount, Color color, String gameName) {
