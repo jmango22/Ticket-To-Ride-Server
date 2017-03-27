@@ -121,6 +121,62 @@ public class TrackForest {
         }
         return playerTracks;
     }
+    class Dist{
+        Node n1;
+        Node n2;
+        int distance;
+        Dist(Node n1, Node n2, int distance){
+            this.n1 = n1;
+            this.n2 = n2;
+            this.distance = distance;
+        }
+
+    }
+    private class Node{
+        public List<Dist> neighbors;
+        Node(){
+            neighbors = new ArrayList<>();
+        }
+        public void addDist(Dist d) {
+            neighbors.add(d);
+        }
+
+    }
+
+
+    private int getLongestPathForTree(TrackTree trackTree) {
+
+        TreeMap<String, Node> nodes = new TreeMap<>();
+        for(Track track: trackTree.getTracks()) {
+            nodes.putIfAbsent(track.getCity1().getName(), new Node());
+            Node n1 = nodes.get(track.getCity1().getName());
+            nodes.putIfAbsent(track.getCity2().getName(), new Node());
+            Node n2 = nodes.get(track.getCity2().getName());
+            Dist dist = new Dist(n1,n2,track.getLength());
+            n1.addDist(dist);
+            n2.addDist(dist);
+        }
+        List<Node> edgeNodes = new ArrayList<>();
+        for(Node n : nodes.values()){
+            if(n.neighbors.size() == 1) {
+                edgeNodes.add(n);
+            }
+        }
+        int max = 0;
+        for (Node node : edgeNodes) {
+            for(Node destinationNode: edgeNodes) {
+
+            }
+        }
+        return max;
+    }
+    public int getLongestTrack() {
+        int longestTrack = 0;
+        int playerWithLongest = -1;
+        for(TrackTree tree: trees) {
+
+        }
+    }
 
     private TrackForest mergeForests(TrackForest first, TrackForest second) {
         return null;
