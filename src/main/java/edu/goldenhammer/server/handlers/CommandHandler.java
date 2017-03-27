@@ -34,7 +34,6 @@ public class CommandHandler extends HandlerBase {
 
                 CommandManager comManager = new CommandManager();
                 List<BaseCommand> commands = comManager.addCommand(baseCommand);
-
                 results.setResponseCode(200);
                 results.setMessage(Serializer.serialize(commands));
             }
