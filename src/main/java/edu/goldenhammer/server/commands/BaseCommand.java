@@ -32,7 +32,8 @@ public abstract class BaseCommand implements Serializable {
     }
 
     public boolean validate() {
-        return true;
+        IDatabaseController dbc = DatabaseController.getInstance();
+        return dbc.validateCommand(this);
     }
 
     public boolean endTurn() {
