@@ -210,17 +210,20 @@ public class TrackForest {
      *
      * @return playerNumber who has the longest track.
      */
-    public int getPlayerWithLongestTrack() {
+    public Set<Integer> getPlayerWithLongestTrack() {
         int longestTrack = 0;
-        int playerWithLongest = -1;
+        TreeSet<Integer> playersWithLongest = new TreeSet<>();
         for(TrackTree tree: trees) {
             int treeMax = getLongestPathForTree(tree);
             if(treeMax > longestTrack){
                 longestTrack = treeMax;
-                playerWithLongest = tree.getPlayerNumber();
+                playersWithLongest = new TreeSet<>();
+                playersWithLongest.add(tree.getPlayerNumber());
+            } else if (treeMax == longestTrack) {
+                playersWithLongest.add(tree.getPlayerNumber());
             }
         }
-        return playerWithLongest;
+        return playersWithLongest;
     }
 
     private TrackForest mergeForests(TrackForest first, TrackForest second) {

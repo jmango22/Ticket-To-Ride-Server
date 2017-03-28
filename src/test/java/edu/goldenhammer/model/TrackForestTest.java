@@ -28,7 +28,26 @@ public class TrackForestTest {
         tracks.add(new Track(city2,city5,5,Color.BLACK,0,0,0,0,0,0,false));
 
         TrackForest forest = new TrackForest(tracks);
-        assert(forest.getPlayerWithLongestTrack() == 0);
+        assert(forest.getPlayerWithLongestTrack().contains(0));
+        assert(!forest.getPlayerWithLongestTrack().contains(1));
+    }
+
+    @Test
+    public void testTie() {
+        List<Track> tracks = new ArrayList<>();
+        tracks.add(new Track(city1,city2,2,Color.BLACK,1,0,0,0,0,0,false));
+        tracks.add(new Track(city1,city3,3,Color.BLACK,1,0,0,0,0,0,false));
+        tracks.add(new Track(city2,city4,2,Color.BLACK,1,0,0,0,0,0,false));
+        tracks.add(new Track(city2,city5,5,Color.BLACK,1,0,0,0,0,0,false));
+        tracks.add(new Track(city1,city2,2,Color.BLACK,0,0,0,0,0,0,false));
+        tracks.add(new Track(city1,city3,3,Color.BLACK,0,0,0,0,0,0,false));
+        tracks.add(new Track(city2,city4,2,Color.BLACK,0,0,0,0,0,0,false));
+        tracks.add(new Track(city2,city5,5,Color.BLACK,0,0,0,0,0,0,false));
+
+        TrackForest forest = new TrackForest(tracks);
+        assert(forest.getPlayerWithLongestTrack().contains(0));
+        assert(forest.getPlayerWithLongestTrack().contains(1));
+        assert(!forest.getPlayerWithLongestTrack().contains(2));
     }
 
     @Test
