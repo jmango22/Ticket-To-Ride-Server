@@ -53,6 +53,7 @@ public class TrackForest {
     List<TrackTree> trees;
 
     public TrackForest(List<Track> tracks) {
+        trees = new ArrayList<>();
         generateForest(tracks);
     }
 
@@ -131,6 +132,12 @@ public class TrackForest {
             this.distance = distance;
         }
 
+        Node getOtherNode(Node n){
+            if(n == n1)
+                return n2;
+            else
+                return n1;
+        }
     }
     private class Node{
         public List<Dist> neighbors;
@@ -143,8 +150,34 @@ public class TrackForest {
 
     }
 
+    private boolean containsDist(List<Dist> l, Dist dist) {
+        for(Dist d: l) {
+            if(dist == d)
+                return true;
+        }
+        return false;
+    }
 
-    private int getLongestPathForTree(TrackTree trackTree) {
+    private int getLongestPathRecursive(Node node, List<Dist> alreadyTraveled) {
+        int maxLength = 0;
+        for(Dist dist: node.neighbors) {
+            if(!containsDist(alreadyTraveled, dist)) {
+                List<Dist> newDist = new ArrayList<>(alreadyTraveled);
+                newDist.add(dist);
+                int newLength = dist.distance + getLongestPathRecursive(dist.getOtherNode(node), newDist);
+                if(newLength > maxLength)
+                    maxLength = newLength;
+            }
+
+        }
+        return maxLength;
+    }
+
+    private int getLongestPathFromNode(Node node) {
+        return getLongestPathRecursive(node, new ArrayList<>());
+    }
+
+    int getLongestPathForTree(TrackTree trackTree) {
 
         TreeMap<String, Node> nodes = new TreeMap<>();
         for(Track track: trackTree.getTracks()) {
@@ -162,20 +195,32 @@ public class TrackForest {
                 edgeNodes.add(n);
             }
         }
+        if(edgeNodes.size() == 0)
+            edgeNodes.add(nodes.firstEntry().getValue());
         int max = 0;
         for (Node node : edgeNodes) {
-            for(Node destinationNode: edgeNodes) {
-
-            }
+            int maxLength = getLongestPathFromNode(node);
+            if(maxLength > max)
+                max = maxLength;
         }
         return max;
     }
-    public int getLongestTrack() {
+
+    /**
+     *
+     * @return playerNumber who has the longest track.
+     */
+    public int getPlayerWithLongestTrack() {
         int longestTrack = 0;
         int playerWithLongest = -1;
         for(TrackTree tree: trees) {
-
+            int treeMax = getLongestPathForTree(tree);
+            if(treeMax > longestTrack){
+                longestTrack = treeMax;
+                playerWithLongest = tree.getPlayerNumber();
+            }
         }
+        return playerWithLongest;
     }
 
     private TrackForest mergeForests(TrackForest first, TrackForest second) {
