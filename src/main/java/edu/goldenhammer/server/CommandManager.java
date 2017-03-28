@@ -8,10 +8,7 @@ import javax.xml.crypto.Data;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.Lock;
-import edu.goldenhammer.server.commands.BaseCommand;
-import edu.goldenhammer.server.commands.EndGameCommand;
-import edu.goldenhammer.server.commands.EndTurnCommand;
-import edu.goldenhammer.server.commands.InitializeHandCommand;
+import edu.goldenhammer.server.commands.*;
 
 /**
  * Created by root on 3/15/17.
@@ -34,7 +31,7 @@ public class CommandManager {
             List<BaseCommand> executed = new ArrayList<>();
             int currentPlayer = currentPlayerTurn(command.getGameName());
 
-            if(currentPlayer == command.getPlayerNumber() || (currentPlayer == -1 && command instanceof InitializeHandCommand)) {
+            if(currentPlayer == command.getPlayerNumber() || (currentPlayer == -1 && command instanceof ReturnDestCardsCommand)) {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
