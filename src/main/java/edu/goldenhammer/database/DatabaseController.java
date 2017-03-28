@@ -1756,7 +1756,7 @@ public class DatabaseController implements IDatabaseController {
         }
         return cards;
     }
-
+//TODO: NOt working
     private List<DatabaseDestinationCard> getDestinationCards(String game_name, String username, int commandNumber, int player_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(

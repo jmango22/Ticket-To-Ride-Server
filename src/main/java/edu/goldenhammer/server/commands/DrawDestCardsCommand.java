@@ -39,11 +39,16 @@ public class DrawDestCardsCommand extends BaseCommand {
 
     private List<DestinationCard> getDestinationCards() {
         IDatabaseController dbc = DatabaseController.getInstance();
-        List<DatabaseDestinationCard> databaseCards = dbc.drawDestinationCards(getGameName(), getPlayerName(), getCommandNumber(), getPlayerNumber());
+//        List<DatabaseDestinationCard> databaseCards = dbc.drawDestinationCards(getGameName(), getPlayerName(), getCommandNumber(), getPlayerNumber());
+//        List<DestinationCard> cards = new ArrayList<>();
+//
+//        for(DatabaseDestinationCard databaseCard : databaseCards) {
+//            cards.add(DestinationCard.parseDatabaseDestinationCard(databaseCard));
+//        }
         List<DestinationCard> cards = new ArrayList<>();
-
-        for(DatabaseDestinationCard databaseCard : databaseCards) {
-            cards.add(DestinationCard.parseDatabaseDestinationCard(databaseCard));
+        for(int i = 0; i < 3; i++) {
+            DestinationCard destinationCard = DestinationCard.parseDatabaseDestinationCard(dbc.drawRandomDestinationCard(getGameName(), getPlayerName()));
+            cards.add(destinationCard);
         }
         return cards;
     }
