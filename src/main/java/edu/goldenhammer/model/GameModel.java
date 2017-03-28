@@ -11,13 +11,15 @@ public class GameModel implements IGameModel {
     private List<TrainCard> trainCardDeck;
     private Map map;
     private GameName name;
+    private List<Color> mBank;
 
-    public GameModel(List<PlayerOverview> players, List<DestinationCard> destinationDeck, List<TrainCard> trainCardDeck, Map map, GameName name) {
+    public GameModel(List<PlayerOverview> players, List<DestinationCard> destinationDeck, List<TrainCard> trainCardDeck, Map map, GameName name, List<Color> mBank) {
         this.players = players;
         this.destinationDeck = destinationDeck;
         this.trainCardDeck = trainCardDeck;
         this.map = map;
         this.name = name;
+        this.mBank = mBank;
     }
 
     public List<PlayerOverview> getPlayers() {
