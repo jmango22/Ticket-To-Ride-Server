@@ -32,4 +32,6 @@ public interface IDatabaseController {
     boolean allHandsInitialized(String gameName);
     List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number);
     boolean discardCard(String gameName, String playerName, Color color);
+    List<DatabaseTrainCard> getSlotCards(String game_name);
+    boolean validateCommand(BaseCommand command);
 }

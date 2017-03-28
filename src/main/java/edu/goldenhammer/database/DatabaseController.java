@@ -2,6 +2,7 @@ package edu.goldenhammer.database;
 
 import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
+import edu.goldenhammer.server.CommandManager;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
@@ -797,7 +798,53 @@ public class DatabaseController implements IDatabaseController {
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
         initializeHands(game_name);
+        initializeTurn(game_name);
         setGameStarted(game_name);
+    }
+
+    private void initializeTurn(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH last_command AS\n" +
+                    "   (SELECT command_number, player_id, game_id FROM command\n" +
+                    "   WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "   ORDER BY command_number DESC\n" +
+                    "   LIMIT 1),\n" +
+                    "last_command_player_number AS \n" +
+                    "   (SELECT player_number FROM participants\n" +
+                    "   WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "   AND user_id IN (SELECT player_id FROM last_command)),\n" +
+                    "current_player_name AS\n" +
+                    "   (SELECT username FROM player WHERE user_id IN\n" +
+                    "       (SELECT user_id FROM participants\n" +
+                    "       WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "       AND player_number IN (SELECT player_number FROM last_command_player_number)))\n" +
+                    "SELECT * FROM last_command, last_command_player_number, current_player_name;\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, game_name);
+            statement.setString(3, game_name);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                int player_number = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+                int command_number = resultSet.getInt(DatabaseCommand.COMMAND_NUMBER) + 1;
+                String player_name = resultSet.getString(DatabasePlayer.USERNAME);
+                int previousPlayer = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER) - 1;
+                int nextPlayer = 0;
+
+                EndTurnCommand endTurn = new EndTurnCommand();
+                endTurn.setPlayerNumber(player_number);
+                endTurn.setCommandNumber(command_number);
+                endTurn.setGameName(game_name);
+                endTurn.setPlayerName(player_name);
+                endTurn.setPreviousPlayer(previousPlayer);
+                endTurn.setNextPlayer(nextPlayer);
+
+
+                endTurn.execute();
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void setGameStarted(String game_name) {
@@ -1249,6 +1296,32 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(2, game_name);
             statement.setString(3, "EndTurn");
 
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                int previousPlayerNumber = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
+                int max_players = playersInGame(game_name);
+                if(previousPlayerNumber == max_players) {
+                    return 0;
+                }
+                else {
+                    return previousPlayerNumber + 1;
+                }
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return -1;
+    }
+
+    private int playersInGame(String game_name) {
+        try(Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT player_number FROM participants\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "ORDER BY player_number DESC\n" +
+                    "LIMIT 1\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
             ResultSet resultSet = statement.executeQuery();
 
             if(resultSet.next()) {
@@ -1906,4 +1979,46 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
+    public List<DatabaseTrainCard> getSlotCards(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM train_card\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND slot IS NOT NULL\n" +
+                    "ORDER BY slot ASC;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            List<DatabaseTrainCard> databaseTrainCards = new ArrayList<>();
+            while(resultSet.next()) {
+                databaseTrainCards.add(DatabaseTrainCard.buildTrainCardFromResultSet(resultSet));
+            }
+            return databaseTrainCards;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean validateCommand(BaseCommand command) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM command\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "ORDER BY command_number DESC;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, command.getGameName());
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                int lastCommandNumber = resultSet.getInt(DatabaseCommand.COMMAND_NUMBER);
+                return command.getCommandNumber() == 0 || command.getCommandNumber() == 1 + lastCommandNumber;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 }
