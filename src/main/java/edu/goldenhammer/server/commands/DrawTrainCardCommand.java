@@ -55,12 +55,13 @@ public class DrawTrainCardCommand extends BaseCommand {
     }
 
     private List<Color> getSlotCards(String game_name) {
-        IDatabaseController dbc = DatabaseController.getInstance();
-        List<Color> slotCards = new ArrayList<>();
-        List<DatabaseTrainCard> databaseTrainCards = dbc.getSlotCards(game_name);
-        for(DatabaseTrainCard databaseTrainCard : databaseTrainCards) {
-            slotCards.add(Color.getTrainCardColorFromString(databaseTrainCard.getTrainType()));
-        }
-        return slotCards;
+//        IDatabaseController dbc = DatabaseController.getInstance();
+//        List<Color> slotCards = new ArrayList<>();
+//        List<DatabaseTrainCard> databaseTrainCards = dbc.getSlotCards(game_name);
+//        for(DatabaseTrainCard databaseTrainCard : databaseTrainCards) {
+//            slotCards.add(Color.getTrainCardColorFromString(databaseTrainCard.getTrainType()));
+//        }
+//        return slotCards;
+        return DatabaseController.getInstance().getSlotCardColors(game_name);
     }
 }

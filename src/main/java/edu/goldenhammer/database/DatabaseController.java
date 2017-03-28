@@ -457,7 +457,7 @@ public class DatabaseController implements IDatabaseController {
         List<TrainCard> trainCardDeck = getTrainCards(game_name);
         Map map = getMap(game_name);
         GameName gameName = new GameName(game_name);
-        return new GameModel(players, destinationDeck, trainCardDeck, map, gameName);
+        return new GameModel(players, destinationDeck, trainCardDeck, map, gameName, getSlotCardColors(game_name));
     }
 
     private List<PlayerOverview> getPlayerOverviews(String game_name) {
@@ -1979,6 +1979,15 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    public List<Color> getSlotCardColors(String game_name) {
+        IDatabaseController dbc = DatabaseController.getInstance();
+        List<Color> slotCards = new ArrayList<>();
+        List<DatabaseTrainCard> databaseTrainCards = dbc.getSlotCards(game_name);
+        for (DatabaseTrainCard databaseTrainCard : databaseTrainCards) {
+            slotCards.add(Color.getTrainCardColorFromString(databaseTrainCard.getTrainType()));
+        }
+        return slotCards;
+    }
     @Override
     public List<DatabaseTrainCard> getSlotCards(String game_name) {
         try (Connection connection = session.getConnection()) {
