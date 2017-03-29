@@ -798,7 +798,7 @@ public class DatabaseController implements IDatabaseController {
         initializeTrainCards(game_name);
         initializeDestinationCards(game_name);
         initializeHands(game_name);
-        initializeTurn(game_name);
+//        initializeTurn(game_name);
         setGameStarted(game_name);
     }
 
