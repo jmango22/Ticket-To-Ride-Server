@@ -968,8 +968,8 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseDestinationCard.getAllDestinations());
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            String pathName = System.getProperty("user.dir") + "/src/main/res/destinations.txt";
-            Scanner destinations = new Scanner(new File(pathName));
+            String pathName = "/destinations.txt";
+            Scanner destinations = new Scanner(getClass().getResourceAsStream(pathName));
             for(int i = 0; i < DatabaseDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
                 String destination = destinations.nextLine();
                 String[] vars = destination.split(",");
@@ -983,7 +983,7 @@ public class DatabaseController implements IDatabaseController {
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
-        catch(FileNotFoundException ex) {
+        catch(Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -992,8 +992,8 @@ public class DatabaseController implements IDatabaseController {
         try(Connection connection = session.getConnection()) {
             String sqlString = DatabaseCity.INSERT_STMT;
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            String pathName = System.getProperty("user.dir") + "/src/main/res/cities.txt";
-            Scanner cities = new Scanner(new File(pathName));
+            String pathName = "/cities.txt";
+            Scanner cities = new Scanner(getClass().getResourceAsStream(pathName));
             for (int i = 0; i < DatabaseCity.CITY_COUNT * 3; i += 3) {
                 String city = cities.nextLine();
                 String[] vars = city.split(",");
@@ -1004,7 +1004,7 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-        } catch(FileNotFoundException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -1014,8 +1014,8 @@ public class DatabaseController implements IDatabaseController {
             String sqlString = DatabaseRoute.INSERT_STMT;
             PreparedStatement statement = connection.prepareStatement(sqlString);
 
-            String pathName = System.getProperty("user.dir") + "/src/main/res/routes.txt";
-            Scanner routes = new Scanner(new File(pathName));
+            String pathName = "/routes.txt";
+            Scanner routes = new Scanner(getClass().getResourceAsStream(pathName));
             for (int i = 0; i < DatabaseRoute.ROUTE_COUNT * 5; i += 5) {
                 String route = routes.nextLine();
                 String[] vars = route.split(",");
@@ -1028,7 +1028,7 @@ public class DatabaseController implements IDatabaseController {
             }
             statement.execute();
         } catch (SQLException ex) {
-        } catch(FileNotFoundException ex) {
+        } catch(Exception ex) {
             ex.printStackTrace();
         }
     }

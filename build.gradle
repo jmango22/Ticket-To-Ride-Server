@@ -22,6 +22,16 @@ task execute(type:JavaExec) {
     main = 'edu.goldenhammer.server.ServerCommunicator'
     classpath = sourceSets.main.runtimeClasspath
 }
+sourceSets {
+    main {
+        java {
+            srcDirs= ["src/main/java"]
+        }
+        resources {
+            srcDirs= ["src/main/resources"]
+        }
+    }
+}
 
 jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
