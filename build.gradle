@@ -1,5 +1,5 @@
 group 'golden-hammer'
-version '1.0-SNAPSHOT'
+version '1.0'
 apply plugin: 'idea'
 apply plugin: 'java'
 
@@ -21,4 +21,13 @@ dependencies {
 task execute(type:JavaExec) {
     main = 'edu.goldenhammer.server.ServerCommunicator'
     classpath = sourceSets.main.runtimeClasspath
+}
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes(
+                "Main-Class": 'edu.goldenhammer.server.ServerCommunicator',
+                )
+    }
 }
