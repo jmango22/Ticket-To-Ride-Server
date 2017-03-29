@@ -1937,13 +1937,14 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("with current_player as (select * from participants where \n" +
                     "\tgame_id in (select game_id from game where name=?)\n" +
-                    "\tand user_id in (select user_id from player where username='devon' limit 1)\n" +
+                    "\tand user_id in (select user_id from player where username=? limit 1)\n" +
                     "), max_player as (select max(player_number) as max from participants\n" +
                     "    where game_id in (select game_id from game where name=?))\n" +
                     "select player_number as previous, mod(player_number + 1,max + 1) as next from  max_player, current_player\n");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, gameName);
-            statement.setString(2, gameName);
+            statement.setString(2, playerName);
+            statement.setString(3, gameName);
             ResultSet resultSet = statement.executeQuery();
 
             if(resultSet.next()) {
