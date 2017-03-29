@@ -8,7 +8,6 @@ import edu.goldenhammer.model.TrainCard;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +23,7 @@ public class DrawTrainCardCommand extends BaseCommand {
         IDatabaseController dbc = DatabaseController.getInstance();
         Results results = new Results();
         results.setResponseCode(200);
-        if(slot >= 0 && slot <= 4) {
+        if(slot >= 0 && slot <= 4 && !drawingWildCardOnSecondDraw()) {
             card = TrainCard.parseDatabaseTrainCard(dbc.drawTrainCardFromSlot(getGameName(), getPlayerName(), slot));
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
@@ -49,9 +48,23 @@ public class DrawTrainCardCommand extends BaseCommand {
         if(slot >= 0 && slot <= 4 && drawnCard == Color.WILD) {
             return true;
         }
+        else if(hasDrawnTwo()) {
+            return true;
+        }
         else {
             return false;
         }
+    }
+
+    private boolean hasDrawnTwo() {
+        IDatabaseController dbc = DatabaseController.getInstance();
+        return dbc.hasDrawnTwoTrainCards(getGameName(), getPlayerName());
+    }
+
+    private boolean drawingWildCardOnSecondDraw() {
+        IDatabaseController dbc = DatabaseController.getInstance();
+        DatabaseTrainCard trainCard = dbc.getTrainCardFromSlot(getGameName(), slot);
+        return trainCard.getTrainType().equals("wild");
     }
 
     private List<Color> getSlotCards(String game_name) {

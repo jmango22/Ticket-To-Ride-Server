@@ -34,4 +34,6 @@ public interface IDatabaseController {
     boolean discardCard(String gameName, String playerName, Color color);
     List<DatabaseTrainCard> getSlotCards(String game_name);
     boolean validateCommand(BaseCommand command);
+    boolean hasDrawnTwoTrainCards(String game_name, String player_name);
+    DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot);
 }

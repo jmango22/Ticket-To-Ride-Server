@@ -2031,4 +2031,50 @@ public class DatabaseController implements IDatabaseController {
         }
         return false;
     }
+
+    @Override
+    public boolean hasDrawnTwoTrainCards(String game_name, String player_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM command\n" +
+                    "INNER JOIN player ON command.player_id = player.user_id\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "ORDER BY command_number DESC\n" +
+                    "LIMIT 2;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()) {
+                String username = resultSet.getString(DatabasePlayer.USERNAME);
+                String command_type = resultSet.getString(DatabaseCommand.COMMAND_TYPE);
+                if(!username.equals(player_name) || !command_type.equals("DrawTrainCard")) {
+                    return false;
+                }
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
+    public DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("SELECT * FROM train_card" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                    "AND slot = ?;");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setInt(2, slot);
+
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()) {
+                DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
 }
