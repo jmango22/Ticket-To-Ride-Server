@@ -53,4 +53,9 @@ public class LayTrackCommand extends BaseCommand {
         }
         return false;
     }
+
+    @Override
+    public boolean isLastRound() {
+        return DatabaseController.getInstance().numTrainsLeft(getGameName(),getPlayerName()) <= 2;
+    }
 }

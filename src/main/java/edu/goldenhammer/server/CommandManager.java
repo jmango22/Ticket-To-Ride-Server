@@ -45,6 +45,15 @@ public class CommandManager {
                         endTurn.execute();
                         executed.add(endTurn);
                     }
+                    if(command.isLastRound()) {
+                        LastTurnCommand lastTurnCommand = new LastTurnCommand();
+                        lastTurnCommand.setGameName(command.getGameName());
+                        lastTurnCommand.setPlayerName(command.getPlayerName());
+                        lastTurnCommand.setPlayerNumber(command.getPlayerNumber());
+                        lastTurnCommand.setCommandNumber(executed.get(executed.size()-1).getCommandNumber()+1);
+                        lastTurnCommand.execute();
+                        executed.add(lastTurnCommand);
+                    }
                 }
             }
             return executed;

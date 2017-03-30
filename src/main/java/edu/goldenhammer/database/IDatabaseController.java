@@ -36,5 +36,6 @@ public interface IDatabaseController {
     List<DatabaseTrainCard> getSlotCards(String game_name);
     boolean validateCommand(BaseCommand command);
     boolean hasDrawnTwoTrainCards(String game_name, String player_name);
+    int numTrainsLeft(String game_name, String player_name);
     DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot);
 }
