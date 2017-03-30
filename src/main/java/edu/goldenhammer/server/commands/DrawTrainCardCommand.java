@@ -63,14 +63,17 @@ public class DrawTrainCardCommand extends BaseCommand {
     }
 
     private boolean drawingWildCardOnSecondDraw() {
+        IDatabaseController dbc = DatabaseController.getInstance();
         if (slot == 5){
             return false;
         }
-        IDatabaseController dbc = DatabaseController.getInstance();
-        if(dbc.getNumberOfDrawTrainCommands(getGameName()) == 0)
+        else if(dbc.getNumberOfDrawTrainCommands(getGameName()) == 0) {
             return false;
-        DatabaseTrainCard trainCard = dbc.getTrainCardFromSlot(getGameName(), slot);
-        return trainCard.getTrainType().equals("wild");
+        }
+        else {
+            DatabaseTrainCard trainCard = dbc.getTrainCardFromSlot(getGameName(), slot);
+            return trainCard.getTrainType().equals("wild");
+        }
     }
 
     private List<Color> getSlotCards(String game_name) {
