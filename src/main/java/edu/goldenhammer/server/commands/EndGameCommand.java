@@ -16,7 +16,7 @@ public class EndGameCommand extends BaseCommand {
     int winner;
     //Are these results the stats for all the players?
     // Spec: Results[] results
-    List<PlayerOverview> playersResults; //get these from the database...
+    List<EndResult>  playersResults; //get these from the database...
     
     //Results results
     public EndGameCommand(String gameName) {
@@ -28,8 +28,8 @@ public class EndGameCommand extends BaseCommand {
     public Results execute() {
         Results result = new Results();
         ResultsGenerator resultsGenerator = new ResultsGenerator();
-        List<EndResult> endResults = resultsGenerator.generateResults(getGameName());
-        result.setMessage(Serializer.serialize(endResults));
+        playersResults = resultsGenerator.generateResults(getGameName());
+        result.setMessage(Serializer.serialize(playersResults));
         addToDatabase(true, true);
         return result;
     }
