@@ -2137,5 +2137,26 @@ public class DatabaseController implements IDatabaseController {
         }
         return 0;
     }
-
+    public boolean isEndOfGame(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "with last_turn_command as \n" +
+                            "\t(select * from command where game_id in \n" +
+                            "     \t(select game_id from game where name = ?) \n" +
+                            "     \t\tand command_type='LastTurn' order by command_number limit 1)\n" +
+                            "select count(*) from command WHERE game_id =(select game_id from last_turn_command) \n" +
+                            "and player_id=(select player_id from last_turn_command) \n" +
+                            "and command_number > (select command_number from last_turn_command)"
+            );
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
