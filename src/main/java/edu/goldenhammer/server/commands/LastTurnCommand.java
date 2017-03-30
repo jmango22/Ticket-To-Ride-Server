@@ -8,7 +8,7 @@ import edu.goldenhammer.server.Results;
  */
 public class LastTurnCommand extends BaseCommand {
     public LastTurnCommand() {
-        setGameName("LastTurn");
+        setName("LastTurn");
     }
 
     @Override
