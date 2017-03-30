@@ -36,6 +36,7 @@ public abstract class BaseCommand implements Serializable {
         return dbc.validateCommand(this);
     }
 
+    public boolean isLastRound() {return false;}
     public boolean endTurn() {
         return true;
     }

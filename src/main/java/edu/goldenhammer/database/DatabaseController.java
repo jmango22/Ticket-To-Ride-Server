@@ -2102,4 +2102,23 @@ public class DatabaseController implements IDatabaseController {
         return 0;
     }
 
+    public int numTrainsLeft(String game_name, String player_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("" +
+                    "select trains_left from participants where game_id in \n" +
+                    "(SELECT game_id FROM game WHERE name = ?)\n" +
+                    "and user_id in (select user_id from player where username=?)");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(1, player_name);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getInt(1);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }
