@@ -1339,7 +1339,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("update participants set trains_left = ?\n" +
                     "where game_id in (select game_id from game where name = ?)\n" +
-                    "and user_id in (select user_id from player where username = ?\n");
+                    "and user_id in (select user_id from player where username = ?)\n");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setInt(1, numTrainsLeft(game_name, username) - trainsToRemove);
             statement.setString(2, game_name);
