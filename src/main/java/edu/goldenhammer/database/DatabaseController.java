@@ -2060,8 +2060,8 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM train_card" +
-                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+            String sqlString = String.format("SELECT * FROM train_card " +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?) " +
                     "AND slot = ?;");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
@@ -2069,12 +2069,29 @@ public class DatabaseController implements IDatabaseController {
 
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()) {
-                DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+                return DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public int getNumberOfDrawTrainCommands(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("" +
+                    "with game_commands as (select * from command where game_id IN (SELECT game_id FROM game WHERE name =?))\n" +
+                    "        select count(*) from game_commands where command_type='DrawTrainCard' and command_number > (select max(command_number) from game_commands where command_type='EndTurn')");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            ResultSet resultSet = statement.executeQuery();
+            if(resultSet.next()){
+                return resultSet.getInt(1);
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }
