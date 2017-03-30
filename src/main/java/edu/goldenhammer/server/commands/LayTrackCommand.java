@@ -24,8 +24,9 @@ public class LayTrackCommand extends BaseCommand {
             dbc.discardCard(getGameName(),getPlayerName(),card);
         }
 
-        dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number());
-        addToDatabase(true, true);
+        if(dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
+            addToDatabase(true, true);
+        }
         return new Results();
     }
 

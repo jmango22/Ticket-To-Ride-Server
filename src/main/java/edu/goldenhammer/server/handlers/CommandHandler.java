@@ -34,8 +34,14 @@ public class CommandHandler extends HandlerBase {
 
                 CommandManager comManager = new CommandManager();
                 List<BaseCommand> commands = comManager.addCommand(baseCommand);
-                results.setResponseCode(200);
-                results.setMessage(Serializer.serialize(commands));
+                if(commands.size() > 0) {
+                    results.setResponseCode(200);
+                    results.setMessage(Serializer.serialize(commands));
+                }
+                else {
+                    results.setResponseCode(400);
+                    results.setMessage("Error: invalid command entered");
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
