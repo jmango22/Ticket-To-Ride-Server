@@ -23,7 +23,7 @@ public class DrawTrainCardCommand extends BaseCommand {
         IDatabaseController dbc = DatabaseController.getInstance();
         Results results = new Results();
         results.setResponseCode(200);
-        if(slot >= 0 && slot <= 4 && !drawingWildCardOnSecondDraw()) {
+        if(slot >= 0 && slot <= 4) {
             card = TrainCard.parseDatabaseTrainCard(dbc.drawTrainCardFromSlot(getGameName(), getPlayerName(), slot));
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
@@ -79,5 +79,11 @@ public class DrawTrainCardCommand extends BaseCommand {
 //        }
 //        return slotCards;
         return DatabaseController.getInstance().getSlotCardColors(game_name);
+    }
+
+    @Override
+    public boolean validate() {
+        return super.validate() && !drawingWildCardOnSecondDraw();
+
     }
 }
