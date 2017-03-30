@@ -1040,6 +1040,7 @@ public class DatabaseController implements IDatabaseController {
                             "               SELECT %11$s FROM %1$s\n" +
                             "              WHERE %2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
                             "              AND %6$s IS NULL\n" +
+                            "              AND %12$s IS NULL\n" +
                             "              AND %7$s = false\n" +
                             "              ORDER BY random() LIMIT 1) " +
                             "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?) " +
@@ -1056,7 +1057,8 @@ public class DatabaseController implements IDatabaseController {
 
                     DatabasePlayer.TABLE_NAME,
                     DatabasePlayer.USERNAME,
-                    DatabaseTrainCard.ID);
+                    DatabaseTrainCard.ID,
+                    DatabaseTrainCard.SLOT);
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, player_name);
             statement.setString(2, game_name);
