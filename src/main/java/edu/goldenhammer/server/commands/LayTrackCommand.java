@@ -21,6 +21,7 @@ public class LayTrackCommand extends BaseCommand {
     public Results execute() {
         DatabaseController dbc = DatabaseController.getInstance();
         if(dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
+            dbc.removeTrainsFromPlayer(getGameName(), getPlayerName(), track.getLength());
             addToDatabase(true, true);
             for(Color card : cards) {
                 dbc.discardCard(getGameName(),getPlayerName(),card);
