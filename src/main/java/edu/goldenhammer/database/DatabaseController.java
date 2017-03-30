@@ -1337,10 +1337,11 @@ public class DatabaseController implements IDatabaseController {
 
     public boolean claimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s\n" +
-                    "SET %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-                    "WHERE %6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)\n" +
-                    "AND %10$s = ?",
+            String sqlString = String.format("" +
+                            "insert into claimed_route (player_id, game_id, route_id) values \n" +
+                            "((SELECT user_id FROM player WHERE username = ?),\n" +
+                            "(SELECT game_id FROM game WHERE name = ?),\n" +
+                            "?)",
                     DatabaseClaimedRoute.TABLE_NAME,
 
                     DatabaseClaimedRoute.PLAYER_ID,
@@ -1359,8 +1360,8 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1, username);
             statement.setString(2, game_name);
             statement.setInt(3, route_number);
-
-            return (statement.executeUpdate() == 1);
+            int numUpdated = statement.executeUpdate();
+            return (numUpdated == 1);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

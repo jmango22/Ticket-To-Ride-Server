@@ -14,9 +14,7 @@ public class DatabaseClaimedRoute implements IDatabaseClaimedRoute{
                     "%3$s INTEGER NOT NULL," +
                     "%4$s INTEGER NOT NULL," +
                     "PRIMARY KEY(%2$s, %3$s)," +
-                    "FOREIGN KEY(%2$s)" +
-                    "   REFERENCES %5$s" +
-                    "   ON DELETE CASCADE," +
+                    "" +
                     "FOREIGN KEY(%3$s)" +
                     "   REFERENCES %6$s" +
                     "   ON DELETE CASCADE," +
