@@ -42,6 +42,10 @@ public class Track {
         return route_number;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public City getCity1() {
         return city1;
     }
