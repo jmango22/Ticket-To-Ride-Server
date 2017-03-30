@@ -30,16 +30,19 @@ public class LayTrackCommand extends BaseCommand {
 
     public boolean validate() {
         DatabaseController dbc = DatabaseController.getInstance();
-        for(Color color: cards) {
-            if(color != Color.WILD && color != track.getColor()) {
-                return false;
+        if(track.getColor() != null) {
+            for (Color color : cards) {
+                if (color != Color.WILD && color != track.getColor()) {
+                    return false;
+                }
             }
         }
         if(cards.length != track.getLength())
             return false;
 //TODO: finish validating the cards
         List<Track> tracks = dbc.getTracks(getGameName());
-
+        if(track.getColor() == null)
+            track.setColor(Color.GRAY);
         for(Track _track: tracks) {
             if(_track.getRoute_number() == track.getRoute_number()) {
                 return (track.getColor() == _track.getColor()
