@@ -1335,6 +1335,23 @@ public class DatabaseController implements IDatabaseController {
         return -1;
     }
 
+    public void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("update participants set trains_left = ?\n" +
+                    "where game_id in (select game_id from game where name = ?)\n" +
+                    "and user_id in (select user_id from player where username = ?\n");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, numTrainsLeft(game_name, username) - trainsToRemove);
+            statement.setString(2, game_name);
+            statement.setString(3, username);
+
+            statement.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
     public boolean claimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
@@ -2088,7 +2105,7 @@ public class DatabaseController implements IDatabaseController {
     public int getNumberOfDrawTrainCommands(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
-                    "with game_commands as (select * from command where game_id IN (SELECT game_id FROM game WHERE name =?))\n" +
+                    "with game_commands as (select * from command where game_id IN (SELECT game_id FROM game WHERE name = ?))\n" +
                     "        select count(*) from game_commands where command_type='DrawTrainCard' and command_number > (select max(command_number) from game_commands where command_type='EndTurn')");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);

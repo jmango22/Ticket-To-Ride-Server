@@ -30,7 +30,7 @@ public interface IDatabaseController {
     List<DatabaseMessage> getMessages(String game_name);
     String getUsername(String player_id);
     boolean allHandsInitialized(String gameName);
-    public int getNumberOfDrawTrainCommands(String game_name);
+    int getNumberOfDrawTrainCommands(String game_name);
     List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number);
     boolean discardCard(String gameName, String playerName, Color color);
     List<DatabaseTrainCard> getSlotCards(String game_name);
