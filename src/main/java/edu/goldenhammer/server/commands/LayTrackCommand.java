@@ -25,6 +25,7 @@ public class LayTrackCommand extends BaseCommand {
         }
 
         dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number());
+        addToDatabase(true, true);
         return new Results();
     }
 
