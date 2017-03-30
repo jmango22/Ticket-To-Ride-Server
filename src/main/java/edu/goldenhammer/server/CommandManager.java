@@ -37,6 +37,10 @@ public class CommandManager {
                     executed.add(command);
                     if(DatabaseController.getInstance().isEndOfGame(command.getGameName())) {
                         EndGameCommand endGameCommand = new EndGameCommand(command.getGameName());
+                        endGameCommand.setCommandNumber(command.getCommandNumber()+1);
+                        endGameCommand.setPlayerName(command.getPlayerName());
+                        endGameCommand.setPlayerNumber(command.getPlayerNumber());
+                        endGameCommand.setGameName(command.getGameName());
                         endGameCommand.execute();
                         executed.add(endGameCommand);
                     } else {
