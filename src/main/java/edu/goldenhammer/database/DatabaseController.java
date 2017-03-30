@@ -2077,6 +2077,11 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    /**
+     *
+     * @param game_name
+     * @return number of drawCard commands since last DrawTrainCard command
+     */
     public int getNumberOfDrawTrainCommands(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
