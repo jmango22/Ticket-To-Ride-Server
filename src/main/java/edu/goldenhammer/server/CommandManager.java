@@ -35,24 +35,25 @@ public class CommandManager {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
-                    if(command.isEndOfGame()) {
+                    if(DatabaseController.getInstance().isEndOfGame(command.getGameName())) {
                         EndGameCommand endGameCommand = new EndGameCommand(command.getGameName());
                         endGameCommand.execute();
                         executed.add(endGameCommand);
-                    }
-                    else if (command.endTurn()) {
-                        EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber()+1, command.getPlayerName());
-                        endTurn.execute();
-                        executed.add(endTurn);
-                    }
-                    if(command.isLastRound()) {
-                        LastTurnCommand lastTurnCommand = new LastTurnCommand();
-                        lastTurnCommand.setGameName(command.getGameName());
-                        lastTurnCommand.setPlayerName(command.getPlayerName());
-                        lastTurnCommand.setPlayerNumber(command.getPlayerNumber());
-                        lastTurnCommand.setCommandNumber(executed.get(executed.size()-1).getCommandNumber()+1);
-                        lastTurnCommand.execute();
-                        executed.add(lastTurnCommand);
+                    } else {
+                     if (command.endTurn()) {
+                            EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber() + 1, command.getPlayerName());
+                            endTurn.execute();
+                            executed.add(endTurn);
+                        }
+                        if (command.isLastRound()) {
+                            LastTurnCommand lastTurnCommand = new LastTurnCommand();
+                            lastTurnCommand.setGameName(command.getGameName());
+                            lastTurnCommand.setPlayerName(command.getPlayerName());
+                            lastTurnCommand.setPlayerNumber(command.getPlayerNumber());
+                            lastTurnCommand.setCommandNumber(executed.get(executed.size() - 1).getCommandNumber() + 1);
+                            lastTurnCommand.execute();
+                            executed.add(lastTurnCommand);
+                        }
                     }
                 }
             }
