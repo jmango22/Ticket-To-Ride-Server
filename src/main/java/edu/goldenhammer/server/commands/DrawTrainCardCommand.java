@@ -40,6 +40,7 @@ public class DrawTrainCardCommand extends BaseCommand {
             results.setAndSerializeMessage("Error: an error occurred while drawing a card from slot " + slot);
         }
         drawnCard = card.getColor();
+        addToDatabase(true, false);
         return null;
     }
 

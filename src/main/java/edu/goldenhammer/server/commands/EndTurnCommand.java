@@ -16,6 +16,7 @@ public class EndTurnCommand extends BaseCommand {
     @Override
     public Results execute() {
         DatabaseController.getInstance().addCommand(this,true,true);
+        addToDatabase(true, true);
         return new Results();
     }
 

@@ -30,6 +30,7 @@ public class EndGameCommand extends BaseCommand {
         ResultsGenerator resultsGenerator = new ResultsGenerator();
         List<EndResult> endResults = resultsGenerator.generateResults(getGameName());
         result.setMessage(Serializer.serialize(endResults));
+        addToDatabase(true, true);
         return result;
     }
 }
