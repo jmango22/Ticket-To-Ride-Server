@@ -2127,7 +2127,7 @@ public class DatabaseController implements IDatabaseController {
                     "and user_id in (select user_id from player where username=?)");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
-            statement.setString(1, player_name);
+            statement.setString(2, player_name);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()){
                 return resultSet.getInt(1);
