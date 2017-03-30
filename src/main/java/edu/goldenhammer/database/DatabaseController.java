@@ -1020,7 +1020,7 @@ public class DatabaseController implements IDatabaseController {
                 String route = routes.nextLine();
                 String[] vars = route.split(",");
 
-                statement.setInt(i + 1, i + 1); //routeID
+                statement.setInt(i + 1, (i / 5) + 1); //routeID
                 statement.setString(i + 2, vars[0]); //city1
                 statement.setString(i + 3, vars[1]); //city2
                 statement.setString(i + 4, vars[2]); //color
