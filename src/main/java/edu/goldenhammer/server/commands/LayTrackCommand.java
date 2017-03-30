@@ -20,12 +20,11 @@ public class LayTrackCommand extends BaseCommand {
     @Override
     public Results execute() {
         DatabaseController dbc = DatabaseController.getInstance();
-        for(Color card : cards) {
-            dbc.discardCard(getGameName(),getPlayerName(),card);
-        }
-
         if(dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
             addToDatabase(true, true);
+            for(Color card : cards) {
+                dbc.discardCard(getGameName(),getPlayerName(),card);
+            }
         }
         return new Results();
     }
