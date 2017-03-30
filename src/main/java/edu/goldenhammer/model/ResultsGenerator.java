@@ -2,6 +2,7 @@ package edu.goldenhammer.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
@@ -50,6 +51,7 @@ public class ResultsGenerator {
 
             //Get the TrackForest Object
             TrackForest trackForest = new TrackForest(endMap.getTracks());
+            Set<Integer> playersWithLongestTrack = trackForest.getPlayerWithLongestTrack();
 
             //get the player's Destination Cards
             List<DatabaseDestinationCard> playerCards = DatabaseController.getInstance().getPlayerDestinationCards(endModel.getName().toString(), player.getPlayer());
@@ -63,12 +65,16 @@ public class ResultsGenerator {
                 } else {
                     incompleteDestinations = incompleteDestinations - card.getPointsWorth();
                 }
+                if(playersWithLongestTrack.contains(player.getPlayer())) {
+                    longestContinuousTrain = longestContinuousTrain + 10;
+                }
 
             }
 
             total = builtTrainPoints + completedDestinations + incompleteDestinations + longestContinuousTrain;
 
             EndResult currentPlayerResults = new EndResult(playerId, builtTrainPoints, completedDestinations, incompleteDestinations, longestContinuousTrain, total);
+            results.add(currentPlayerResults);
         }
         return results;
     }
