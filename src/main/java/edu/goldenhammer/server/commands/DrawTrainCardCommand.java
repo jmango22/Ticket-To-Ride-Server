@@ -63,6 +63,9 @@ public class DrawTrainCardCommand extends BaseCommand {
     }
 
     private boolean drawingWildCardOnSecondDraw() {
+        if (slot == 5){
+            return false;
+        }
         IDatabaseController dbc = DatabaseController.getInstance();
         if(dbc.getNumberOfDrawTrainCommands(getGameName()) == 0)
             return false;
