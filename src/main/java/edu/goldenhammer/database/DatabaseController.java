@@ -778,7 +778,7 @@ public class DatabaseController implements IDatabaseController {
     @Override
     public void maybeDropGame(String gameName) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("DELETE FROM %1$s WHERE %2$s=?" +
+            String sqlString = String.format("DELETE FROM %1$s WHERE %2$s=?\n" +
                             "AND %3$s NOT IN (SELECT %4$s FROM %5$s)",
                     DatabaseGame.TABLE_NAME,
                     DatabaseGame.GAME_NAME,
@@ -880,8 +880,8 @@ public class DatabaseController implements IDatabaseController {
         List<String> players = getPlayers(game_name);
         try (Connection connection = session.getConnection()){
             for (int i = 0; i < players.size(); i++) {
-                String sqlString = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?" +
-                                " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)" +
+                String sqlString = String.format("UPDATE %1$s SET %2$s = ?, %3$s = 0, %4$s = ?\n" +
+                                " WHERE %5$s IN (SELECT %6$s FROM %7$s WHERE %8$s = ?)\n" +
                                 " AND %9$s IN (SELECT %10$s FROM %11$s WHERE %12$s = ?);",
                         DatabaseParticipants.TABLE_NAME,
                         DatabaseParticipants.PLAYER_NUMBER,
@@ -1035,15 +1035,15 @@ public class DatabaseController implements IDatabaseController {
 
     public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)" +
-                            "WHERE %11$s IN (" +
+            String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)\n" +
+                            "WHERE %11$s IN (\n" +
                             "               SELECT %11$s FROM %1$s\n" +
                             "              WHERE %2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
                             "              AND %6$s IS NULL\n" +
                             "              AND %12$s IS NULL\n" +
                             "              AND %7$s = false\n" +
-                            "              ORDER BY random() LIMIT 1) " +
-                            "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?) " +
+                            "              ORDER BY random() LIMIT 1)\n " +
+                            "and %2$s in (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n " +
                             "RETURNING *;",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.GAME_ID,
@@ -1184,7 +1184,7 @@ public class DatabaseController implements IDatabaseController {
 
     public boolean reshuffleTrainCardDiscardPile(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = false" +
+            String sqlString = String.format("UPDATE %1$s SET %2$s = false\n" +
                             "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
                     DatabaseTrainCard.TABLE_NAME,
                     DatabaseTrainCard.DISCARDED,
@@ -1204,7 +1204,7 @@ public class DatabaseController implements IDatabaseController {
 
     public boolean reshuffleDestinationCardDiscardPile(String game_name) {
         try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("UPDATE %1$s SET %2$s = false" +
+            String sqlString = String.format("UPDATE %1$s SET %2$s = false\n" +
                     "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.DISCARDED,
@@ -1224,9 +1224,10 @@ public class DatabaseController implements IDatabaseController {
 //    SELECT * FROM commandWHERE game_id = (SELECT game_id FROM game WHERE name = ?)AND ((player_id = (SELECT user_id FROM player WHERE username = ?)AND visible_to_self = ?)OR visible_to_all = ?)AND command_number > ?;
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("(SELECT * FROM %1$s natural join participants where user_id=player_id" +
-                    " and %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-//                    " AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)" +
+            String sqlString = String.format("(SELECT * FROM %1$s natural join participants where user_id=player_id\n" +
+                    " and %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+//                    " AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)
+" +
 //                            " AND %10$s = ?)" +
 //                        " OR %11$s = ?)" +
                     " AND %12$s >= ? order by command_number);",
@@ -1681,8 +1682,8 @@ public class DatabaseController implements IDatabaseController {
     public List<DatabaseDestinationCard> getPlayerDestinationCards(String game_name, int player_id) {
         List<DatabaseDestinationCard> playerDestCards = new ArrayList<>();
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT *" +
-                            "FROM %1$s" +
+            String sqlString = String.format("SELECT *\n" +
+                            "FROM %1$s\n" +
                             "WHERE (%2$s = (SELECT %3$s FROM %4$s WHERE %5s = ?) AND %6$s = ? AND %7$s = ? AND %8$s = ?)",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.GAME_ID,
