@@ -1226,10 +1226,6 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("(SELECT * FROM %1$s natural join participants where user_id=player_id\n" +
                     " and %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
-//                    " AND ((%6$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?)
-" +
-//                            " AND %10$s = ?)" +
-//                        " OR %11$s = ?)" +
                     " AND %12$s >= ? order by command_number);",
                     DatabaseCommand.TABLE_NAME,
 
@@ -1250,9 +1246,6 @@ public class DatabaseController implements IDatabaseController {
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
-//            statement.setString(2, player_name);
-//            statement.setBoolean(3, true);
-//            statement.setBoolean(4, true);
             statement.setInt(2, lastCommandID);
 
             ResultSet resultSet = statement.executeQuery();
@@ -1439,7 +1432,7 @@ public class DatabaseController implements IDatabaseController {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("INSERT INTO %1$s(%14$s,%2$s,%3$s,%4$s,%5$s,%6$s,%7$s) VALUES (\n" +
                             "   ?,\n" +
-                            "   (SELECT %8$s FROM %9$s WHERE %10$s = ?" +
+                            "   (SELECT %8$s FROM %9$s WHERE %10$s = ?\n" +
                             "       AND NOT EXISTS (SELECT * FROM %1$s WHERE %14$s = ?\n" +
                             "           AND %2$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?))),\n" +
                             "   (SELECT %11$s FROM %12$s WHERE %13$s = ?),\n" +
