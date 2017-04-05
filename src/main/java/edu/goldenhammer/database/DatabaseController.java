@@ -1383,13 +1383,13 @@ public class DatabaseController implements IDatabaseController {
     public boolean canClaimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("WITH route_train_requirement AS\n" +
-                    "   (SELECT route_length FROM route WHERE route_number = ?),\n" +
+                    "\t(SELECT route_length FROM route WHERE route_number = ?),\n" +
                     "route_owner AS (SELECT player_id FROM claimed_route\n" +
-                    "   WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                    "   AND route_id = ?)\n" +
-                    "SELECT trains_left, route_length, player_id FROM participants, route_train_requirement, route_owner\n" +
-                    "   WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                    "   AND user_id IN (SELECT user_id FROM player WHERE username = ?);");
+                    "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "\tAND route_id = ?)\n" +
+                    "SELECT trains_left, route_length, player_id FROM participants LEFT OUTER JOIN route_owner ON (participants.user_id = route_owner.player_id), route_train_requirement\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND user_id IN (SELECT user_id FROM player WHERE username = ?)");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setInt(1, route_number);
             statement.setString(2, game_name);
