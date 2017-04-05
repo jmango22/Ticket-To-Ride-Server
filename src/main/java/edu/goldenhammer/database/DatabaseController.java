@@ -395,7 +395,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("DELETE FROM %1$s WHERE " +
                     "%2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s = ?)",
+                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s = ? AND started = false)",
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.USER_ID,
                     DatabasePlayer.ID,
