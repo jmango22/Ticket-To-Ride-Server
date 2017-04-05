@@ -1,5 +1,6 @@
 package edu.goldenhammer.database;
 
+import com.google.gson.Gson;
 import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.CommandManager;
@@ -74,6 +75,7 @@ public class DatabaseController implements IDatabaseController {
         createTable(DatabaseTrainCard.CREATE_STMT);
         createTable(DatabaseCommand.CREATE_STMT);
         createTable(DatabaseMessage.CREATE_STMT);
+        createTable(DatabaseInitialGameModel.CREATE_STMT);
         initializeCities();
         initializeRoutes();
     }
@@ -440,9 +442,14 @@ public class DatabaseController implements IDatabaseController {
                 if (resultSet.next() && players.size() > 1) {
                     if (!resultSet.getBoolean(DatabaseGame.STARTED)) {
                         initializeGame(game_name);
+                        GameModel gameModel = getGameModel(game_name);
+                        for(PlayerOverview player: gameModel.getPlayers()) {
+                            player.setDestCards(0);
+                        }
+                        setInitialGameModel(gameModel, game_name);
                     }
-                    IGameModel gameModel = getGameModel(game_name);
-                    return gameModel;
+//                    IGameModel gameModel = getGameModel(game_name);
+                    return getInitialGameModel(game_name);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -451,13 +458,44 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    public IGameModel getGameModel(String game_name) {
+    public GameModel getGameModel(String game_name) {
         List<PlayerOverview> players = getPlayerOverviews(game_name);
         List<DestinationCard> destinationDeck = getDestinationCards(game_name);
         List<TrainCard> trainCardDeck = getTrainCards(game_name);
         Map map = getMap(game_name);
         GameName gameName = new GameName(game_name);
         return new GameModel(players, destinationDeck, trainCardDeck, map, gameName, getSlotCardColors(game_name));
+    }
+
+    private void setInitialGameModel(IGameModel initialModel, String gameName) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "insert into %1$s (%2$s, %3$s)values(?, ?)"
+                    ,DatabaseInitialGameModel.TABLE_NAME
+                    ,DatabaseInitialGameModel.GAME_NAME
+                    ,DatabaseInitialGameModel.INITIAL_STATE);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, gameName);
+            statement.setString(2, new Gson().toJson(initialModel));
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public GameModel getInitialGameModel(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "select * from %1$s where %2$s=?"
+                    ,DatabaseInitialGameModel.TABLE_NAME,
+                    DatabaseInitialGameModel.GAME_NAME);
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            return DatabaseInitialGameModel.buildFromResultsSet(statement.executeQuery());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private List<PlayerOverview> getPlayerOverviews(String game_name) {
