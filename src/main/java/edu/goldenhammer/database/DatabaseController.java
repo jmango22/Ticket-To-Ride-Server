@@ -397,7 +397,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("DELETE FROM %1$s WHERE " +
                     "%2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)" +
-                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s = ?)",
+                    "AND %6$s IN (SELECT %7$s FROM %8$s WHERE %9$s = ? AND started = false)",
                     DatabaseParticipants.TABLE_NAME,
                     DatabaseParticipants.USER_ID,
                     DatabasePlayer.ID,
@@ -1167,6 +1167,9 @@ public class DatabaseController implements IDatabaseController {
                 resultSet.next();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
+            else {
+                card = drawTrainCardFromSlotWithoutReplacement(game_name, player_name, slot);
+            }
             return card;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -1174,6 +1177,38 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
+    public DatabaseTrainCard drawTrainCardFromSlotWithoutReplacement(String game_name, String player_name, int slot) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "WITH selected_card AS\n" +
+                            "\t(SELECT train_card_id FROM train_card\n" +
+                            "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "\tAND slot = ?)\n" +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?),\n" +
+                            "slot = NULL\n" +
+                            "FROM selected_card\n" +
+                            "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
+                            "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "RETURNING *");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setInt(2, slot);
+            statement.setString(3, player_name);
+            statement.setString(4, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            DatabaseTrainCard card = null;
+            if(resultSet.next()) {
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            return card;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public DatabaseDestinationCard drawRandomDestinationCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %8$s = ?,\n" +
@@ -1383,6 +1418,39 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
+    public boolean canClaimRoute(String game_name, String username, int route_number) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH route_train_requirement AS\n" +
+                    "\t(SELECT route_length FROM route WHERE route_number = ?),\n" +
+                    "route_owner AS (SELECT player_id FROM claimed_route\n" +
+                    "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "\tAND route_id = ?)\n" +
+                    "SELECT trains_left, route_length, player_id FROM participants LEFT OUTER JOIN route_owner ON (participants.user_id = route_owner.player_id), route_train_requirement\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND user_id IN (SELECT user_id FROM player WHERE username = ?)");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, route_number);
+            statement.setString(2, game_name);
+            statement.setInt(3, route_number);
+            statement.setString(4, game_name);
+            statement.setString(5, username);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()) {
+                int trains_left = resultSet.getInt(DatabaseParticipants.TRAINS_LEFT);
+                int route_owner = resultSet.getInt(DatabaseClaimedRoute.PLAYER_ID);
+                if(resultSet.wasNull()) {
+                    route_owner = -1;
+                }
+                int route_length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
+
+                return trains_left > route_length && route_owner == -1;
+            }
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 
     public boolean claimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
@@ -1390,7 +1458,7 @@ public class DatabaseController implements IDatabaseController {
                             "insert into claimed_route (player_id, game_id, route_id) values \n" +
                             "((SELECT user_id FROM player WHERE username = ?),\n" +
                             "(SELECT game_id FROM game WHERE name = ?),\n" +
-                            "?)",
+                            "?)\n",
                     DatabaseClaimedRoute.TABLE_NAME,
 
                     DatabaseClaimedRoute.PLAYER_ID,
@@ -2023,14 +2091,6 @@ public class DatabaseController implements IDatabaseController {
         return res;
 
     }
-    public boolean playerHasCards(int wildCount, int nonWildCount, Color color, String gameName) {
-        try (Connection connection = session.getConnection()) {
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     public List<Color> getSlotCardColors(String game_name) {
         IDatabaseController dbc = DatabaseController.getInstance();
@@ -2190,5 +2250,33 @@ public class DatabaseController implements IDatabaseController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean isClaimedDouble(String game_name, String player_name, int route_number) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("WITH route_to_claim AS (\n" +
+                    "                       SELECT route_number, city_1, city_2 FROM route\n" +
+                    "                       WHERE route_number = ?\n" +
+                    "                    ),\n" +
+                    "duplicate_track AS (SELECT route.route_number FROM route, route_to_claim\n" +
+                    "                    WHERE route.city_1 = route_to_claim.city_1\n" +
+                    "                    AND route.city_2 = route_to_claim.city_2\n" +
+                    "                    AND route_to_claim.route_number != route.route_number)\n" +
+                    "SELECT * FROM route INNER JOIN claimed_route ON (route.route_number = claimed_route.route_id), duplicate_track\n" +
+                    "\tWHERE route.route_number = duplicate_track.route_number\n" +
+                    "    AND player_id IN (SELECT user_id FROM player WHERE username = ?)\n" +
+                    "    AND game_id IN (SELECT game_id FROM game WHERE name = ?);");
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, route_number);
+            statement.setString(2, player_name);
+            statement.setString(3, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            return resultSet.next();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return true;
     }
 }

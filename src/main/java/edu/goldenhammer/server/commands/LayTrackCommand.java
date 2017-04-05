@@ -20,7 +20,9 @@ public class LayTrackCommand extends BaseCommand {
     @Override
     public Results execute() {
         DatabaseController dbc = DatabaseController.getInstance();
-        if(dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
+        if(dbc.canClaimRoute(getGameName(), getPlayerName(), track.getRoute_number()) &&
+                !dbc.isClaimedDouble(getGameName(), getPlayerName(), track.getRoute_number()) &&
+                dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
             dbc.removeTrainsFromPlayer(getGameName(), getPlayerName(), track.getLength());
             addToDatabase(true, true);
             for(Color card : cards) {
