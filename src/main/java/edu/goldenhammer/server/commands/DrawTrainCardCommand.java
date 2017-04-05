@@ -27,6 +27,10 @@ public class DrawTrainCardCommand extends BaseCommand {
             card = TrainCard.parseDatabaseTrainCard(dbc.drawTrainCardFromSlot(getGameName(), getPlayerName(), slot));
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
+            while(hasThreeWilds(bank)) {
+                dbc.redealSlotCards(getGameName());
+                bank = getSlotCards(getGameName());
+            }
             dbc.addCommand(this, true, false);
             results.setMessage(Serializer.serialize(this));
         } else if(slot == 5) {
@@ -91,5 +95,15 @@ public class DrawTrainCardCommand extends BaseCommand {
     public boolean validate() {
         return super.validate() && !drawingWildCardOnSecondDraw();
 
+    }
+
+    private boolean hasThreeWilds(List<Color> bank) {
+        int wildCount = 0;
+        for(Color trainCard : bank) {
+            if(trainCard == Color.WILD) {
+                ++wildCount;
+            }
+        }
+        return wildCount >= 3;
     }
 }

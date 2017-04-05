@@ -39,4 +39,5 @@ public interface IDatabaseController {
     int numTrainsLeft(String game_name, String player_name);
     boolean isEndOfGame(String game_name);
     DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot);
+    void redealSlotCards(String game_name);
 }

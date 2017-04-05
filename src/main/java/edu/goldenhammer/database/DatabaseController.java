@@ -2279,4 +2279,24 @@ public class DatabaseController implements IDatabaseController {
         }
         return true;
     }
+
+    @Override
+    public void redealSlotCards(String game_name) {
+        clearSlots(game_name);
+        initializeSlots(game_name);
+    }
+
+    private void clearSlots(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("" +
+                    "UPDATE train_card SET slot = NULL, discarded = true\n" +
+                    "WHERE slot IS NOT NULL\n" +
+                    "AND game_id IN (SELECT game_id FROM game WHERE name = ?)");
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
