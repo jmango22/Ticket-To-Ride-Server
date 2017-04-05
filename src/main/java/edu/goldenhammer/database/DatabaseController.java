@@ -1108,6 +1108,7 @@ public class DatabaseController implements IDatabaseController {
                     "FROM selected_card, new_slot_card\n" +
                     "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
                     "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND EXISTS (SELECT count(*) FROM new_slot_card)\n" +
                     "RETURNING *");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
@@ -1435,11 +1436,9 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseClaimedRoute.ROUTE_ID);
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            statement.setString(2, username);
-            statement.setString(3, username);
-            statement.setString(4, game_name);
-            statement.setInt(5, route_number);
+            statement.setString(1, username);
+            statement.setString(2, game_name);
+            statement.setInt(3, route_number);
             int numUpdated = statement.executeUpdate();
             return (numUpdated == 1);
         } catch (SQLException ex) {
