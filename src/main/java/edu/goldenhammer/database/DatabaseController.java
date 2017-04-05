@@ -1170,8 +1170,6 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-
-
     public DatabaseDestinationCard drawRandomDestinationCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %8$s = ?,\n" +
