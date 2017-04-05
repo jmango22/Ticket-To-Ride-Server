@@ -59,8 +59,8 @@ public abstract class HandlerBase implements HttpHandler {
 
     protected Results getInvalidAuthorizationResults() {
         Results results = new Results();
-        results.setResponseCode(500);
-        results.setAndSerializeMessage("Error: invalid username or invalid access token.");
+        results.setResponseCode(403);
+        results.setAndSerializeMessage("Device not authorized. Log in again");
 
         return results;
     }
