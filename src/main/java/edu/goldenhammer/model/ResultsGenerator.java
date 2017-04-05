@@ -47,28 +47,54 @@ public class ResultsGenerator {
             playerId = player.getPlayer();
 
             //built Train points should be the same as the LeaderBoard Points...
-            builtTrainPoints = player.getPoints();
+            //This seems to be zero in the database...
+            for(Track track : endMap.getTracks()) {
+                if(track.getOwner() == playerId) {
+                    int length = track.getLength();
+                    switch (length) {
+                        case 1:
+                            builtTrainPoints = builtTrainPoints+1;
+                            break;
+                        case 2:
+                            builtTrainPoints = builtTrainPoints+2;
+                            break;
+                        case 3:
+                            builtTrainPoints = builtTrainPoints+4;
+                            break;
+                        case 4:
+                            builtTrainPoints = builtTrainPoints+7;
+                            break;
+                        case 5:
+                            builtTrainPoints = builtTrainPoints+10;
+                            break;
+                        case 6:
+                            builtTrainPoints = builtTrainPoints+15;
+                            break;
+                    }
+                }
+            }
+            //builtTrainPoints = player.getPoints();
 
             //Get the TrackForest Object
             TrackForest trackForest = new TrackForest(endMap.getTracks());
             Set<Integer> playersWithLongestTrack = trackForest.getPlayerWithLongestTrack();
 
+            if(playersWithLongestTrack.contains(playerId)) {
+                longestContinuousTrain = 10;
+            }
+
             //get the player's Destination Cards
+            //This always return zero...
             List<DatabaseDestinationCard> playerCards = DatabaseController.getInstance().getPlayerDestinationCards(endModel.getName().toString(), player.getPlayer());
 
             //Go through the player's Destination Cards and see if they have completed it
             for(DatabaseDestinationCard databaseCard : playerCards) {
-                //TODO : use the TrackForest to see if the destination complete or not.
                 DestinationCard card = DestinationCard.parseDatabaseDestinationCard(databaseCard);
                 if(trackForest.connectedCities(card.getCity1(), card.getCity2(), player.getPlayer())) {
                     completedDestinations = completedDestinations + card.getPointsWorth();
                 } else {
                     incompleteDestinations = incompleteDestinations - card.getPointsWorth();
                 }
-                if(playersWithLongestTrack.contains(player.getPlayer())) {
-                    longestContinuousTrain = longestContinuousTrain + 10;
-                }
-
             }
 
             total = builtTrainPoints + completedDestinations + incompleteDestinations + longestContinuousTrain;

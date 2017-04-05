@@ -1783,7 +1783,7 @@ public class DatabaseController implements IDatabaseController {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT *\n" +
                             "FROM %1$s\n" +
-                            "WHERE (%2$s = (SELECT %3$s FROM %4$s WHERE %5s = ?) AND %6$s = ? AND %7$s = ? AND %8$s = ?)",
+                            "WHERE (%2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?) AND %6$s = (SELECT %7$s FROM %8$s WHERE (%9$s = ? AND %10$s = (SELECT %11$s FROM %12$s WHERE %13$s = ?))))",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.GAME_ID,
 
@@ -1792,14 +1792,20 @@ public class DatabaseController implements IDatabaseController {
                     DatabaseGame.GAME_NAME,
 
                     DatabaseDestinationCard.PLAYER_ID,
-                    DatabaseDestinationCard.DRAWN,
-                    DatabaseDestinationCard.DISCARDED);
+
+                    DatabaseParticipants.USER_ID,
+                    DatabaseParticipants.TABLE_NAME,
+                    DatabaseParticipants.PLAYER_NUMBER,
+                    DatabaseParticipants.GAME_ID,
+
+                    DatabaseGame.ID,
+                    DatabaseGame.TABLE_NAME,
+                    DatabaseGame.GAME_NAME);
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
-            statement.setString(2, Integer.toString(player_id));
-            statement.setString(3, "TRUE");
-            statement.setString(4, "FALSE");
+            statement.setInt(2, player_id);
+            statement.setString(3, game_name);
 
             ResultSet resultSet = statement.executeQuery();
 
