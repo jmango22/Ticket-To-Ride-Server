@@ -1108,7 +1108,6 @@ public class DatabaseController implements IDatabaseController {
                     "FROM selected_card, new_slot_card\n" +
                     "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
                     "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                    "AND EXISTS (SELECT count(*) FROM new_slot_card)\n" +
                     "RETURNING *");
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
@@ -1129,12 +1128,49 @@ public class DatabaseController implements IDatabaseController {
                 resultSet.next();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
+            else {
+                card = drawTrainCardFromSlotWithoutReplacement(game_name, player_name, slot);
+            }
             return card;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         return null;
     }
+
+    public DatabaseTrainCard drawTrainCardFromSlotWithoutReplacement(String game_name, String player_name, int slot) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format(
+                    "WITH selected_card AS\n" +
+                            "\t(SELECT train_card_id FROM train_card\n" +
+                            "\tWHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "\tAND slot = ?)\n" +
+                    "UPDATE train_card SET player_id = (SELECT user_id FROM player WHERE username = ?),\n" +
+                            "slot = NULL\n" +
+                            "FROM selected_card\n" +
+                            "WHERE train_card.train_card_id = selected_card.train_card_id\n" +
+                            "AND train_card.game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                            "RETURNING *");
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setInt(2, slot);
+            statement.setString(3, player_name);
+            statement.setString(4, game_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            DatabaseTrainCard card = null;
+            if(resultSet.next()) {
+                card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+            }
+            return card;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+
 
     public DatabaseDestinationCard drawRandomDestinationCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
