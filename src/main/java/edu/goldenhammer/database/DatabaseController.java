@@ -2294,6 +2294,7 @@ public class DatabaseController implements IDatabaseController {
                     "AND game_id IN (SELECT game_id FROM game WHERE name = ?)");
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
             statement.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
