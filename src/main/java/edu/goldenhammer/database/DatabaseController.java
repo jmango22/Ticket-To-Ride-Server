@@ -2216,23 +2216,23 @@ public class DatabaseController implements IDatabaseController {
 
     public boolean isClaimedDouble(String game_name, String player_name, int route_number) {
         try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("" +
-                    "WITH route_to_claim AS (" +
-                    "   SELECT * FROM route INNER JOIN claimed_route ON route.route_number = claimed_route.route_id\n" +
-                    "   WHERE route_number = ?\n" +
-                    "   AND game_id IN (SELECT game_id FROM game WHERE name = ?)" +
-                    ")" +
-                    "SELECT * FROM route INNER JOIN claimed_route ON route.route_number = claimed_route.route_id\n" +
-                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                    "AND city_1 = route_to_claim.city_1\n" +
-                    "AND city_2 = route_to_claim.city_2\n" +
-                    "AND player_id IN (SELECT user_id FROM player WHERE username = ?)\n");
+            String sqlString = String.format("WITH route_to_claim AS (\n" +
+                    "                       SELECT route_number, city_1, city_2 FROM route\n" +
+                    "                       WHERE route_number = ?\n" +
+                    "                    ),\n" +
+                    "duplicate_track AS (SELECT route.route_number FROM route, route_to_claim\n" +
+                    "                    WHERE route.city_1 = route_to_claim.city_1\n" +
+                    "                    AND route.city_2 = route_to_claim.city_2\n" +
+                    "                    AND route_to_claim.route_number != route.route_number)\n" +
+                    "SELECT * FROM route INNER JOIN claimed_route ON (route.route_number = claimed_route.route_id), duplicate_track\n" +
+                    "\tWHERE route.route_number = duplicate_track.route_number\n" +
+                    "    AND player_id IN (SELECT user_id FROM player WHERE username = ?)\n" +
+                    "    AND game_id IN (SELECT game_id FROM game WHERE name = ?);");
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setInt(1, route_number);
-            statement.setString(2, game_name);
+            statement.setString(2, player_name);
             statement.setString(3, game_name);
-            statement.setString(4, player_name);
             ResultSet resultSet = statement.executeQuery();
 
             return resultSet.next();
