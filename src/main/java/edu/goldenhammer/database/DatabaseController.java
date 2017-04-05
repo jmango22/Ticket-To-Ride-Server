@@ -2222,4 +2222,32 @@ public class DatabaseController implements IDatabaseController {
         }
         return false;
     }
+
+    public boolean isClaimedDouble(String game_name, String player_name, int route_number) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("" +
+                    "WITH route_to_claim AS (" +
+                    "   SELECT * FROM route INNER JOIN claimed_route ON route.route_number = claimed_route.route_id\n" +
+                    "   WHERE route_number = ?\n" +
+                    "   AND game_id IN (SELECT game_id FROM game WHERE name = ?)" +
+                    ")" +
+                    "SELECT * FROM route INNER JOIN claimed_route ON route.route_number = claimed_route.route_id\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND city_1 = route_to_claim.city_1\n" +
+                    "AND city_2 = route_to_claim.city_2\n" +
+                    "AND player_id IN (SELECT user_id FROM player WHERE username = ?)\n");
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setInt(1, route_number);
+            statement.setString(2, game_name);
+            statement.setString(3, game_name);
+            statement.setString(4, player_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            return resultSet.next();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return true;
+    }
 }
