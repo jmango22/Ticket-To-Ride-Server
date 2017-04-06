@@ -2300,4 +2300,24 @@ public class DatabaseController implements IDatabaseController {
             ex.printStackTrace();
         }
     }
+
+    @Override
+    public boolean alreadyLastRound(String game_name) {
+        try (Connection connection = session.getConnection()) {
+            String sqlString = String.format("" +
+                    "SELECT * FROM command\n" +
+                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
+                    "AND command_type = ?");
+
+            PreparedStatement statement = connection.prepareStatement(sqlString);
+            statement.setString(1, game_name);
+            statement.setString(2, "LastTurn");
+            ResultSet resultSet = statement.executeQuery();
+
+            return resultSet.next();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
 }
