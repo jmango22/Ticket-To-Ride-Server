@@ -40,4 +40,5 @@ public interface IDatabaseController {
     boolean isEndOfGame(String game_name);
     DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot);
     void redealSlotCards(String game_name);
+    boolean alreadyLastRound(String game_name);
 }

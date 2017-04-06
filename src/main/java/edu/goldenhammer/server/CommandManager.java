@@ -44,7 +44,7 @@ public class CommandManager {
                         endGameCommand.execute();
                         executed.add(endGameCommand);
                     } else {
-                     if (command.endTurn()) {
+                        if (command.endTurn()) {
                             EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber() + 1, command.getPlayerName());
                             endTurn.execute();
                             executed.add(endTurn);
