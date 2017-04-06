@@ -1,6 +1,7 @@
 package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Results;
 
@@ -59,6 +60,8 @@ public class LayTrackCommand extends BaseCommand {
 
     @Override
     public boolean isLastRound() {
-        return DatabaseController.getInstance().numTrainsLeft(getGameName(),getPlayerName()) <= 2;
+        IDatabaseController dbc = DatabaseController.getInstance();
+        return dbc.numTrainsLeft(getGameName(),getPlayerName()) <= 2
+                && !dbc.alreadyLastRound(getGameName());
     }
 }
