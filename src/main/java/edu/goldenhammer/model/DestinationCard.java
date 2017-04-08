@@ -31,12 +31,4 @@ public class DestinationCard implements Serializable{
     public int getPointsWorth() {
         return pointsWorth;
     }
-
-    public static DestinationCard parseDatabaseDestinationCard(DatabaseDestinationCard databaseDestinationCard) {
-        IDatabaseController dbc = DatabaseController.getInstance();
-        City city1 = City.parseDatabaseCity(dbc.getCity(databaseDestinationCard.getCity1()));
-        City city2 = City.parseDatabaseCity(dbc.getCity(databaseDestinationCard.getCity2()));
-        int pointsWorth = databaseDestinationCard.getPoints();
-        return new DestinationCard(city1, city2, pointsWorth);
-    }
 }

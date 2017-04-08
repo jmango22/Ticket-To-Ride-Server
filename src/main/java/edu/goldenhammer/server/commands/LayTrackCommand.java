@@ -20,9 +20,8 @@ public class LayTrackCommand extends BaseCommand {
 
     @Override
     public Results execute() {
-        DatabaseController dbc = DatabaseController.getInstance();
+        IDatabaseController dbc = DatabaseController.getInstance();
         if(dbc.canClaimRoute(getGameName(), getPlayerName(), track.getRoute_number()) &&
-                !dbc.isClaimedDouble(getGameName(), getPlayerName(), track.getRoute_number()) &&
                 dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
             dbc.removeTrainsFromPlayer(getGameName(), getPlayerName(), track.getLength());
             addToDatabase(true, true);
@@ -34,7 +33,7 @@ public class LayTrackCommand extends BaseCommand {
     }
 
     public boolean validate() {
-        DatabaseController dbc = DatabaseController.getInstance();
+        IDatabaseController dbc = DatabaseController.getInstance();
         if(track.getColor() != null) {
             for (Color color : cards) {
                 if (color != Color.WILD && color != track.getColor()) {

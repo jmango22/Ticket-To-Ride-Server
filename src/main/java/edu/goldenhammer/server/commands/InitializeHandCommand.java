@@ -30,7 +30,8 @@ public class InitializeHandCommand extends BaseCommand {
         Results results = new Results();
         hand = null;
         try {
-            if(!dbc.hasDestinationCards(getGameName(), getPlayerName())) {
+            List<DestinationCard> playerDestinationCards = dbc.getPlayerDestinationCards(getGameName(), getPlayerName());
+            if(playerDestinationCards.size() == 0) {
                 hand = new Hand(new ArrayList<>(), drawTrainCards(dbc), drawDestinationCards(dbc));
                 results.setResponseCode(200);
                 Serializer serializer = new Serializer();
@@ -55,7 +56,7 @@ public class InitializeHandCommand extends BaseCommand {
     private List<TrainCard> drawTrainCards(IDatabaseController dbc) {
         List<TrainCard> trainCards = new ArrayList<>();
         for(int i = 0; i < DatabaseTrainCard.MAX_STARTING_CARDS; i++) {
-            TrainCard trainCard = TrainCard.parseDatabaseTrainCard(dbc.drawRandomTrainCard(getGameName(), getPlayerName()));
+            TrainCard trainCard = dbc.drawRandomTrainCard(getGameName(), getPlayerName());
             trainCards.add(trainCard);
         }
 
@@ -65,7 +66,7 @@ public class InitializeHandCommand extends BaseCommand {
     private DrawnDestinationCards drawDestinationCards(IDatabaseController dbc) {
         List<DestinationCard> cards = new ArrayList<>();
         for(int i = 0; i < 3; i++) {
-            DestinationCard destinationCard = DestinationCard.parseDatabaseDestinationCard(dbc.drawRandomDestinationCard(getGameName(), getPlayerName()));
+            DestinationCard destinationCard = dbc.drawRandomDestinationCard(getGameName(), getPlayerName());
             cards.add(destinationCard);
         }
         return new DrawnDestinationCards(cards);

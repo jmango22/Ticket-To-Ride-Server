@@ -1,5 +1,7 @@
 package edu.goldenhammer.database.data_types;
 
+import edu.goldenhammer.model.City;
+
 import java.io.Serializable;
 
 /**
@@ -112,6 +114,10 @@ public class DatabaseCity implements Serializable, IDatabaseCity{
 
     public static String getFormattedCity() {
         return "(?, ?, ?),\n";
+    }
+
+    public City parseDatabaseCity() {
+        return new City(pointX, pointY, name);
     }
 
     private String id;

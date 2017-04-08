@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
 import edu.goldenhammer.database.data_types.DatabasePlayer;
 
@@ -25,8 +26,9 @@ public class ResultsGenerator {
     }
 
     public List<EndResult> generateResults(String game_name) {
+        IDatabaseController dbc = DatabaseController.getInstance();
         //Use the Database to grab the right game
-        GameModel endModel = (GameModel)DatabaseController.getInstance().getGameModel(game_name);
+        GameModel endModel = dbc.getGameModel(game_name);
         //From the GameModel get the Player Data
         List<PlayerOverview> players = endModel.getPlayers();
         //From the GameModel get the Map Data
@@ -85,11 +87,10 @@ public class ResultsGenerator {
 
             //get the player's Destination Cards
             //This always return zero...
-            List<DatabaseDestinationCard> playerCards = DatabaseController.getInstance().getPlayerDestinationCards(endModel.getName().toString(), player.getPlayer());
+            List<DestinationCard> playerCards = dbc.getPlayerDestinationCards(endModel.getName().toString(), player.getUsername());
 
             //Go through the player's Destination Cards and see if they have completed it
-            for(DatabaseDestinationCard databaseCard : playerCards) {
-                DestinationCard card = DestinationCard.parseDatabaseDestinationCard(databaseCard);
+            for(DestinationCard card : playerCards) {
                 if(trackForest.connectedCities(card.getCity1(), card.getCity2(), player.getPlayer())) {
                     completedDestinations = completedDestinations + card.getPointsWorth();
                 } else {

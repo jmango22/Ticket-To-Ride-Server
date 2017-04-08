@@ -53,6 +53,7 @@ public class ReturnDestCardsCommand extends BaseCommand {
 
     @Override
     public boolean endTurn() {
-        return DatabaseController.getInstance().allHandsInitialized(getGameName());
+        IDatabaseController dbc = DatabaseController.getInstance();
+        return dbc.allHandsInitialized(getGameName());
     }
 }
