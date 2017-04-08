@@ -68,7 +68,6 @@ public class CommandManager {
 
     private int currentPlayerTurn(String game_name, String playerName) {
         IDatabaseController dbc = DatabaseController.getInstance();
-//        int current_player = dbc.getCurrentPlayerTurn(game_name);
         //-1 means that the not everyone has initialized their hands
         List<BaseCommand> commands = dbc.getCommandsSinceLastCommand(game_name, playerName, 0);
         int current_player = -1;
