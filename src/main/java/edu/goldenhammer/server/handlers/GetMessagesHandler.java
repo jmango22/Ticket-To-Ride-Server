@@ -27,7 +27,7 @@ public class GetMessagesHandler extends HandlerBase{
                 results = getInvalidAuthorizationResults();
             } else {
                 String game_name = exchange.getRequestHeaders().get("gamename").get(0);
-                List<Message> messages = parseDatabaseMessages(dbc.getMessages(game_name));
+                List<Message> messages = dbc.getMessages(game_name);
 
                 results.setResponseCode(200);
                 results.setMessage(Serializer.serialize(messages));
@@ -42,15 +42,5 @@ public class GetMessagesHandler extends HandlerBase{
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
-
-    private static List<Message> parseDatabaseMessages(List<DatabaseMessage> databaseMessages) {
-        List<Message> messages = new ArrayList<>();
-        IDatabaseController dbc = DatabaseController.getInstance();
-        for(int i = 0; i < databaseMessages.size(); i++) {
-            DatabaseMessage databaseMessage = databaseMessages.get(i);
-            messages.add(new Message(dbc.getUsername(databaseMessage.getPlayerID()), databaseMessage.getMessage()));
-        }
-        return messages;
     }
 }

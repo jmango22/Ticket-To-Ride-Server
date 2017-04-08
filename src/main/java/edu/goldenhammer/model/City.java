@@ -23,13 +23,6 @@ public class City implements Serializable{
         this.name = name;
     }
 
-    public static City parseDatabaseCity(DatabaseCity databaseCity) {
-        double x_location = databaseCity.getPointX();
-        double y_location = databaseCity.getPointY();
-        String name = databaseCity.getName();
-        return new City(x_location, y_location, name);
-    }
-
     @Override
     public boolean equals(Object o) {
         if(o == null) {

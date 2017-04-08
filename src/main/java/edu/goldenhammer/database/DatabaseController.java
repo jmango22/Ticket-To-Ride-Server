@@ -3,14 +3,11 @@ package edu.goldenhammer.database;
 import com.google.gson.Gson;
 import edu.goldenhammer.database.data_types.*;
 import edu.goldenhammer.model.*;
-import edu.goldenhammer.server.CommandManager;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 import edu.goldenhammer.server.commands.InitializeHandCommand;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,7 +93,7 @@ public class DatabaseController implements IDatabaseController {
      * @return The IDatabasePlayer associated with the username is returned
      */
     @Override
-    public IDatabasePlayer getPlayerInfo(String player_user_name) {
+    public Player getPlayerInfo(String player_user_name) {
         try (Connection connection = session.getConnection()){
             String sqlString = String.format("SELECT %1$s FROM %2$s WHERE %3$s = ?",
                     DatabasePlayer.columnNames(),
@@ -106,10 +103,8 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(1, player_user_name);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
-                return new DatabasePlayer(
-                        resultSet.getString(DatabasePlayer.ID),
+                return new Player(
                         resultSet.getString(DatabasePlayer.USERNAME),
-                        resultSet.getString(DatabasePlayer.PASSWORD),
                         resultSet.getString(DatabasePlayer.ACCESS_TOKEN)
                 );
             }
@@ -448,7 +443,6 @@ public class DatabaseController implements IDatabaseController {
                         }
                         setInitialGameModel(gameModel, game_name);
                     }
-//                    IGameModel gameModel = getGameModel(game_name);
                     return getInitialGameModel(game_name);
                 }
             } catch (SQLException e) {
@@ -458,6 +452,7 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
+    @Override
     public GameModel getGameModel(String game_name) {
         List<PlayerOverview> players = getPlayerOverviews(game_name);
         List<DestinationCard> destinationDeck = getDestinationCards(game_name);
@@ -678,6 +673,7 @@ public class DatabaseController implements IDatabaseController {
         return new Map(tracks, cities);
     }
 
+    @Override
     public List<Track> getTracks(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format(
@@ -1071,7 +1067,7 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
-    public DatabaseTrainCard drawRandomTrainCard(String game_name, String player_name) {
+    public TrainCard drawRandomTrainCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %6$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?)\n" +
                             "WHERE %11$s IN (\n" +
@@ -1103,15 +1099,16 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(3, game_name);
             ResultSet resultSet = statement.executeQuery();
 
-            DatabaseTrainCard card = null;
+            DatabaseTrainCard card;
             if(resultSet.next()){
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+                return new TrainCard(Color.getTrainCardColorFromString(card.getTrainType()));
             }
             else if(reshuffleTrainCardDiscardPile(game_name)) {
                 resultSet = statement.executeQuery();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+                return new TrainCard(Color.getTrainCardColorFromString(card.getTrainType()));
             }
-            return card;
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -1120,7 +1117,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public DatabaseTrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+    public TrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(
                     "WITH selected_card AS\n" +
@@ -1158,26 +1155,27 @@ public class DatabaseController implements IDatabaseController {
             statement.setString(7, game_name);
             ResultSet resultSet = statement.executeQuery();
 
-            DatabaseTrainCard card = null;
+            DatabaseTrainCard card;
             if(resultSet.next()) {
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+                return new TrainCard(Color.getTrainCardColorFromString(card.getTrainType()));
             }
             else if(reshuffleTrainCardDiscardPile(game_name)) {
                 resultSet = statement.executeQuery();
                 resultSet.next();
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
+                return new TrainCard(Color.getTrainCardColorFromString(card.getTrainType()));
             }
             else {
-                card = drawTrainCardFromSlotWithoutReplacement(game_name, player_name, slot);
+                return drawTrainCardFromSlotWithoutReplacement(game_name, player_name, slot);
             }
-            return card;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
-    public DatabaseTrainCard drawTrainCardFromSlotWithoutReplacement(String game_name, String player_name, int slot) {
+    private TrainCard drawTrainCardFromSlotWithoutReplacement(String game_name, String player_name, int slot) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(
                     "WITH selected_card AS\n" +
@@ -1201,7 +1199,7 @@ public class DatabaseController implements IDatabaseController {
             if(resultSet.next()) {
                 card = DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
             }
-            return card;
+            return new TrainCard(Color.getTrainCardColorFromString(card.getTrainType()));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -1209,7 +1207,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public DatabaseDestinationCard drawRandomDestinationCard(String game_name, String player_name) {
+    public DestinationCard drawRandomDestinationCard(String game_name, String player_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %8$s = ?,\n" +
                             "%6$s = (SELECT %9$s FROM %10$s WHERE %11$s = ?)\n" +
@@ -1248,14 +1246,14 @@ public class DatabaseController implements IDatabaseController {
                 resultSet = statement.executeQuery();
                 card = DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet);
             }
-            return card;
+            return new DestinationCard(getCity(card.getCity1()), getCity(card.getCity2()), card.getPoints());
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         return null;
     }
 
-    public boolean reshuffleTrainCardDiscardPile(String game_name) {
+    private boolean reshuffleTrainCardDiscardPile(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %2$s = false\n" +
                             "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
@@ -1275,7 +1273,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    public boolean reshuffleDestinationCardDiscardPile(String game_name) {
+    private boolean reshuffleDestinationCardDiscardPile(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("UPDATE %1$s SET %2$s = false\n" +
                     "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)",
@@ -1294,7 +1292,8 @@ public class DatabaseController implements IDatabaseController {
         }
         return false;
     }
-//    SELECT * FROM commandWHERE game_id = (SELECT game_id FROM game WHERE name = ?)AND ((player_id = (SELECT user_id FROM player WHERE username = ?)AND visible_to_self = ?)OR visible_to_all = ?)AND command_number > ?;
+
+    @Override
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("(SELECT * FROM %1$s natural join participants where user_id=player_id\n" +
@@ -1339,69 +1338,7 @@ public class DatabaseController implements IDatabaseController {
         return commands;
     }
 
-    public int getCurrentPlayerTurn(String game_name) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
-                            "WHERE %3$s IN (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
-                            "AND %7$s IN (SELECT %8$s FROM %9$s\n" +
-                                "WHERE %10$s IN (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
-                                "AND %11$s = ?\n" +
-                                "ORDER BY %12$s DESC\n" +
-                                "LIMIT 1);\n",
-                    DatabaseParticipants.PLAYER_NUMBER,
-                    DatabaseParticipants.TABLE_NAME,
-                    DatabaseParticipants.GAME_ID,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME,
-                    DatabaseParticipants.USER_ID,
-                    DatabaseCommand.PLAYER_ID,
-                    DatabaseCommand.TABLE_NAME,
-                    DatabaseCommand.GAME_ID,
-                    DatabaseCommand.COMMAND_TYPE,
-                    DatabaseCommand.COMMAND_NUMBER);
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            statement.setString(2, game_name);
-            statement.setString(3, "EndTurn");
-
-            ResultSet resultSet = statement.executeQuery();
-
-            if(resultSet.next()) {
-                int previousPlayerNumber = resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
-                int max_players = playersInGame(game_name);
-                if(previousPlayerNumber == max_players) {
-                    return 0;
-                }
-                else {
-                    return previousPlayerNumber + 1;
-                }
-            }
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-        }
-        return -1;
-    }
-
-    private int playersInGame(String game_name) {
-        try(Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT player_number FROM participants\n" +
-                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
-                    "ORDER BY player_number DESC\n" +
-                    "LIMIT 1\n");
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            ResultSet resultSet = statement.executeQuery();
-
-            if(resultSet.next()) {
-                return resultSet.getInt(DatabaseParticipants.PLAYER_NUMBER);
-            }
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-        }
-        return -1;
-    }
-
+    @Override
     public void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("update participants set trains_left = ?\n" +
@@ -1418,6 +1355,7 @@ public class DatabaseController implements IDatabaseController {
         }
     }
 
+    @Override
     public boolean canClaimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("WITH route_train_requirement AS\n" +
@@ -1444,7 +1382,7 @@ public class DatabaseController implements IDatabaseController {
                 }
                 int route_length = resultSet.getInt(DatabaseRoute.ROUTE_LENGTH);
 
-                return trains_left > route_length && route_owner == -1;
+                return trains_left > route_length && route_owner == -1 &&!isClaimedDouble(game_name, username, route_number);
             }
         } catch(SQLException ex) {
             ex.printStackTrace();
@@ -1452,6 +1390,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
     public boolean claimRoute(String game_name, String username, int route_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
@@ -1485,7 +1424,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    public DatabaseCity getCity(int cityID) {
+    private City getCity(int cityID) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT * FROM %1$s WHERE %2$s = ?",
                     DatabaseCity.TABLE_NAME,
@@ -1500,38 +1439,12 @@ public class DatabaseController implements IDatabaseController {
                 int x_coord = resultSet.getInt(DatabaseCity.POINT_X);
                 int y_coord = resultSet.getInt(DatabaseCity.POINT_Y);
 
-                return new DatabaseCity(id, name, x_coord, y_coord);
+                return new City(x_coord, y_coord, name);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         return null;
-    }
-
-    public boolean hasDestinationCards(String gameName, String playerName) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
-                            "WHERE %3$s = (SELECT %4$s FROM %5$s WHERE %6$s = ?)\n" +
-                            "AND %7$s = (SELECT %8$s FROM %9$s WHERE %10$s = ?);\n",
-                    DatabaseDestinationCard.ID,
-                    DatabaseDestinationCard.TABLE_NAME,
-                    DatabaseDestinationCard.PLAYER_ID,
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-                    DatabaseDestinationCard.GAME_ID,
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME);
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, playerName);
-            statement.setString(2, gameName);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return true;
     }
 
     private boolean addFirstCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
@@ -1579,6 +1492,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
     public synchronized boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
         if(cmd.getCommandNumber() == 0) {
             return addFirstCommand(cmd, visibleToSelf, visibleToAll);
@@ -1627,6 +1541,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
     public boolean returnDestCards(String gameName, String playerName, List<DestinationCard> destinationCards) {
         if(destinationCards.size() == 1 && getDrawnDestCardCount(gameName, playerName) == 3) {
             return returnSingleDestCard(gameName, playerName, destinationCards.get(0));
@@ -1778,12 +1693,16 @@ public class DatabaseController implements IDatabaseController {
         return -1;
     }
 
-    public List<DatabaseDestinationCard> getPlayerDestinationCards(String game_name, int player_id) {
-        List<DatabaseDestinationCard> playerDestCards = new ArrayList<>();
+    @Override
+    public List<DestinationCard> getPlayerDestinationCards(String game_name, String player_name) {
+        List<DestinationCard> playerDestCards = new ArrayList<>();
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT *\n" +
                             "FROM %1$s\n" +
-                            "WHERE (%2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?) AND %6$s = (SELECT %7$s FROM %8$s WHERE (%9$s = ? AND %10$s = (SELECT %11$s FROM %12$s WHERE %13$s = ?))))",
+                            "WHERE %2$s IN (SELECT %3$s FROM %4$s WHERE %5$s = ?)\n" +
+                            "AND %6$s IN (SELECT %7$s FROM %8$s\n" +
+                            "   WHERE %9$s = (SELECT user_id FROM player WHERE username = ?)\n" +
+                            "   AND %10$s = (SELECT %11$s FROM %12$s WHERE %13$s = ?))",
                     DatabaseDestinationCard.TABLE_NAME,
                     DatabaseDestinationCard.GAME_ID,
 
@@ -1804,13 +1723,16 @@ public class DatabaseController implements IDatabaseController {
 
             PreparedStatement statement = connection.prepareStatement(sqlString);
             statement.setString(1, game_name);
-            statement.setInt(2, player_id);
+            statement.setString(2, player_name);
             statement.setString(3, game_name);
 
             ResultSet resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
-                playerDestCards.add(DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet));
+                DatabaseDestinationCard destinationCard = DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet);
+                City city1 = getCity(destinationCard.getCity1());
+                City city2 = getCity(destinationCard.getCity2());
+                playerDestCards.add(new DestinationCard(city1, city2, destinationCard.getPoints()));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -1850,7 +1772,7 @@ public class DatabaseController implements IDatabaseController {
     }
 
     @Override
-    public List<DatabaseMessage> getMessages(String game_name) {
+    public List<Message> getMessages(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT * FROM %1$s\n" +
                             "WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?);",
@@ -1866,9 +1788,10 @@ public class DatabaseController implements IDatabaseController {
 
             ResultSet resultSet = statement.executeQuery();
 
-            List<DatabaseMessage> messages = new ArrayList<>();
+            List<Message> messages = new ArrayList<>();
             while(resultSet.next()) {
-                messages.add(DatabaseMessage.parseResultSetRow(resultSet));
+                DatabaseMessage databaseMessage = DatabaseMessage.parseResultSetRow(resultSet);
+                messages.add(new Message(getUsername(databaseMessage.getPlayerID()), databaseMessage.getMessage()));
             }
 
             return messages;
@@ -1878,8 +1801,7 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
-    @Override
-    public String getUsername(String player_id) {
+    private String getUsername(String player_id) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s\n" +
                             "WHERE %3$s = ?;",
@@ -1900,114 +1822,6 @@ public class DatabaseController implements IDatabaseController {
         return null;
     }
 
-    @Override
-    public List<DatabaseDestinationCard> drawDestinationCards(String game_name, String username, int commandNumber, int player_number) {
-        List<DatabaseDestinationCard> cards = getDestinationCards(game_name, username, commandNumber, player_number);
-        if(cards != null && cards.size() < 3) {
-            reshuffleDestinationCardDiscardPile(game_name);
-            cards = getDestinationCards(game_name, username, commandNumber, player_number);
-        }
-        return cards;
-    }
-//TODO: NOt working
-    private List<DatabaseDestinationCard> getDestinationCards(String game_name, String username, int commandNumber, int player_number) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format(
-                    "UPDATE %1$s SET %2$s = ?,\n" +
-                            "%3$s = (SELECT %7$s FROM %8$s WHERE %9$s = ?),\n" + //player id
-                            "WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" + //game id
-                            "AND %3$s IS NULL\n" + //player id is null
-                            "AND %5$s = ?\n" + //not discarded
-                            "AND EXISTS (SELECT * FROM (\n" + //make sure there are three destination cards left in the deck
-                            "       SELECT count(*) FROM %1$s\n" +
-                            "       WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
-                            "       AND %3$s IS NULL\n" +
-                            "       AND %5$s = ?) AS dest_card_count WHERE count >= ?)\n" +
-                            "AND %6$s IN (\n" + //select three random destination card ids to update
-                            "   SELECT %6$s FROM %1$s\n" +
-                            "   WHERE %4$s = (SELECT %10$s FROM %11$s WHERE %12$s = ?)\n" +
-                            "   AND %3$s IS NULL\n" +
-                            "   ORDER BY random()\n" +
-                            "   LIMIT 3)\n" +
-                            "AND NOT EXISTS (" + //make sure the command number has not been used yet
-                            "SELECT * FROM commands\n" +
-                            "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
-                            "AND command_number = ?)\n" +
-                            "AND EXISTS (\n" + //make sure the last command was the previous player's end turn command
-                            "SELECT * FROM commands\n" +
-                            "WHERE game_id IN (SELECT game_id FROM game WHERE game_name = ?)\n" +
-                            "AND command_number = ?\n" +
-                            "AND player_number IN (\n" + //find the previous player number
-                            "       SELECT player_number FROM participants\n" +
-                            "       WHERE player_id = (SELECT user_id FROM player WHERE username = ?)\n" +
-                            "       AND game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
-                            "       AND (player_number = ? - 1\n" + //player number can be either the number minus one
-                            "           OR player_number = ? + (\n" +//or the total number of participants, if player zero
-                            "               SELECT player_number FROM participants\n" +
-                            "               WHERE game_id = (SELECT game_id FROM game WHERE name = ?)\n" +
-                            "               ORDER BY player_number DESC\n" + //make sure the highest number (the total
-                            "               LIMIT 1)\n" +                    //number of participants) is on top
-                            ")\n" +
-                            "AND command_type = ?)\n" + //command type needs to be EndTurn
-                            "RETURNING *\n" +
-                            ");",
-                    DatabaseDestinationCard.TABLE_NAME,
-                    DatabaseDestinationCard.DRAWN,
-                    DatabaseDestinationCard.PLAYER_ID,
-                    DatabaseDestinationCard.GAME_ID,
-                    DatabaseDestinationCard.DISCARDED,
-                    DatabaseDestinationCard.ID,
-
-                    DatabasePlayer.ID,
-                    DatabasePlayer.TABLE_NAME,
-                    DatabasePlayer.USERNAME,
-
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME
-            );
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setBoolean(1, true);
-            statement.setString(2, username);
-            statement.setString(3, game_name);
-            statement.setBoolean(4, false);
-            statement.setString(5, game_name);
-            statement.setBoolean(6, false);
-            statement.setInt(7, 3);
-            statement.setString(8, game_name);
-            statement.setString(9, game_name);
-            statement.setInt(10, commandNumber);
-            statement.setString(11, game_name);
-            statement.setInt(12, commandNumber - 1);
-            statement.setString(13, username);
-            statement.setString(14, game_name);
-            statement.setInt(15, player_number);
-            statement.setInt(16, player_number);
-            statement.setString(17, game_name);
-            statement.setString(18, "EndTurn");
-
-            ResultSet resultSet = statement.executeQuery();
-            List<DatabaseDestinationCard> cards = new ArrayList<>();
-            while (resultSet.next()) {
-                cards.add(DatabaseDestinationCard.buildDestinationCardFromResultSet(resultSet));
-            }
-            return cards;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-//    with card as (select * from train_card
-//            where game_id in (select game_id from game where name='aaaa')
-//    and player_id in (select user_id from player where username='devon')
-//    and train_type='yellow'
-//    Limit 1
-//    FOR UPDATE)
-//    update train_card t set discarded = true, player_id = null
-//    from card
-//    where t.train_card_id = card.train_card_id
-//    and t.game_id = card.game_id;
     @Override
     public boolean discardCard(String gameName, String playerName, Color color) {
         try (Connection connection = session.getConnection()) {
@@ -2059,6 +1873,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
+    @Override
     public EndTurnCommand getEndTurnCommand(String gameName, int commandNumber, String playerName) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("with current_player as (select * from participants where \n" +
@@ -2098,17 +1913,8 @@ public class DatabaseController implements IDatabaseController {
 
     }
 
-    public List<Color> getSlotCardColors(String game_name) {
-        IDatabaseController dbc = DatabaseController.getInstance();
-        List<Color> slotCards = new ArrayList<>();
-        List<DatabaseTrainCard> databaseTrainCards = dbc.getSlotCards(game_name);
-        for (DatabaseTrainCard databaseTrainCard : databaseTrainCards) {
-            slotCards.add(Color.getTrainCardColorFromString(databaseTrainCard.getTrainType()));
-        }
-        return slotCards;
-    }
     @Override
-    public List<DatabaseTrainCard> getSlotCards(String game_name) {
+    public List<Color> getSlotCardColors(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT * FROM train_card\n" +
                     "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?)\n" +
@@ -2119,11 +1925,11 @@ public class DatabaseController implements IDatabaseController {
 
             ResultSet resultSet = statement.executeQuery();
 
-            List<DatabaseTrainCard> databaseTrainCards = new ArrayList<>();
+            List<Color> slotCards = new ArrayList<>();
             while(resultSet.next()) {
-                databaseTrainCards.add(DatabaseTrainCard.buildTrainCardFromResultSet(resultSet));
+                slotCards.add(Color.getTrainCardColorFromString(resultSet.getString(DatabaseTrainCard.TRAIN_TYPE)));
             }
-            return databaseTrainCards;
+            return slotCards;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2175,31 +1981,12 @@ public class DatabaseController implements IDatabaseController {
         return true;
     }
 
-    @Override
-    public DatabaseTrainCard getTrainCardFromSlot(String game_name, int slot) {
-        try (Connection connection = session.getConnection()) {
-            String sqlString = String.format("SELECT * FROM train_card " +
-                    "WHERE game_id IN (SELECT game_id FROM game WHERE name = ?) " +
-                    "AND slot = ?;");
-            PreparedStatement statement = connection.prepareStatement(sqlString);
-            statement.setString(1, game_name);
-            statement.setInt(2, slot);
-
-            ResultSet resultSet = statement.executeQuery();
-            if(resultSet.next()) {
-                return DatabaseTrainCard.buildTrainCardFromResultSet(resultSet);
-            }
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      *
      * @param game_name
      * @return number of drawCard commands since last DrawTrainCard command
      */
+    @Override
     public int getNumberOfDrawTrainCommands(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
@@ -2217,6 +2004,7 @@ public class DatabaseController implements IDatabaseController {
         return 0;
     }
 
+    @Override
     public int numTrainsLeft(String game_name, String player_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("" +
@@ -2235,6 +2023,8 @@ public class DatabaseController implements IDatabaseController {
         }
         return 0;
     }
+
+    @Override
     public boolean isEndOfGame(String game_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(
@@ -2258,7 +2048,7 @@ public class DatabaseController implements IDatabaseController {
         return false;
     }
 
-    public boolean isClaimedDouble(String game_name, String player_name, int route_number) {
+    private boolean isClaimedDouble(String game_name, String player_name, int route_number) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("WITH route_to_claim AS (\n" +
                     "                       SELECT route_number, city_1, city_2 FROM route\n" +

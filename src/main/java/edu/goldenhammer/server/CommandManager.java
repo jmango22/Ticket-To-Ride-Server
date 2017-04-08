@@ -28,6 +28,7 @@ public class CommandManager {
 
     public List<BaseCommand> addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
+            IDatabaseController dbc = DatabaseController.getInstance();
             List<BaseCommand> executed = new ArrayList<>();
             int currentPlayer = currentPlayerTurn(command.getGameName(), command.getPlayerName());
 
@@ -35,7 +36,7 @@ public class CommandManager {
                 if (command.validate()) {
                     command.execute();
                     executed.add(command);
-                    if(DatabaseController.getInstance().isEndOfGame(command.getGameName())) {
+                    if(dbc.isEndOfGame(command.getGameName())) {
                         EndGameCommand endGameCommand = new EndGameCommand(command.getGameName());
                         endGameCommand.setCommandNumber(command.getCommandNumber()+1);
                         endGameCommand.setPlayerName(command.getPlayerName());
@@ -45,7 +46,7 @@ public class CommandManager {
                         executed.add(endGameCommand);
                     } else {
                         if (command.endTurn()) {
-                            EndTurnCommand endTurn = DatabaseController.getInstance().getEndTurnCommand(command.getGameName(), command.getCommandNumber() + 1, command.getPlayerName());
+                            EndTurnCommand endTurn = dbc.getEndTurnCommand(command.getGameName(), command.getCommandNumber() + 1, command.getPlayerName());
                             endTurn.execute();
                             executed.add(endTurn);
                         }
@@ -66,8 +67,7 @@ public class CommandManager {
     }
 
     private int currentPlayerTurn(String game_name, String playerName) {
-        DatabaseController dbc = DatabaseController.getInstance();
-//        int current_player = dbc.getCurrentPlayerTurn(game_name);
+        IDatabaseController dbc = DatabaseController.getInstance();
         //-1 means that the not everyone has initialized their hands
         List<BaseCommand> commands = dbc.getCommandsSinceLastCommand(game_name, playerName, 0);
         int current_player = -1;

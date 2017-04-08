@@ -24,7 +24,7 @@ public class DrawTrainCardCommand extends BaseCommand {
         Results results = new Results();
         results.setResponseCode(200);
         if(slot >= 0 && slot <= 4) {
-            card = TrainCard.parseDatabaseTrainCard(dbc.drawTrainCardFromSlot(getGameName(), getPlayerName(), slot));
+            card = dbc.drawTrainCardFromSlot(getGameName(), getPlayerName(), slot);
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
             while(hasThreeWilds(bank)) {
@@ -34,7 +34,7 @@ public class DrawTrainCardCommand extends BaseCommand {
             dbc.addCommand(this, true, false);
             results.setMessage(Serializer.serialize(this));
         } else if(slot == 5) {
-            card = TrainCard.parseDatabaseTrainCard(dbc.drawRandomTrainCard(getGameName(), getPlayerName()));
+            card = dbc.drawRandomTrainCard(getGameName(), getPlayerName());
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
             dbc.addCommand(this, true, false);
@@ -75,20 +75,14 @@ public class DrawTrainCardCommand extends BaseCommand {
             return false;
         }
         else {
-            DatabaseTrainCard trainCard = dbc.getTrainCardFromSlot(getGameName(), slot);
-            return trainCard.getTrainType().equals("wild");
+            List<Color> slots = dbc.getSlotCardColors(getGameName());
+            return slots.get(slot) == Color.WILD;
         }
     }
 
     private List<Color> getSlotCards(String game_name) {
-//        IDatabaseController dbc = DatabaseController.getInstance();
-//        List<Color> slotCards = new ArrayList<>();
-//        List<DatabaseTrainCard> databaseTrainCards = dbc.getSlotCards(game_name);
-//        for(DatabaseTrainCard databaseTrainCard : databaseTrainCards) {
-//            slotCards.add(Color.getTrainCardColorFromString(databaseTrainCard.getTrainType()));
-//        }
-//        return slotCards;
-        return DatabaseController.getInstance().getSlotCardColors(game_name);
+        IDatabaseController dbc = DatabaseController.getInstance();
+        return dbc.getSlotCardColors(game_name);
     }
 
     @Override
