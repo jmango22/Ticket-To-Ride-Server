@@ -1,9 +1,11 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql;
+
+import edu.goldenhammer.database.data_types.IDatabaseClaimedRoute;
 
 /**
  * Created by seanjib on 2/22/2017.
  */
-public class SQLClaimedRoute implements IDatabaseClaimedRoute{
+public class SQLClaimedRoute implements IDatabaseClaimedRoute {
     public static final String TABLE_NAME = "claimed_route";
     public static final String ROUTE_ID = "route_id";
     public static final String GAME_ID = "game_id";

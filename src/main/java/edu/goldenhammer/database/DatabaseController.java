@@ -1,7 +1,7 @@
 package edu.goldenhammer.database;
 
 import com.google.gson.Gson;
-import edu.goldenhammer.database.data_types.*;
+import edu.goldenhammer.database.postgresql.*;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;

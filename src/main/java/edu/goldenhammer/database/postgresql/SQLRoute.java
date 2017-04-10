@@ -1,4 +1,6 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql;
+
+import edu.goldenhammer.database.data_types.IDatabaseRoute;
 
 import java.io.Serializable;
 

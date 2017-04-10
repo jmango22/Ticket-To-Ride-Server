@@ -1,4 +1,4 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql;
 
 import com.google.gson.Gson;
 import edu.goldenhammer.model.GameModel;
