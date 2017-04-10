@@ -16,7 +16,6 @@ public class CommandHandler extends HandlerBase {
         Results results = new Results();
         try {
             String requestBody = readRequestBody(httpExchange);
-            //Class c = this.getClass();
             if(!isAuthorized(httpExchange)) {
                 results = getInvalidAuthorizationResults();
             }
@@ -24,7 +23,7 @@ public class CommandHandler extends HandlerBase {
                 results = getNotInGameResults();
             }
             else {
-                String pkg = "edu.goldenhammer.server.commands.";//c.getPackage().getName();
+                String pkg = "edu.goldenhammer.server.commands.";
                 BaseCommand baseCommand = Serializer.deserializeCommand(
                         requestBody, pkg/* + ".Server"*/);
                 String game_name = httpExchange.getRequestHeaders().get("gamename").get(0);
