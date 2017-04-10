@@ -1,4 +1,6 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql;
+
+import edu.goldenhammer.database.data_types.IDatabasePlayer;
 
 /**
  * Created by seanjib on 2/3/2017.

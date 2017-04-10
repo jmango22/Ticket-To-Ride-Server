@@ -1,7 +1,8 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import edu.goldenhammer.database.data_types.IDatabaseCommand;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.sql.ResultSet;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/22/2017.
  */
-public class SQLCommand implements IDatabaseCommand{
+public class SQLCommand implements IDatabaseCommand {
 
     public static final String TABLE_NAME = "command";
     public static final String COMMAND_NUMBER = "command_number";
