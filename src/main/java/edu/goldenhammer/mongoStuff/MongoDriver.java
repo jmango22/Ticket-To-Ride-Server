@@ -51,13 +51,13 @@ public class MongoDriver {
      * @return the json what is contained in mongo
      * @throws UnknownHostException
      */
-    public String getGame(String gameName) throws UnknownHostException{
+    public MongoGame getGame(String gameName) throws UnknownHostException{
         DBCollection coll = getCollection("games");
-        BasicDBObject query = new BasicDBObject("gameName", gameName);
+        BasicDBObject query = new BasicDBObject("$eq", new BasicDBObject("gameName", gameName));
         Cursor cursor = coll.find(query);
         DBObject object = getOne(cursor);
         if(object != null) {
-            return object.toString();
+            return MongoGame.deserialize(object.toString());
         } else {
             return null;
         }
