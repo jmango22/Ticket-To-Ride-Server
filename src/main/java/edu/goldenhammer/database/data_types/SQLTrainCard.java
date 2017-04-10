@@ -6,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/19/2017.
  */
-public class DatabaseTrainCard implements IDatabaseTrainCard {
+public class SQLTrainCard implements IDatabaseTrainCard {
     public static final int MAX_COLORED_CARDS = 12;
     public static final int MAX_WILD_CARDS = 14;
     public static final int MAX_STARTING_CARDS = 4;
@@ -40,12 +40,12 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
             TRAIN_TYPE,
             SLOT,
             DISCARDED,
-            DatabasePlayer.TABLE_NAME,
-            DatabaseGame.TABLE_NAME
+            SQLPlayer.TABLE_NAME,
+            SQLGame.TABLE_NAME
     );
 
-    public DatabaseTrainCard(String id,String gameID, String playerID,
-                             String trainType, int slot, boolean discarded) {
+    public SQLTrainCard(String id, String gameID, String playerID,
+                        String trainType, int slot, boolean discarded) {
         this.id = id;
         this.gameID = gameID;
         this.playerID = playerID;
@@ -89,9 +89,9 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < MAX_COLORED_CARDS; j++) {
                 sqlString += String.format("(?, (SELECT %1$s FROM %2$s WHERE %3$s = ?), ",
-                        DatabaseGame.ID,
-                        DatabaseGame.TABLE_NAME,
-                        DatabaseGame.GAME_NAME
+                        SQLGame.ID,
+                        SQLGame.TABLE_NAME,
+                        SQLGame.GAME_NAME
                 );
 
                 switch (i) {
@@ -125,9 +125,9 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
 
         for(int i = 0; i < MAX_WILD_CARDS; i++) {
             sqlString += String.format("(?, (SELECT %1$s FROM %2$s WHERE %3$s = ?), 'wild')",
-                    DatabaseGame.ID,
-                    DatabaseGame.TABLE_NAME,
-                    DatabaseGame.GAME_NAME
+                    SQLGame.ID,
+                    SQLGame.TABLE_NAME,
+                    SQLGame.GAME_NAME
             );
             if(i != MAX_WILD_CARDS - 1) {
                 sqlString += ",";
@@ -139,8 +139,8 @@ public class DatabaseTrainCard implements IDatabaseTrainCard {
         return sqlString;
     }
 
-    public static DatabaseTrainCard buildTrainCardFromResultSet(ResultSet resultSet) throws SQLException{
-        return new DatabaseTrainCard(
+    public static SQLTrainCard buildTrainCardFromResultSet(ResultSet resultSet) throws SQLException{
+        return new SQLTrainCard(
                 resultSet.getString(ID),
                 resultSet.getString(GAME_ID),
                 resultSet.getString(PLAYER_ID),

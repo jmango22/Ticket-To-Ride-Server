@@ -2,7 +2,6 @@ package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseTrainCard;
 import edu.goldenhammer.model.Color;
 import edu.goldenhammer.model.TrainCard;
 import edu.goldenhammer.server.Results;
