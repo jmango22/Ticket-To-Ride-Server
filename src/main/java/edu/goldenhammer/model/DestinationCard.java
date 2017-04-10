@@ -1,9 +1,5 @@
 package edu.goldenhammer.model;
 
-import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
-
 import java.io.Serializable;
 
 /**

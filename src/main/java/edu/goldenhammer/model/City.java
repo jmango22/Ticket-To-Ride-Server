@@ -1,8 +1,6 @@
 package edu.goldenhammer.model;
 
 
-import edu.goldenhammer.database.data_types.DatabaseCity;
-
 import java.io.Serializable;
 
 /**

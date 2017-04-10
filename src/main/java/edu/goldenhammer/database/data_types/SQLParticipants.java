@@ -1,13 +1,11 @@
 package edu.goldenhammer.database.data_types;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class DatabaseParticipants implements IDatabaseParticipants, Serializable {
-    public static final int MAX_TRAIN_COUNT = 30;
+public class SQLParticipants implements IDatabaseParticipants, Serializable {
     public static final String TABLE_NAME = "participants";
     public static final String USER_ID = "user_id";
     public static final String GAME_ID = "game_id";
@@ -36,10 +34,10 @@ public class DatabaseParticipants implements IDatabaseParticipants, Serializable
             PLAYER_NUMBER,
             POINTS,
             TRAINS_LEFT,
-            DatabasePlayer.TABLE_NAME,
-            DatabaseGame.TABLE_NAME);
+            SQLPlayer.TABLE_NAME,
+            SQLGame.TABLE_NAME);
 
-    public DatabaseParticipants(String playerID, String gameID, int playerNumber, int points, int trainsLeft) {
+    public SQLParticipants(String playerID, String gameID, int playerNumber, int points, int trainsLeft) {
         this.playerID = playerID;
         this.gameID = gameID;
         this.playerNumber = playerNumber;

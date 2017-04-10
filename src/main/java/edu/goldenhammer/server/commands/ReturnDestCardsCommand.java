@@ -2,9 +2,7 @@ package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
 import edu.goldenhammer.model.DestinationCard;
-import edu.goldenhammer.model.Hand;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 

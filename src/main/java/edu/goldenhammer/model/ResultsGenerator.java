@@ -6,8 +6,6 @@ import java.util.Set;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseDestinationCard;
-import edu.goldenhammer.database.data_types.DatabasePlayer;
 
 /**
  * Created by jon on 3/24/17.
