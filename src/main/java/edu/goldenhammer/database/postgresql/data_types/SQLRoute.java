@@ -1,11 +1,11 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.io.Serializable;
 
 /**
  * Created by seanjib on 2/19/2017.
  */
-public class DatabaseRoute implements Serializable, IDatabaseRoute {
+public class SQLRoute implements Serializable {
     public static final int ROUTE_COUNT = 101;
     public static final String ROUTE_NUMBER = "route_number";
     public static final String CITY_1 = "city_1";
@@ -34,7 +34,7 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
             CITY_2,
             ROUTE_COLOR,
             ROUTE_LENGTH,
-            DatabaseCity.TABLE_NAME);
+            SQLCity.TABLE_NAME);
     public static final String INSERT_STMT = String.format(
             "INSERT INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s) VALUES %7$s",
             TABLE_NAME,
@@ -45,7 +45,7 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
             ROUTE_LENGTH,
             getAllRoutes());
 
-    public DatabaseRoute(String id, int city1, int city2, String routeColor, int routeLength) {
+    public SQLRoute(String id, int city1, int city2, String routeColor, int routeLength) {
         this.id = id;
         this.city1 = city1;
         this.city2 = city2;
@@ -53,27 +53,27 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
         this.routeLength = routeLength;
     }
 
-    @Override
+    
     public String getID() {
         return id;
     }
 
-    @Override
+    
     public int getCity1() {
         return city1;
     }
 
-    @Override
+    
     public int getCity2() {
         return city2;
     }
 
-    @Override
+    
     public String getRouteColor() {
         return routeColor;
     }
 
-    @Override
+    
     public int getRouteLength() {
         return routeLength;
     }
@@ -89,13 +89,13 @@ public class DatabaseRoute implements Serializable, IDatabaseRoute {
     private static String getFormattedRoute() {
         return String.format("(?, %1$s, %2$s, ?, ?),\n",
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)\n",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME),
+                        SQLCity.ID,
+                        SQLCity.TABLE_NAME,
+                        SQLCity.NAME),
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)\n",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME)
+                        SQLCity.ID,
+                        SQLCity.TABLE_NAME,
+                        SQLCity.NAME)
         );
     }
 

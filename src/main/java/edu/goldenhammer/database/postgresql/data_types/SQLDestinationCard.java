@@ -1,4 +1,4 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
  * and to store it in the database. It has all the SQL code needed to create the table in the database and to insert
  * new destination card values inside.
  */
-public class DatabaseDestinationCard implements IDatabaseDestinationCard {
+public class SQLDestinationCard {
     public static final int MAX_DESTINATION_CARDS = 76;
     public static final String TABLE_NAME = "destination_card";
     public static final String ID = "destination_card_id";
@@ -52,9 +52,9 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
             DISCARDED,
             POINTS,
             DRAWN,
-            DatabaseGame.TABLE_NAME,
-            DatabasePlayer.TABLE_NAME,
-            DatabaseCity.TABLE_NAME
+            SQLGame.TABLE_NAME,
+            SQLPlayer.TABLE_NAME,
+            SQLCity.TABLE_NAME
     );
 
     /**
@@ -71,8 +71,8 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
      * @param drawn - used during the first phase of drawing destination cards. This indicates
      *              that the card has been drawn, but not yet permanently assigned to the player.
      */
-    public DatabaseDestinationCard(String destinationCardID, String gameID, int city1, int city2,
-                                   String playerID, boolean discarded, int points, boolean drawn) {
+    public SQLDestinationCard(String destinationCardID, String gameID, int city1, int city2,
+                              String playerID, boolean discarded, int points, boolean drawn) {
         this.destinationCardID = destinationCardID;
         this.gameID = gameID;
         this.playerID = playerID;
@@ -83,42 +83,42 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
         this.drawn = drawn;
     }
 
-    @Override
+    
     public String getID() {
         return destinationCardID;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getPlayerID() {
         return playerID;
     }
 
-    @Override
+    
     public int getCity1() {
         return city1;
     }
 
-    @Override
+    
     public int getCity2() {
         return city2;
     }
 
-    @Override
+    
     public boolean isDiscarded() {
         return discarded;
     }
     
-    @Override
+    
     public int getPoints() {
         return points;
     }
 
-    @Override
+    
     public boolean isDrawn() {
         return drawn;
     }
@@ -155,32 +155,32 @@ public class DatabaseDestinationCard implements IDatabaseDestinationCard {
     private static String getFormattedDestination() {
         return String.format("(%1$s, %2$s, %3$s, ?),\n",
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
-                        DatabaseGame.ID,
-                        DatabaseGame.TABLE_NAME,
-                        DatabaseGame.GAME_NAME),
+                        SQLGame.ID,
+                        SQLGame.TABLE_NAME,
+                        SQLGame.GAME_NAME),
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME),
+                        SQLCity.ID,
+                        SQLCity.TABLE_NAME,
+                        SQLCity.NAME),
                 String.format("(SELECT %1$s FROM %2$s WHERE %3$s = ?)",
-                        DatabaseCity.ID,
-                        DatabaseCity.TABLE_NAME,
-                        DatabaseCity.NAME)
+                        SQLCity.ID,
+                        SQLCity.TABLE_NAME,
+                        SQLCity.NAME)
         );
     }
 
     /**
      *
      * @param resultSet the result of a SELECT query to the table destination_card
-     * @return a new DatabaseDestinationCard that matches the information pulled from the database
+     * @return a new SQLDestinationCard that matches the information pulled from the database
      * @pre the ResultSet is not null; it currently points to a row pulled from the destination_card table;
      * the ResultSet includes all columns in the destination_card table
-     * @post a new DatabaseDestinationCard is generated and returned with attributes set to the values from
+     * @post a new SQLDestinationCard is generated and returned with attributes set to the values from
      * the input ResultSet
      * @throws SQLException
      */
-    public static DatabaseDestinationCard buildDestinationCardFromResultSet(ResultSet resultSet) throws SQLException {
-        return new DatabaseDestinationCard(
+    public static SQLDestinationCard buildDestinationCardFromResultSet(ResultSet resultSet) throws SQLException {
+        return new SQLDestinationCard(
                 resultSet.getString(ID),
                 resultSet.getString(GAME_ID),
                 resultSet.getInt(CITY_1),

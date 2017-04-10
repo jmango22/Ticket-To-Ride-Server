@@ -1,9 +1,8 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import edu.goldenhammer.server.commands.BaseCommand;
-import edu.goldenhammer.server.commands.InitializeHandCommand;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/22/2017.
  */
-public class DatabaseCommand implements IDatabaseCommand{
+public class SQLCommand {
 
     public static final String TABLE_NAME = "command";
     public static final String COMMAND_NUMBER = "command_number";
@@ -46,11 +45,11 @@ public class DatabaseCommand implements IDatabaseCommand{
             METADATA,
             VISIBLE_TO_SELF,
             VISIBLE_TO_ALL,
-            DatabaseGame.TABLE_NAME,
-            DatabasePlayer.TABLE_NAME
+            SQLGame.TABLE_NAME,
+            SQLPlayer.TABLE_NAME
     );
 
-    public DatabaseCommand(String commandNumber, String gameID, String userID, String commandType, String metadata, boolean visibleToSelf, boolean visibleToAll) {
+    public SQLCommand(String commandNumber, String gameID, String userID, String commandType, String metadata, boolean visibleToSelf, boolean visibleToAll) {
         this.commandNumber = commandNumber;
         this.gameID = gameID;
         this.userID = userID;
@@ -64,39 +63,34 @@ public class DatabaseCommand implements IDatabaseCommand{
         return commandNumber;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getUserID() {
         return userID;
     }
 
-    @Override
+    
     public String getCommandType() {
         return commandType;
     }
 
-    @Override
+    
     public String getMetadata() {
         return metadata;
     }
 
-    @Override
+    
     public boolean isVisibleToSelf() {
         return visibleToSelf;
     }
 
-    @Override
+    
     public boolean isVisibleToAll() {
         return visibleToAll;
-    }
-
-    public static String columnNames() {
-        return  String.join(",", COMMAND_NUMBER, GAME_ID, PLAYER_ID,
-                METADATA, VISIBLE_TO_SELF, VISIBLE_TO_ALL);
     }
 
     public static BaseCommand buildCommandFromResultSet(ResultSet resultSet, String player_name) throws SQLException{

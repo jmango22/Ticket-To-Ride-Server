@@ -1,4 +1,4 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import com.google.gson.Gson;
 import edu.goldenhammer.model.GameModel;
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Created by devonkinghorn on 4/5/17.
  */
-public class DatabaseInitialGameModel implements Serializable {
+public class SQLInitialGameModel implements Serializable {
 
     public static final String ID = "uid";
     public static final String GAME_NAME = "game_name";
@@ -29,7 +29,7 @@ public class DatabaseInitialGameModel implements Serializable {
     public static GameModel buildFromResultsSet(ResultSet resultSet) throws SQLException {
         Gson gson = new Gson();
         if(resultSet.next())
-            return (GameModel)gson.fromJson(resultSet.getString(INITIAL_STATE),GameModel.class);
+            return gson.fromJson(resultSet.getString(INITIAL_STATE),GameModel.class);
         return null;
     }
 }

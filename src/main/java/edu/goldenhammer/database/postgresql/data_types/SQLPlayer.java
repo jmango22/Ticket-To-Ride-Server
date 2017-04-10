@@ -1,9 +1,9 @@
-package edu.goldenhammer.database.data_types;
+package edu.goldenhammer.database.postgresql.data_types;
 
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class DatabasePlayer implements IDatabasePlayer {
+public class SQLPlayer {
     public static final String ID = "user_id";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -20,29 +20,29 @@ public class DatabasePlayer implements IDatabasePlayer {
             , TABLE_NAME, ID, USERNAME, PASSWORD, ACCESS_TOKEN, ID);
 
 
-    public DatabasePlayer(String id, String username, String password, String accessToken) {
+    public SQLPlayer(String id, String username, String password, String accessToken) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.accessToken = accessToken;
     }
 
-    @Override
+    
     public String getID() {
         return id;
     }
 
-    @Override
+    
     public String getUsername() {
         return username;
     }
 
-    @Override
+    
     public String getPassword() {
         return password;
     }
 
-    @Override
+    
     public String getAccessToken() {
         return accessToken;
     }

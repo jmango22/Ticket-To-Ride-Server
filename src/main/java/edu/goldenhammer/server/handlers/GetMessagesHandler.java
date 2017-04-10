@@ -1,16 +1,13 @@
 package edu.goldenhammer.server.handlers;
 
-import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseMessage;
 import edu.goldenhammer.model.Message;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -2,7 +2,7 @@ package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.data_types.DatabaseTrainCard;
+import edu.goldenhammer.database.postgresql.data_types.SQLTrainCard;
 import edu.goldenhammer.model.DestinationCard;
 import edu.goldenhammer.model.DrawnDestinationCards;
 import edu.goldenhammer.model.Hand;
@@ -55,7 +55,7 @@ public class InitializeHandCommand extends BaseCommand {
 
     private List<TrainCard> drawTrainCards(IDatabaseController dbc) {
         List<TrainCard> trainCards = new ArrayList<>();
-        for(int i = 0; i < DatabaseTrainCard.MAX_STARTING_CARDS; i++) {
+        for(int i = 0; i < SQLTrainCard.MAX_STARTING_CARDS; i++) {
             TrainCard trainCard = dbc.drawRandomTrainCard(getGameName(), getPlayerName());
             trainCards.add(trainCard);
         }
