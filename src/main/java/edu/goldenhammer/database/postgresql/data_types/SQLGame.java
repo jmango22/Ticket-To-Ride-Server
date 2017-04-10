@@ -1,13 +1,11 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseGame;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.io.Serializable;
 
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class SQLGame implements IDatabaseGame, Serializable {
+public class SQLGame implements Serializable {
 
     public static final String ID = "game_id";
     public static final String GAME_NAME = "name";

@@ -1,6 +1,4 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseMessage;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/22/2017.
  */
-public class SQLMessage implements IDatabaseMessage {
+public class SQLMessage {
     public static final String TABLE_NAME = "chat_message";
     public static final String ID = "message_id";
     public static final String GAME_ID = "game_id";
@@ -48,22 +46,22 @@ public class SQLMessage implements IDatabaseMessage {
         this.message = message;
     }
 
-    @Override
+    
     public String getID() {
         return messageID;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getPlayerID() {
         return playerID;
     }
 
-    @Override
+    
     public String getMessage() {
         return message;
     }

@@ -1,6 +1,4 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseDestinationCard;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +8,7 @@ import java.sql.SQLException;
  * and to store it in the database. It has all the SQL code needed to create the table in the database and to insert
  * new destination card values inside.
  */
-public class SQLDestinationCard implements IDatabaseDestinationCard {
+public class SQLDestinationCard {
     public static final int MAX_DESTINATION_CARDS = 76;
     public static final String TABLE_NAME = "destination_card";
     public static final String ID = "destination_card_id";
@@ -85,42 +83,42 @@ public class SQLDestinationCard implements IDatabaseDestinationCard {
         this.drawn = drawn;
     }
 
-    @Override
+    
     public String getID() {
         return destinationCardID;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getPlayerID() {
         return playerID;
     }
 
-    @Override
+    
     public int getCity1() {
         return city1;
     }
 
-    @Override
+    
     public int getCity2() {
         return city2;
     }
 
-    @Override
+    
     public boolean isDiscarded() {
         return discarded;
     }
     
-    @Override
+    
     public int getPoints() {
         return points;
     }
 
-    @Override
+    
     public boolean isDrawn() {
         return drawn;
     }

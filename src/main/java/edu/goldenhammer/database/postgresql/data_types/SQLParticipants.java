@@ -1,13 +1,11 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseParticipants;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.io.Serializable;
 
 /**
  * Created by seanjib on 2/3/2017.
  */
-public class SQLParticipants implements IDatabaseParticipants, Serializable {
+public class SQLParticipants implements Serializable {
     public static final String TABLE_NAME = "participants";
     public static final String USER_ID = "user_id";
     public static final String GAME_ID = "game_id";
@@ -47,27 +45,27 @@ public class SQLParticipants implements IDatabaseParticipants, Serializable {
         this.trainsLeft = trainsLeft;
     }
 
-    @Override
+    
     public String getPlayerID() {
         return playerID;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public int getPlayerNumber() {
         return playerNumber;
     }
 
-    @Override
+    
     public int getPoints() {
         return points;
     }
 
-    @Override
+    
     public int getTrainsLeft() {
         return trainsLeft;
     }

@@ -1,6 +1,4 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseTrainCard;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/19/2017.
  */
-public class SQLTrainCard implements IDatabaseTrainCard {
+public class SQLTrainCard {
     public static final int MAX_COLORED_CARDS = 12;
     public static final int MAX_WILD_CARDS = 14;
     public static final int MAX_STARTING_CARDS = 4;
@@ -56,32 +54,32 @@ public class SQLTrainCard implements IDatabaseTrainCard {
         this.discarded = discarded;
     }
 
-    @Override
+    
     public String getID() {
         return id;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getPlayerID() {
         return playerID;
     }
 
-    @Override
+    
     public String getTrainType() {
         return trainType;
     }
 
-    @Override
+    
     public int getSlot() {
         return slot;
     }
 
-    @Override
+    
     public boolean isDiscarded() {
         return discarded;
     }

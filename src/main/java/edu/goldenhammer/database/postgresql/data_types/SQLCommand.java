@@ -1,8 +1,7 @@
-package edu.goldenhammer.database.postgresql;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import edu.goldenhammer.database.data_types.IDatabaseCommand;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.sql.ResultSet;
@@ -11,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Created by seanjib on 2/22/2017.
  */
-public class SQLCommand implements IDatabaseCommand {
+public class SQLCommand {
 
     public static final String TABLE_NAME = "command";
     public static final String COMMAND_NUMBER = "command_number";
@@ -64,32 +63,32 @@ public class SQLCommand implements IDatabaseCommand {
         return commandNumber;
     }
 
-    @Override
+    
     public String getGameID() {
         return gameID;
     }
 
-    @Override
+    
     public String getUserID() {
         return userID;
     }
 
-    @Override
+    
     public String getCommandType() {
         return commandType;
     }
 
-    @Override
+    
     public String getMetadata() {
         return metadata;
     }
 
-    @Override
+    
     public boolean isVisibleToSelf() {
         return visibleToSelf;
     }
 
-    @Override
+    
     public boolean isVisibleToAll() {
         return visibleToAll;
     }

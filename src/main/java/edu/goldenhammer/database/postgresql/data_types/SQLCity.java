@@ -1,14 +1,11 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseCity;
-import edu.goldenhammer.model.City;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.io.Serializable;
 
 /**
  * Created by seanjib on 2/19/2017.
  */
-public class SQLCity implements Serializable, IDatabaseCity {
+public class SQLCity implements Serializable {
 
     public static final int CITY_COUNT = 35;
     public static final String ID = "city_id";
@@ -46,22 +43,22 @@ public class SQLCity implements Serializable, IDatabaseCity {
         this.pointY = pointY;
     }
 
-    @Override
+    
     public String getID() {
         return id;
     }
 
-    @Override
+    
     public String getName() {
         return name;
     }
 
-    @Override
+    
     public int getPointX() {
         return pointX;
     }
 
-    @Override
+    
     public int getPointY() {
         return pointY;
     }

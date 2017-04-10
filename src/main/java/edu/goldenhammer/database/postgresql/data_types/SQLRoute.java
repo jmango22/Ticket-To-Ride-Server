@@ -1,13 +1,11 @@
-package edu.goldenhammer.database.postgresql;
-
-import edu.goldenhammer.database.data_types.IDatabaseRoute;
+package edu.goldenhammer.database.postgresql.data_types;
 
 import java.io.Serializable;
 
 /**
  * Created by seanjib on 2/19/2017.
  */
-public class SQLRoute implements Serializable, IDatabaseRoute {
+public class SQLRoute implements Serializable {
     public static final int ROUTE_COUNT = 101;
     public static final String ROUTE_NUMBER = "route_number";
     public static final String CITY_1 = "city_1";
@@ -55,27 +53,27 @@ public class SQLRoute implements Serializable, IDatabaseRoute {
         this.routeLength = routeLength;
     }
 
-    @Override
+    
     public String getID() {
         return id;
     }
 
-    @Override
+    
     public int getCity1() {
         return city1;
     }
 
-    @Override
+    
     public int getCity2() {
         return city2;
     }
 
-    @Override
+    
     public String getRouteColor() {
         return routeColor;
     }
 
-    @Override
+    
     public int getRouteLength() {
         return routeLength;
     }
