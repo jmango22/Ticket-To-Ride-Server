@@ -2,7 +2,7 @@ package edu.goldenhammer.server.commands;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.postgresql.SQLTrainCard;
+import edu.goldenhammer.database.postgresql.data_types.SQLTrainCard;
 import edu.goldenhammer.model.DestinationCard;
 import edu.goldenhammer.model.DrawnDestinationCards;
 import edu.goldenhammer.model.Hand;

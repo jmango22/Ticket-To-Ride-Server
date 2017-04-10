@@ -1,6 +1,6 @@
 package edu.goldenhammer.model;
 
-import edu.goldenhammer.database.postgresql.SQLTrainCard;
+import edu.goldenhammer.database.postgresql.data_types.SQLTrainCard;
 
 import java.io.Serializable;
 

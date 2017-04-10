@@ -1,4 +1,4 @@
-package edu.goldenhammer.database;
+package edu.goldenhammer.database.postgresql;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import javax.sql.DataSource;
@@ -7,15 +7,10 @@ import java.sql.*;
 /**
  * Created by devonkinghorn on 2/1/17.
  */
-public class DatabaseConnectionFactory {
-//    private static final String POSTGRESQL_DRIVER_NAME = "org.postgresql.Driver";
-//
-//    private DataSource dataSource;
-//    private String schema;
-//    private String databaseName;
+public class SQLConnectionFactory {
 
-    private static DatabaseConnectionFactory singleton;
-    public static DatabaseConnectionFactory getInstance() {
+    private static SQLConnectionFactory singleton;
+    public static SQLConnectionFactory getInstance() {
         if (singleton == null) {
             String host = "ec2-35-167-43-52.us-west-2.compute.amazonaws.com";
             String database = "postgres";
@@ -23,12 +18,12 @@ public class DatabaseConnectionFactory {
             int maxConnections = 10;
             String userName = "postgres";
             String password = "goldenhammerteam";
-            singleton = new DatabaseConnectionFactory(host, database, schema, maxConnections, userName, password);
+            singleton = new SQLConnectionFactory(host, database, schema, maxConnections, userName, password);
         }
         return singleton;
     }
 
-    DatabaseConnectionFactory(String host, String database, String schema, int maxConnections, String userName, String password) {
+    SQLConnectionFactory(String host, String database, String schema, int maxConnections, String userName, String password) {
         this.databaseName = database;
         this.dataSource = configureDataSource(host, database, maxConnections, userName, password);
         if (schema != null) {
