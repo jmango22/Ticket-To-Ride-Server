@@ -52,8 +52,8 @@ public class MongoDriver {
      * @throws UnknownHostException
      */
     public MongoGame getGame(String gameName) throws UnknownHostException{
-        DBCollection coll = getCollection("games");
-        BasicDBObject query = new BasicDBObject("$eq", new BasicDBObject("gameName", gameName));
+        DBCollection coll = getGameCollection();
+        BasicDBObject query = new BasicDBObject("gameName", gameName);
         Cursor cursor = coll.find(query);
         DBObject object = getOne(cursor);
         if(object != null) {
