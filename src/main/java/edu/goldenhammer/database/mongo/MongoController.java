@@ -2,6 +2,8 @@ package edu.goldenhammer.database.mongo;
 
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.model.*;
+import edu.goldenhammer.mongoStuff.MongoDriver;
+import edu.goldenhammer.mongoStuff.MongoUser;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 
@@ -11,6 +13,11 @@ import java.util.List;
  * Created by seanjib on 4/9/2017.
  */
 public class MongoController implements IDatabaseController{
+    private MongoDriver driver;
+
+    public MongoController(){
+        driver = new MongoDriver();
+    }
     @Override
     public Player getPlayerInfo(String player) {
         return null;
@@ -18,7 +25,8 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Boolean login(String username, String password) {
-        return null;
+        //try getting player from Driver.
+        return true;
     }
 
     @Override
@@ -28,7 +36,14 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Boolean createUser(String username, String password) {
-        return null;
+        MongoUser u =new MongoUser(username,password);
+        try {
+            //driver.addUser(m);
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @Override
