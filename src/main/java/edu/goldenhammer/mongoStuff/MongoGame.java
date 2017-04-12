@@ -1,15 +1,13 @@
 package edu.goldenhammer.mongoStuff;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import edu.goldenhammer.model.GameModel;
 import edu.goldenhammer.model.Message;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,18 +79,41 @@ public class MongoGame implements Serializable {
         this.gameName = gameName;
     }
 
-    public static MongoGame deserialize(String jsObject) {
-        Gson gson = new Gson();
-        JsonObject json = gson.fromJson(jsObject, JsonObject.class);
-        MongoGame game = gson.fromJson(jsObject, MongoGame.class);
-        if(json.has("commands")){
-            JsonArray jsCommands = json.getAsJsonArray("commands");
-            ArrayList<BaseCommand> commands = new ArrayList<>();
-            for(JsonElement jsCommand: jsCommands){
-                commands.add(Serializer.deserializeCommand(jsCommand.toString(),"edu.goldenhammer.server.commands."));
+    protected static class BaseCommandAdapter implements JsonDeserializer<BaseCommand>, JsonSerializer<BaseCommand> {
+        @Override
+        public BaseCommand deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(json.toString(), JsonObject.class);
+            String commandName = jsonObject.get("name").getAsString();
+
+            String className = "edu.goldenhammer.server.commands." + commandName + "Command";
+
+            BaseCommand basecmd = null;
+            try {
+                Class c = null;
+                try {
+                    c = Class.forName(className);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                basecmd = (BaseCommand)gson.fromJson(json, c);
+
+            } catch (JsonSyntaxException e) {
+                e.printStackTrace();
             }
-            game.setCommands(commands);
+            return basecmd;
         }
-        return game;
+
+        @Override
+        public JsonElement serialize(BaseCommand src, Type typeOfSrc, JsonSerializationContext context) {
+            return null;
+        }
+    }
+    public static MongoGame deserialize(String jsObject) {
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(BaseCommand.class, new BaseCommandAdapter());
+        Gson gson = builder.create();
+        return gson.fromJson(jsObject, MongoGame.class);
     }
 }

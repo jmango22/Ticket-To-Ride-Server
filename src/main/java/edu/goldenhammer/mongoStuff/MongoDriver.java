@@ -78,6 +78,14 @@ public class MongoDriver {
 //        coll.findAndModify(query, update);
     }
 
+    public boolean setUser(MongoUser user) throws UnknownHostException {
+        return false;
+    }
+
+    public MongoUser getUser(String username) throws UnknownHostException {
+        return null;
+    }
+
 
 
 
