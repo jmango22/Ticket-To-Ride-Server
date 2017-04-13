@@ -23,6 +23,11 @@ public class MongoGame implements Serializable {
     String gameName;
 
     public MongoGame(GameModel checkpoint, int checkpointIndex, List<Message> chatMessages, List<BaseCommand> commands, List<String> players) {
+        if(commands == null)
+            commands = new ArrayList<>();
+        if(chatMessages == null)
+            chatMessages = new ArrayList<>();
+
         this.checkpoint = checkpoint;
         this.checkpointIndex = checkpointIndex;
         this.chatMessages = chatMessages;
