@@ -12,6 +12,7 @@ public class GameModel implements IGameModel {
     private Map map;
     private GameName name;
     private List<Color> mBank;
+    private int checkpointIndex;
 
     public GameModel(List<PlayerOverview> players, List<DestinationCard> destinationDeck, List<TrainCard> trainCardDeck, Map map, GameName name, List<Color> mBank) {
         this.players = players;
@@ -20,6 +21,15 @@ public class GameModel implements IGameModel {
         this.map = map;
         this.name = name;
         this.mBank = mBank;
+        checkpointIndex = 0;
+    }
+
+    public int getCheckpointIndex() {
+        return checkpointIndex;
+    }
+
+    public void setCheckpointIndex(int checkpointIndex) {
+        this.checkpointIndex = checkpointIndex;
     }
 
     public List<PlayerOverview> getPlayers() {
