@@ -48,8 +48,14 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Boolean login(String username, String password) {
-        //try getting player from Driver.
-        return true;
+        MongoUser user;
+        try{
+            user = driver.getUser(username);
+            return user!=null && user.getPassword().equals(password);
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -59,19 +65,30 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Boolean createUser(String username, String password) {
-        MongoUser u =new MongoUser(username,password);
+        MongoUser u = new MongoUser(username,password);
         try {
-            //driver.addUser(m);
+            if (driver.getUser(username) != null){
+                return false;
+            }
+            else{
+                driver.setUser(u);
+                return true;
+            }
         }catch(Exception e){
             e.printStackTrace();
             return false;
         }
-        return true;
     }
 
     @Override
-    public void setAccessToken(String userID, String accessToken) {
+    public void setAccessToken(String username, String accessToken) {
+        try{
+            MongoUser u = driver.getUser(username);
+            u.setToken(accessToken);
+            driver.setUser(u);
+        }catch(Exception e){
 
+        }
     }
 
     @Override
