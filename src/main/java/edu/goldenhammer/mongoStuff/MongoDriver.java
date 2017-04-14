@@ -89,6 +89,15 @@ public class MongoDriver {
         return getGamesFromCursor(cursor);
     }
 
+
+    public List<MongoGame> getAllGames() throws UnknownHostException {
+        DBCollection coll = getGameCollection();
+        //TODO: check the query to make sure it returns all of the games.
+        DBObject query = new BasicDBObject();
+  DBCursor cursor = coll.find(query);
+        return getGamesFromCursor(cursor);
+    }
+
     public List<MongoGame> getGamesNotStarted() throws UnknownHostException {
         DBCollection coll = getGameCollection();
         DBObject query = new BasicDBObject("checkpoint", new BasicDBObject("$exists", "false"));

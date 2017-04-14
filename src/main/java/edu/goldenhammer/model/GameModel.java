@@ -13,6 +13,7 @@ public class GameModel implements IGameModel {
     private GameName name;
     private List<Color> mBank;
     private int checkpointIndex;
+    private int currentTurn;
 
     public GameModel(List<PlayerOverview> players, List<DestinationCard> destinationDeck, List<TrainCard> trainCardDeck, Map map, GameName name, List<Color> mBank) {
         this.players = players;
@@ -22,6 +23,14 @@ public class GameModel implements IGameModel {
         this.name = name;
         this.mBank = mBank;
         checkpointIndex = 0;
+    }
+
+    public int getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public void setCurrentTurn(int currentTurn) {
+        this.currentTurn = currentTurn;
     }
 
     public int getCheckpointIndex() {
