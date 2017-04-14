@@ -5,6 +5,7 @@ import com.mongodb.*;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.util.JSON;
 import edu.goldenhammer.model.GameModel;
+import edu.goldenhammer.model.Message;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 import org.bson.Document;
@@ -61,6 +62,13 @@ public class MongoDriver {
         return getGamesFromCursor(cursor);
     }
 
+    public boolean addChat(String gameName, Message chat) throws UnknownHostException {
+        DBObject json = (DBObject) JSON.parse(Serializer.serialize(chat));
+        DBCollection coll = getGameCollection();
+        DBObject query = new BasicDBObject("gameName", new BasicDBObject("$eq",gameName));
+        DBObject push = new BasicDBObject("$push", new BasicDBObject("chatMessages",json));
+        return coll.update(query, push).getN() == 1;
+    }
     /**
      *
      * @param username games excluded that have this user
