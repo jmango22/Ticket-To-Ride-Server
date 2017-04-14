@@ -226,7 +226,7 @@ public class MongoController implements IDatabaseController{
 
         MongoGame currentGame = this.getGame(game_name);
         for(BaseCommand command : currentGame.getCommands()) {
-            if(lastRound && (command.getPlayerNumber() == player)) {
+            if(lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
                 return true;
             }
             else if(command.getName().equals("LastTurn")) {
