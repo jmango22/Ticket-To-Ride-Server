@@ -18,29 +18,13 @@ import java.util.TreeMap;
  */
 public class MongoController implements IDatabaseController{
     private MongoDriver driver;
-    private TreeMap mongoGames = new TreeMap<String, MongoGame>();
-
-    private MongoGame getGame(String game_name) {
-        MongoGame game;
-        if(mongoGames.containsKey(game_name)) {
-            game = (MongoGame) mongoGames.get(game_name);
-        } else {
-            try {
-                game = driver.getGame(game_name);
-                if(game != null) {
-                    mongoGames.put(game_name, game);
-                }
-            } catch (UnknownHostException uh) {
-                uh.printStackTrace();
-                game = null;
-            }
-        }
-        return game;
-    }
+    private TreeMap gameModels;
 
     public MongoController(){
         driver = new MongoDriver();
+        gameModels = new TreeMap<String, GameModel>();
     }
+
     @Override
     public Player getPlayerInfo(String player) {
         return null;
@@ -238,35 +222,56 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean isEndOfGame(String game_name) {
-        int player = - 1;
-        boolean lastRound = false;
+        try {
+            int player = -1;
+            boolean lastRound = false;
 
-        MongoGame currentGame = this.getGame(game_name);
-        for(BaseCommand command : currentGame.getCommands()) {
-            if(lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
-                return true;
+            MongoGame currentGame = driver.getGame(game_name);
+            for (BaseCommand command : currentGame.getCommands()) {
+                if (lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
+                    return true;
+                } else if (command.getName().equals("LastTurn")) {
+                    player = command.getPlayerNumber();
+                    lastRound = true;
+                }
             }
-            else if(command.getName().equals("LastTurn")) {
-                player = command.getPlayerNumber();
-                lastRound = true;
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
 
     @Override
     public boolean alreadyLastRound(String game_name) {
-        MongoGame currentGame = this.getGame(game_name);
-        for(BaseCommand command : currentGame.getCommands()) {
-            if(command.getName().equals("LastTurn")) {
-                return true;
+        try {
+            MongoGame currentGame = driver.getGame(game_name);
+            for (BaseCommand command : currentGame.getCommands()) {
+                if (command.getName().equals("LastTurn")) {
+                    return true;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
 
     @Override
     public GameModel getGameModel(String game_name) {
-        return null;
+        GameModel game;
+        if(gameModels.containsKey(game_name)) {
+            game = (GameModel) gameModels.get(game_name);
+        } else {
+            try {
+                game = driver.getGame(game_name).getCheckpoint();
+                if(game != null) {
+                    gameModels.put(game_name, game);
+                }
+            } catch (UnknownHostException uh) {
+                uh.printStackTrace();
+                game = null;
+            }
+        }
+        return game;
     }
 }
