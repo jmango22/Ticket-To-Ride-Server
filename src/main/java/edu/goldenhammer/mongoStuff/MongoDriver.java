@@ -10,6 +10,8 @@ import edu.goldenhammer.server.commands.BaseCommand;
 import org.bson.Document;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoDriver {
     private static MongoClient mongoClient;
@@ -41,6 +43,41 @@ public class MongoDriver {
         if(cursor.hasNext())
             return cursor.next();
         return null;
+    }
+    private List<MongoGame> getGamesFromCursor(DBCursor cursor) {
+        ArrayList<MongoGame> games = new ArrayList<>();
+        while(cursor.hasNext()) {
+            games.add(MongoGame.deserialize(cursor.next().toString()));
+        }
+        return games;
+    }
+
+    public List<MongoGame> getGamesWithPlayer(String username) throws UnknownHostException{
+        DBCollection coll = getGameCollection();
+        ArrayList<String> s = new ArrayList<>();
+        s.add(username);
+        DBObject query = new BasicDBObject("players", new BasicDBObject("$in", s));
+        DBCursor cursor = coll.find(query);
+        return getGamesFromCursor(cursor);
+    }
+
+    /**
+     *
+     * @param username games excluded that have this user
+     * @return
+     */
+    public List<MongoGame> getGamesNotStartedWithoutPlayer(String username) throws UnknownHostException {
+        DBCollection coll = getGameCollection();
+        ArrayList<String> s = new ArrayList<>();
+        s.add(username);
+        DBObject query1 = new BasicDBObject("checkpoint", new BasicDBObject("$exists", "false"));
+        DBObject query2 = new BasicDBObject("players", new BasicDBObject("$not", new BasicDBObject("$in", s)));
+        BasicDBList and = new BasicDBList();
+        and.add(query1);
+        and.add(query2);
+        DBObject query = new BasicDBObject("$and", and);
+        DBCursor cursor = coll.find(query);
+        return getGamesFromCursor(cursor);
     }
 
     /**
