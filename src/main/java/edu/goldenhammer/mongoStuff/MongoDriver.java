@@ -69,6 +69,7 @@ public class MongoDriver {
         DBObject push = new BasicDBObject("$push", new BasicDBObject("chatMessages",json));
         return coll.update(query, push).getN() == 1;
     }
+
     /**
      *
      * @param username games excluded that have this user
