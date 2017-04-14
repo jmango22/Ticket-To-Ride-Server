@@ -7,7 +7,6 @@ import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.mongoStuff.MongoUser;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
-import edu.goldenhammer.server.commands.LastTurnCommand;
 
 import java.net.UnknownHostException;
 import java.util.List;
@@ -17,14 +16,49 @@ import java.util.TreeMap;
  * Created by seanjib on 4/9/2017.
  */
 public class MongoController implements IDatabaseController{
+    private int MAX_TRAIN;
     private MongoDriver driver;
-    private TreeMap gameModels;
-    //Make sure that if you try to get the game and it isn't in the tree you need to execute
-    //the commands on the MongoGame's model that you have in memory.
+
+    private TreeMap mongoGames;
+
+    public MongoController(int maxTrain) {
+        MAX_TRAIN=maxTrain;
+        driver = new MongoDriver();
+        mongoGames = new TreeMap<String, GameModel>();
+    }
 
     public MongoController(){
+        MAX_TRAIN=45;
         driver = new MongoDriver();
-        gameModels = new TreeMap<String, GameModel>();
+        mongoGames = new TreeMap<String, GameModel>();
+    }
+
+    private MongoGame getGame(String game_name) {
+        MongoGame game;
+        if(mongoGames.containsKey(game_name)) {
+            game = (MongoGame) mongoGames.get(game_name);
+        } else {
+            try {
+                game = driver.getGame(game_name);
+                if(game != null) {
+                    mongoGames.put(game_name, game);
+                }
+            } catch (UnknownHostException uh) {
+                uh.printStackTrace();
+                game = null;
+            }
+        }
+        return game;
+    }
+
+    private int getPlayerNumber(MongoGame currentGame, String player_name) {
+        int playerId = -1;
+        for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
+            if(player.getUsername().equals(player_name)) {
+                playerId = player.getPlayer();
+            }
+        }
+        return playerId;
     }
 
     @Override
@@ -263,17 +297,32 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove) {
+        MongoGame currentGame = getGame(game_name);
+        int playerId = this.getPlayerNumber(currentGame, username);
 
+        for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
+            player.setPieces(player.getPieces()-trainsToRemove);
+        }
     }
 
     @Override
     public List<Track> getTracks(String game_name) {
-        return null;
+        return this.getGame(game_name).getCheckpoint().getMap().getTracks();
     }
 
     @Override
     public int numTrainsLeft(String game_name, String player_name) {
-        return 0;
+        MongoGame currentGame = getGame(game_name);
+        int playerTrains=MAX_TRAIN;
+        int playerNumber = this.getPlayerNumber(currentGame, player_name);
+
+        for(Track track : currentGame.getCheckpoint().getMap().getTracks()) {
+            if(track.getOwner() == playerNumber) {
+                playerTrains = playerTrains-track.getLength();
+            }
+        }
+
+        return playerTrains;
     }
 
     @Override
@@ -303,56 +352,35 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean isEndOfGame(String game_name) {
-        try {
-            int player = -1;
-            boolean lastRound = false;
+        int player = -1;
+        boolean lastRound = false;
 
-            MongoGame currentGame = driver.getGame(game_name);
-            for (BaseCommand command : currentGame.getCommands()) {
-                if (lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
-                    return true;
-                } else if (command.getName().equals("LastTurn")) {
-                    player = command.getPlayerNumber();
-                    lastRound = true;
-                }
+        MongoGame currentGame = this.getGame(game_name);
+        for (BaseCommand command : currentGame.getCommands()) {
+            if (lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
+                return true;
+            } else if (command.getName().equals("LastTurn")) {
+                player = command.getPlayerNumber();
+                lastRound = true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
         return false;
     }
 
     @Override
     public boolean alreadyLastRound(String game_name) {
-        try {
-            MongoGame currentGame = driver.getGame(game_name);
-            for (BaseCommand command : currentGame.getCommands()) {
-                if (command.getName().equals("LastTurn")) {
-                    return true;
-                }
+        MongoGame currentGame = this.getGame(game_name);
+        for (BaseCommand command : currentGame.getCommands()) {
+            if (command.getName().equals("LastTurn")) {
+                return true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return false;
     }
 
     @Override
     public GameModel getGameModel(String game_name) {
-        GameModel game;
-        if(gameModels.containsKey(game_name)) {
-            game = (GameModel) gameModels.get(game_name);
-        } else {
-            try {
-                game = driver.getGame(game_name).getCheckpoint();
-                if(game != null) {
-                    gameModels.put(game_name, game);
-                }
-            } catch (UnknownHostException uh) {
-                uh.printStackTrace();
-                game = null;
-            }
-        }
-        return game;
+        return ((MongoGame)mongoGames.get(game_name)).getCheckpoint();
     }
 }
