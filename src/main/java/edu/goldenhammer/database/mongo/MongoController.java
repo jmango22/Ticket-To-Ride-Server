@@ -29,7 +29,7 @@ public class MongoController implements IDatabaseController{
                 game = driver.getGame(game_name);
                 mongoGames.put(game_name, game);
             } catch (UnknownHostException uh) {
-                System.out.println(uh.toString());
+                uh.printStackTrace();
                 game = null;
             }
         }
