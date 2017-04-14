@@ -18,6 +18,7 @@ import java.util.TreeMap;
 public class MongoController implements IDatabaseController{
     private int MAX_TRAIN;
     private MongoDriver driver;
+
     private TreeMap mongoGames;
 
     public MongoController(int maxTrain) {
@@ -62,7 +63,18 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Player getPlayerInfo(String player) {
-        return null;
+        try{
+            MongoUser user = driver.getUser(player);
+            if (user == null){
+                return null;
+            }
+            else{
+                return new Player(player,user.getToken());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -135,22 +147,77 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public GameList getGames(String player) {
-        return null;
+       try{
+           List<MongoGame> games = driver.getGamesWithPlayer(player);
+           GameList gameList = new GameList();
+           for (MongoGame mg : games){
+               Boolean started = mg.getCheckpoint() == null;
+               GameListItem gli = new GameListItem(mg.getGameName(),mg.getGameName(),started,mg.getPlayers());
+               gameList.add(gli);
+           }
+           return gameList;
+       }catch(Exception e){
+           e.printStackTrace();
+           return null;
+       }
     }
 
     @Override
-    public Boolean joinGame(String player, String gameID) {
-        return null;
+    public Boolean joinGame(String player, String gameName) {
+        try{
+            MongoGame mg = driver.getGame(gameName);
+            if (mg == null || mg.getPlayers().size() >= 5 || mg.getCheckpoint() != null){
+                return false;
+            }
+            else{
+                List<String> players = mg.getPlayers();
+                players.add(player);
+                mg.setPlayers(players);
+                driver.setGame(mg);
+                return true;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
-    public Boolean leaveGame(String player, String gameID) {
-        return null;
+    public Boolean leaveGame(String player, String gameName) {
+        try{
+            MongoGame mg = driver.getGame(gameName);
+            if (mg == null || mg.getCheckpoint() != null){
+                return false;
+            }
+            else{
+                List<String> players = mg.getPlayers();
+                if (!players.contains(player)){
+                    return false;
+                }
+                else{
+                    players.remove(player);
+                    mg.setPlayers(players);
+                    driver.setGame(mg);
+                    return true;
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public void maybeDropGame(String gameName) {
+        try{
+            MongoGame mg = driver.getGame(gameName);
+            if (mg.getPlayers().isEmpty()){
+                //driver needs delete function.
+            }
+        }catch (Exception e){
+            e.printStackTrace();
 
+        }
     }
 
     @Override
