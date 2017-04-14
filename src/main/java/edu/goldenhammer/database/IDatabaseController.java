@@ -45,10 +45,10 @@ Player registration and login
 
     /**
      *
-     * @param userID
+     * @param username
      * @param accessToken
      */
-    void setAccessToken(String userID, String accessToken);
+    void setAccessToken(String username, String accessToken);
 
     /*
     Game management
