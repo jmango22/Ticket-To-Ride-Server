@@ -31,7 +31,7 @@ public class MongoController implements IDatabaseController{
                     mongoGames.put(game_name, game);
                 }
             } catch (UnknownHostException uh) {
-                System.out.println(uh.toString());
+                uh.printStackTrace();
                 game = null;
             }
         }
