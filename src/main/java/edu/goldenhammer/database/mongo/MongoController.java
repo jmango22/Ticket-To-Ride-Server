@@ -3,17 +3,40 @@ package edu.goldenhammer.database.mongo;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.mongoStuff.MongoDriver;
+import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.mongoStuff.MongoUser;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.LastTurnCommand;
 
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by seanjib on 4/9/2017.
  */
 public class MongoController implements IDatabaseController{
     private MongoDriver driver;
+    private TreeMap mongoGames = new TreeMap<String, MongoGame>();
+
+    private MongoGame getGame(String game_name) {
+        MongoGame game;
+        if(mongoGames.containsKey(game_name)) {
+            game = (MongoGame) mongoGames.get(game_name);
+        } else {
+            try {
+                game = driver.getGame(game_name);
+                if(game != null) {
+                    mongoGames.put(game_name, game);
+                }
+            } catch (UnknownHostException uh) {
+                uh.printStackTrace();
+                game = null;
+            }
+        }
+        return game;
+    }
 
     public MongoController(){
         driver = new MongoDriver();
@@ -198,11 +221,30 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean isEndOfGame(String game_name) {
+        int player = - 1;
+        boolean lastRound = false;
+
+        MongoGame currentGame = this.getGame(game_name);
+        for(BaseCommand command : currentGame.getCommands()) {
+            if(lastRound && (command.getName().equals("EndTurn") && command.getPlayerNumber() == player)) {
+                return true;
+            }
+            else if(command.getName().equals("LastTurn")) {
+                player = command.getPlayerNumber();
+                lastRound = true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean alreadyLastRound(String game_name) {
+        MongoGame currentGame = this.getGame(game_name);
+        for(BaseCommand command : currentGame.getCommands()) {
+            if(command.getName().equals("LastTurn")) {
+                return true;
+            }
+        }
         return false;
     }
 
