@@ -22,6 +22,15 @@ public class MongoGame implements Serializable {
     List<String> players;
     String gameName;
 
+    public MongoGame(String name){
+        commands = new ArrayList<>();
+        chatMessages = new ArrayList<>();
+        checkpoint = null;
+        checkpointIndex = -1;
+        players = new ArrayList<>();
+        gameName = name;
+    }
+
     public MongoGame(GameModel checkpoint, int checkpointIndex, List<Message> chatMessages, List<BaseCommand> commands, List<String> players) {
         if(commands == null)
             commands = new ArrayList<>();

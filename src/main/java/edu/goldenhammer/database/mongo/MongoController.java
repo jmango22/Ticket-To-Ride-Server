@@ -77,7 +77,20 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public Boolean createGame(String name) {
-        return null;
+        try{
+            MongoGame g = driver.getGame(name);
+            if (g == null){
+                MongoGame creation = new MongoGame(name);
+                driver.setGame(creation);
+                return true;
+            }
+            else{
+                return false;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
