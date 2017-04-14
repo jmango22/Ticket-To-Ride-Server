@@ -16,10 +16,18 @@ import java.util.TreeMap;
  * Created by seanjib on 4/9/2017.
  */
 public class MongoController implements IDatabaseController{
+    private int MAX_TRAIN;
     private MongoDriver driver;
     private TreeMap mongoGames;
 
+    public MongoController(int maxTrain) {
+        MAX_TRAIN=maxTrain;
+        driver = new MongoDriver();
+        mongoGames = new TreeMap<String, GameModel>();
+    }
+
     public MongoController(){
+        MAX_TRAIN=45;
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
     }
@@ -40,6 +48,16 @@ public class MongoController implements IDatabaseController{
             }
         }
         return game;
+    }
+
+    private int getPlayerNumber(MongoGame currentGame, String player_name) {
+        int playerId = -1;
+        for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
+            if(player.getUsername().equals(player_name)) {
+                playerId = player.getPlayer();
+            }
+        }
+        return playerId;
     }
 
     @Override
@@ -212,17 +230,32 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove) {
+        MongoGame currentGame = getGame(game_name);
+        int playerId = this.getPlayerNumber(currentGame, username);
 
+        for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
+            player.setPieces(player.getPieces()-trainsToRemove);
+        }
     }
 
     @Override
     public List<Track> getTracks(String game_name) {
-        return null;
+        return this.getGame(game_name).getCheckpoint().getMap().getTracks();
     }
 
     @Override
     public int numTrainsLeft(String game_name, String player_name) {
-        return 0;
+        MongoGame currentGame = getGame(game_name);
+        int playerTrains=MAX_TRAIN;
+        int playerNumber = this.getPlayerNumber(currentGame, player_name);
+
+        for(Track track : currentGame.getCheckpoint().getMap().getTracks()) {
+            if(track.getOwner() == playerNumber) {
+                playerTrains = playerTrains-track.getLength();
+            }
+        }
+
+        return playerTrains;
     }
 
     @Override
