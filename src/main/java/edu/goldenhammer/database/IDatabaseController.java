@@ -251,25 +251,28 @@ Player registration and login
      */
 
     /**
-     *
+     * Checks to make sure the a route can be claimed, according to the following criteria:
+     * -The route has not yet been claimed
+     * -If the route is a double, the player doesn't own the other double route
+     * -The player has enough trains left to lay the track
      * @param game_name
      * @param username
      * @param route_number
-     * @return
+     * @return whether the player can claim the route
      */
     boolean canClaimRoute(String game_name, String username, int route_number);
 
     /**
-     *
+     * Assigns the route to the player with no extra checking
      * @param game_name
      * @param username
      * @param route_number
-     * @return
+     * @return whether the player has successfully claimed the route
      */
     boolean claimRoute(String game_name, String username, int route_number);
 
     /**
-     *
+     * Decrements the number of trains owned by the player by the number given in trainsToRemove
      * @param game_name
      * @param username
      * @param trainsToRemove
@@ -277,17 +280,18 @@ Player registration and login
     void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove);
 
     /**
-     *
+     * Gets all the tracks and their associated data, including who owns them and what cities they connect.
+     *  Look in the Track object for all the data you need to find.
      * @param game_name
-     * @return
+     * @return A list of all the tracks in the game, fully populated with data
      */
     List<Track> getTracks(String game_name);
 
     /**
-     *
+     * Finds how many trains the player has left in the game
      * @param game_name
      * @param player_name
-     * @return
+     * @return the number of trains the player has left
      */
     int numTrainsLeft(String game_name, String player_name);
 
