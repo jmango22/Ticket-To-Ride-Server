@@ -441,6 +441,11 @@ public class SQLController implements IDatabaseController {
         return new GameModel(players, destinationDeck, trainCardDeck, map, gameName, getSlotCardColors(game_name));
     }
 
+    @Override
+    public void updateCurrentPlayer(int nextPlayer) {
+
+    }
+
     private void setInitialGameModel(IGameModel initialModel, String gameName) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format(

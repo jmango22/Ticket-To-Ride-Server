@@ -331,4 +331,6 @@ Player registration and login
      * @return
      */
     GameModel getGameModel(String game_name);
+
+    void updateCurrentPlayer(int nextPlayer);
 }
