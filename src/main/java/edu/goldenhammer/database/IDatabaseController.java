@@ -300,43 +300,48 @@ Player registration and login
      */
 
     /**
-     *
+     * Adds the command to the database, according to the following criteria:
+     * -If the command number is zero, it will be instantly added to the database only if
+     *  there is no currently-existing command with the number zero
+     * -If the command number is greater than zero, it will only be added if the command number
+     *  doesn't exist yet, but the previous command number does exist.
      * @param cmd
      * @param visibleToSelf
      * @param visibleToAll
-     * @return
+     * @return whether the command was added to the database
      */
     boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll);
 
     /**
-     *
+     * Generates (but does not execute or store in the database) an EndTurnCommand for the given player. Finds
+     * the previous and next players to store in the command.
      * @param gameName
      * @param commandNumber
      * @param playerName
-     * @return
+     * @return the generated EndTurnCommand
      */
     EndTurnCommand getEndTurnCommand(String gameName, int commandNumber, String playerName);
 
     /**
-     *
+     * Gets a list of all the commands generated since the given command number
      * @param game_name
      * @param player_name
      * @param lastCommandID
-     * @return
+     * @return A list of all commands newer than the given number
      */
     List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID);
 
     /**
-     *
+     * Makes sure that the input command is either number zero or one number higher than the previous command
      * @param command
-     * @return
+     * @return whether the command is the correct number
      */
     boolean validateCommand(BaseCommand command);
 
     /**
-     *
+     * Finds the number of DrawTrainCard commands since the last EndTurn command
      * @param game_name
-     * @return
+     * @return the number of DrawTrainCard commands since the last EndTurn command
      */
     int getNumberOfDrawTrainCommands(String game_name);
 
@@ -345,16 +350,16 @@ Player registration and login
      */
 
     /**
-     *
+     * Checks if a full round has passed since the LastRound command was added.
      * @param game_name
-     * @return
+     * @return whether or not the game is over
      */
     boolean isEndOfGame(String game_name);
 
     /**
-     *
+     * Looks to see if the game contains a LastRound command
      * @param game_name
-     * @return
+     * @return whether the game is already in the LastRound phase
      */
     boolean alreadyLastRound(String game_name);
 
@@ -363,9 +368,9 @@ Player registration and login
      */
 
     /**
-     *
+     * Builds and returns the current model of the game, as stored in the database
      * @param game_name
-     * @return
+     * @return the constructed GameModel
      */
     GameModel getGameModel(String game_name);
 }
