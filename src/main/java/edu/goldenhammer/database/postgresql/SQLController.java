@@ -442,7 +442,7 @@ public class SQLController implements IDatabaseController {
     }
 
     @Override
-    public void updateCurrentPlayer(int nextPlayer) {
+    public void updateCurrentPlayer(String game_name, int nextPlayer) {
 
     }
 

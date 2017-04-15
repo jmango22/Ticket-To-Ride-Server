@@ -385,7 +385,8 @@ public class MongoController implements IDatabaseController{
     }
 
     @Override
-    public void updateCurrentPlayer(int nextPlayer) {
+    public void updateCurrentPlayer(String game_name, int nextPlayer) {
+        getGameModel(game_name).setCurrentTurn(nextPlayer);
 
     }
 }
