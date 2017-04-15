@@ -19,6 +19,7 @@ public class EndTurnCommand extends BaseCommand {
         IDatabaseController dbc = DatabaseController.getInstance();
         dbc.addCommand(this,true,true);
         addToDatabase(true, true);
+        dbc.updateCurrentPlayer(getGameName(), nextPlayer);
         return new Results();
     }
 

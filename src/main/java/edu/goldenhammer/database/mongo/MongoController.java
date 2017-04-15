@@ -405,4 +405,10 @@ public class MongoController implements IDatabaseController{
     public GameModel getGameModel(String game_name) {
         return ((MongoGame)mongoGames.get(game_name)).getCheckpoint();
     }
+
+    @Override
+    public void updateCurrentPlayer(String game_name, int nextPlayer) {
+        getGameModel(game_name).setCurrentTurn(nextPlayer);
+
+    }
 }
