@@ -9,6 +9,7 @@ import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -94,7 +95,18 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public List<String> getPlayers(String gameID) {
-        return null;
+        try{
+            MongoGame mg = driver.getGame(gameID);
+            if (mg == null){
+                return null;
+            }
+            else{
+                return mg.getPlayers();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -145,7 +157,18 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public GameList getGames() {
-        return null;
+        try{
+            List<MongoGame> list = driver.getAllGames();
+            GameList gameList = new GameList();
+            for (MongoGame mg : list){
+                Boolean started = mg.getCheckpoint() != null;
+                gameList.add(new GameListItem(mg.getGameName(),mg.getGameName(), started,mg.getPlayers()));
+            }
+            return gameList;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -290,21 +313,68 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean canClaimRoute(String game_name, String username, int route_number) {
-        return false;
+        MongoGame currentGame = getGame(game_name);
+        int playerId = getPlayerNumber(currentGame, username);
+        int trainsLeft = -1;
+        boolean result = false;
+
+        City city1 = null;
+        City city2 = null;
+
+        for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
+            if(player.getUsername().equals(username)) {
+                trainsLeft = player.getPieces();
+            }
+        }
+
+        for(Track track : currentGame.getCheckpoint().getMap().getTracks()) {
+            if(track.getRoute_number() == route_number) {
+                city1 = track.getCity1();
+                city2 = track.getCity2();
+                if(track.getOwner() == -1) {
+                    if(trainsLeft > track.getLength()) {
+                        result = true;
+                    }
+                }
+            }
+        }
+
+        //Check if double routes are allowed...
+        if(currentGame.getPlayers().size() > 3) {
+            for(Track track : currentGame.getCheckpoint().getMap().getTracks()) {
+                if(track.getRoute_number() != route_number && track.getCity1().equals(city1) && track.getCity2().equals(city2)) {
+                    // If the person owns the other route return false
+                    if(track.getOwner() == playerId) {
+                        result = false;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
     public boolean claimRoute(String game_name, String username, int route_number) {
-        return false;
+        boolean result = false;
+        MongoGame currentGame = getGame(game_name);
+        for(Track track : currentGame.getCheckpoint().getMap().getTracks()) {
+            if(track.getRoute_number() == route_number) {
+                track.setOwner(getPlayerNumber(currentGame, username));
+                result = true;
+            }
+        }
+        return result;
     }
 
     @Override
     public void removeTrainsFromPlayer(String game_name, String username, int trainsToRemove) {
         MongoGame currentGame = getGame(game_name);
-        int playerId = this.getPlayerNumber(currentGame, username);
 
         for(PlayerOverview player : currentGame.getCheckpoint().getPlayers()) {
-            player.setPieces(player.getPieces()-trainsToRemove);
+            if(player.getUsername().equals(username)) {
+                player.setPieces(player.getPieces() - trainsToRemove);
+            }
         }
     }
 
@@ -348,22 +418,69 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public EndTurnCommand getEndTurnCommand(String gameName, int commandNumber, String playerName) {
-        return null;
+        EndTurnCommand newEndTurn = new EndTurnCommand();
+        MongoGame currentGame = getGame(gameName);
+        int numPlayers = currentGame.getCheckpoint().getPlayers().size();
+        int playerId = getPlayerNumber(currentGame, playerName);
+
+        if(playerId > 0) {
+            newEndTurn.setPreviousPlayer(playerId-1);
+        }
+
+        if(playerId < (numPlayers-1)) {
+            newEndTurn.setNextPlayer(playerId+1);
+        } else {
+            newEndTurn.setNextPlayer(0);
+        }
+
+        return newEndTurn;
     }
 
     @Override
     public List<BaseCommand> getCommandsSinceLastCommand(String game_name, String player_name, int lastCommandID) {
-        return null;
+        List<BaseCommand> remainingCommands = new ArrayList<BaseCommand>();
+        MongoGame currentGame = getGame(game_name);
+        for(BaseCommand command : currentGame.getCommands()) {
+            if(command.getCommandNumber() > lastCommandID) {
+                remainingCommands.add(command);
+            }
+        }
+        return remainingCommands;
     }
 
     @Override
     public boolean validateCommand(BaseCommand command) {
-        return false;
+        boolean valid = false;
+        MongoGame currentGame = getGame(command.getGameName());
+
+        int commandNumber = command.getCommandNumber();
+        int lastCommandExecuted = currentGame.getCommands().get(currentGame.getCommands().size()-1).getCommandNumber();
+        if(commandNumber == (lastCommandExecuted+1)) {
+            valid = true;
+        }
+
+        return valid;
     }
 
     @Override
     public int getNumberOfDrawTrainCommands(String game_name) {
-        return 0;
+        MongoGame currentGame = getGame(game_name);
+        int numberOfDrawCommands = 0;
+        int indexOfLastEndTurn = 0;
+
+        for(BaseCommand command : currentGame.getCommands()) {
+            if(command.getName().equals("EndTurn")) {
+                indexOfLastEndTurn = command.getCommandNumber();
+            }
+        }
+
+        for(int i=indexOfLastEndTurn; i<currentGame.getCommands().size(); i++) {
+            if(currentGame.getCommands().get(i).getName().equals("DrawTrainCard")) {
+                numberOfDrawCommands++;
+            }
+        }
+
+        return numberOfDrawCommands;
     }
 
     @Override

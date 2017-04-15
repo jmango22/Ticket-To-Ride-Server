@@ -1,8 +1,12 @@
 package edu.goldenhammer.mongoStuff;
 
 import com.google.gson.*;
+
+import edu.goldenhammer.model.DestinationCard;
 import edu.goldenhammer.model.GameModel;
+import edu.goldenhammer.model.Hand;
 import edu.goldenhammer.model.Message;
+import edu.goldenhammer.model.TrainCard;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
 
@@ -10,6 +14,8 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by devonkinghorn on 4/10/17.
@@ -21,6 +27,11 @@ public class MongoGame implements Serializable {
     List<BaseCommand> commands;
     List<String> players;
     String gameName;
+    Map<String, Hand> hands = new TreeMap<>();
+    List<DestinationCard> destDeck;
+    List<DestinationCard> destDiscard;
+    List<TrainCard> trainDeck;
+    List<TrainCard> trainDiscard;
 
     public MongoGame(String name){
         commands = new ArrayList<>();
