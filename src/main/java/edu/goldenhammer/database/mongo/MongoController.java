@@ -91,7 +91,18 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public List<String> getPlayers(String gameID) {
-        return null;
+        try{
+            MongoGame mg = driver.getGame(gameID);
+            if (mg == null){
+                return null;
+            }
+            else{
+                return mg.getPlayers();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -142,7 +153,18 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public GameList getGames() {
-        return null;
+        try{
+            List<MongoGame> list = driver.getAllGames();
+            GameList gameList = new GameList();
+            for (MongoGame mg : list){
+                Boolean started = mg.getCheckpoint() != null;
+                gameList.add(new GameListItem(mg.getGameName(),mg.getGameName(), started,mg.getPlayers()));
+            }
+            return gameList;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
