@@ -18,19 +18,22 @@ import java.util.TreeMap;
 public class MongoController implements IDatabaseController{
     private int MAX_TRAIN;
     private MongoDriver driver;
+    private int betweenCheckpoint;
 
     private TreeMap mongoGames;
 
-    public MongoController(int maxTrain) {
+    public MongoController(int maxTrain, int betweenCheckpoint) {
         MAX_TRAIN=maxTrain;
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
+        this.betweenCheckpoint = betweenCheckpoint;
     }
 
     public MongoController(){
         MAX_TRAIN=45;
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
+        betweenCheckpoint = 5;
     }
 
     private MongoGame getGame(String game_name) {
@@ -327,6 +330,19 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean addCommand(BaseCommand cmd, boolean visibleToSelf, boolean visibleToAll) {
+        try {
+            MongoGame game = getGame(cmd.getGameName());
+            game.getCommands().add(cmd);
+            if (!(game.getCommands().size() - (game.getCheckpointIndex() + 1) == betweenCheckpoint)) {
+                MongoGame oldgame = driver.getGame(cmd.getGameName());
+                oldgame.getCommands().add(cmd);
+                driver.setGame(oldgame);
+            }else{
+                game.setCheckpointIndex(game.getCheckpointIndex()+betweenCheckpoint);
+                driver.setGame(game);
+            }
+            return true;
+        }catch (UnknownHostException e){   }
         return false;
     }
 
