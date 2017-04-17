@@ -9,9 +9,9 @@ import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 
 /**
  * Created by seanjib on 4/9/2017.
@@ -288,17 +288,70 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public DestinationCard drawRandomDestinationCard(String gameName, String playerName) {
-        return null;
+        // Need to pull it out of the cards and put it into limbo...
+        MongoGame currentGame = getGame(gameName);
+        Random rand = new Random();
+        int n = rand.nextInt(currentGame.getDestDeck().size());
+        DestinationCard randomCard = currentGame.getDestDeck().get(n);
+
+        // Now remove that from the deck, putting it in limbo
+        Iterator<DestinationCard> it = currentGame.getDestDeck().iterator();
+        while(it.hasNext()) {
+            DestinationCard temp = it.next();
+            if(temp.equals(randomCard)) {
+                it.remove();
+            }
+        }
+        return randomCard;
     }
 
     @Override
     public List<DestinationCard> getPlayerDestinationCards(String game_name, String player_name) {
-        return null;
+        MongoGame currentGame = getGame(game_name);
+        Hand playerHand = currentGame.getHands().get(player_name);
+        return playerHand.getDestinationCards();
     }
 
     @Override
     public boolean returnDestCards(String gameName, String playerName, List<DestinationCard> destinationCards) {
-        return false;
+        MongoGame currentGame = getGame(gameName);
+        Hand playerHand = currentGame.getHands().get(playerName);
+
+        //If needs to test if it's initializing hand, then it has to be 0 or 1 card, otherwise can be up to 2.
+        if((currentGame.getCommands().get(currentGame.getCommands().size()-1)).getName().equals("InitializeHand")) {
+            if(destinationCards.size() > 1) {
+                return false;
+            }
+        } else {
+            if(destinationCards.size() > 2) {
+                return false;
+            }
+        }
+
+        //List of drawn but not added dest cards
+        List<DestinationCard> playerCards = asList(playerHand.getDrawnDestinationCards().getCards());
+
+        //Go through the discarded cards and make sure they are in the players hand
+        for(DestinationCard disCard : destinationCards)
+        {
+            boolean assigned = false;
+            Iterator<DestinationCard> it = playerCards.iterator();
+            while(it.hasNext()) {
+                DestinationCard playerCard = it.next();
+                if(disCard.equals(playerCard)) {
+                    assigned = true;
+                    currentGame.getDestDiscard().add(disCard);
+                    it.remove();
+                }
+            }
+            // The card was never drawn by that player...
+            if(!assigned) {
+                return false;
+            }
+        }
+
+        playerHand.setDrawnDestinationCards(new DrawnDestinationCards(new ArrayList<DestinationCard>()));
+        return true;
     }
 
     @Override

@@ -104,6 +104,46 @@ public class MongoGame implements Serializable {
         this.gameName = gameName;
     }
 
+    public Map<String, Hand> getHands() {
+        return hands;
+    }
+
+    public void setHands(Map<String, Hand> hands) {
+        this.hands = hands;
+    }
+
+    public List<DestinationCard> getDestDeck() {
+        return destDeck;
+    }
+
+    public void setDestDeck(List<DestinationCard> destDeck) {
+        this.destDeck = destDeck;
+    }
+
+    public List<DestinationCard> getDestDiscard() {
+        return destDiscard;
+    }
+
+    public void setDestDiscard(List<DestinationCard> destDiscard) {
+        this.destDiscard = destDiscard;
+    }
+
+    public List<TrainCard> getTrainDeck() {
+        return trainDeck;
+    }
+
+    public void setTrainDeck(List<TrainCard> trainDeck) {
+        this.trainDeck = trainDeck;
+    }
+
+    public List<TrainCard> getTrainDiscard() {
+        return trainDiscard;
+    }
+
+    public void setTrainDiscard(List<TrainCard> trainDiscard) {
+        this.trainDiscard = trainDiscard;
+    }
+
     protected static class BaseCommandAdapter implements JsonDeserializer<BaseCommand>, JsonSerializer<BaseCommand> {
         @Override
         public BaseCommand deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
