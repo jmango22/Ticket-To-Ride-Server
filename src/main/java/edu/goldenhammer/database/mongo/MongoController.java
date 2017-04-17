@@ -1,17 +1,27 @@
 package edu.goldenhammer.database.mongo;
 
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.postgresql.data_types.SQLDestinationCard;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.mongoStuff.MongoDriver;
 import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.mongoStuff.MongoUser;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import javafx.util.Pair;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.net.UnknownHostException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.TreeMap;
+
 import java.util.*;
 
 import static java.util.Arrays.asList;
+
 
 /**
  * Created by seanjib on 4/9/2017.
@@ -19,7 +29,14 @@ import static java.util.Arrays.asList;
 public class MongoController implements IDatabaseController{
     private int MAX_TRAIN;
     private MongoDriver driver;
+
+    private TreeMap<String, City> allCities;
+    private TreeMap<Pair<City,City>,Track> allTracks;
+    public static final int ROUTE_COUNT = 101;
+    public static final int CITY_COUNT = 35;
+
     private int betweenCheckpoint;
+
 
     private TreeMap mongoGames;
 
@@ -27,14 +44,20 @@ public class MongoController implements IDatabaseController{
         MAX_TRAIN=maxTrain;
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
+
         this.betweenCheckpoint = betweenCheckpoint;
+
     }
 
     public MongoController(){
         MAX_TRAIN=45;
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
+
+        allCities = new TreeMap<String,City>();
+
         betweenCheckpoint = 5;
+
     }
 
     private MongoGame getGame(String game_name) {
@@ -238,17 +261,128 @@ public class MongoController implements IDatabaseController{
         try{
             MongoGame mg = driver.getGame(gameName);
             if (mg.getPlayers().isEmpty()){
-                //driver needs delete function.
+                driver.removeGame(mg.getGameName());
             }
         }catch (Exception e){
             e.printStackTrace();
-
         }
     }
 
     @Override
     public IGameModel playGame(String gameID) {
-        return null;
+        try{
+            MongoGame mg = driver.getGame(gameID);
+            if (mg == null){
+                return null;
+            }
+            else if (mg.getCheckpoint() != null){
+                return mg.getCheckpoint();
+            }
+            else{
+                List<PlayerOverview> leaderboard = new ArrayList<>();
+                List<TrainCard> trainCardDeck = initializeTrainCards();
+                List<DestinationCard> destCardDeck = initializeDestCards();
+                //TrainCard[] bankCards = new TrainCard[5];
+                List<Color> bank = new ArrayList<>();
+                for (int i=0; i<5; i++){
+                    bank.add((trainCardDeck.get(0).getColor()));
+                    trainCardDeck.remove(0);
+                }
+
+                Map map = initializeMap();
+                GameName g = new GameName(gameID);
+                GameModel model = new GameModel(leaderboard,map,g,bank);
+
+                mg.setCheckpoint(model);
+                mg.setCheckpointIndex(-1); //TODO should this be -1 or 0
+                mg.setDestDeck(destCardDeck);
+                mg.setTrainDeck(trainCardDeck);
+
+                return model;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private Map initializeMap(){
+        List<City> cities = initializeCities();
+        List<Track> tracks = initializeTracks();
+        Map map = new Map(tracks,cities);
+        return map;
+    }
+
+    private List<City> initializeCities(){
+        List<City> cityList = new ArrayList<>();
+        String pathName = "/cities.txt";
+        Scanner cities = new Scanner(getClass().getResourceAsStream(pathName));
+        for (int i = 0; i < CITY_COUNT * 3; i += 3) {
+            String city = cities.nextLine();
+            String[] vars = city.split(",");
+            City c = new City(Integer.parseInt(vars[1]),Integer.parseInt(vars[2]),vars[0]);
+            cityList.add(c);
+            allCities.put(vars[0],c);
+        }
+        return cityList;
+    }
+
+    private List<Track> initializeTracks(){
+        List<Track> trackList = new ArrayList<>();
+        String pathName = "/routes.txt";
+        Scanner routes = new Scanner(getClass().getResourceAsStream(pathName));
+        for (int i = 0; i < ROUTE_COUNT * 5; i += 5) {
+            String route = routes.nextLine();
+            String[] vars = route.split(",");
+            City city1 = allCities.get(vars[0]);
+            City city2 = allCities.get(vars[1]);
+            int length = Integer.parseInt(vars[3]);
+            int id = (i / 5) + 1;
+            Color color = Color.getTrackColorFromString(vars[2]);
+            Boolean secondTrack = allTracks.containsKey(new Pair<>(city1,city2));
+            Track t = new Track(city1,city2,length,color,-1,
+                    city1.getX_location(),city1.getY_location(),
+                    city2.getX_location(),city2.getY_location(),
+                    id,secondTrack);
+            trackList.add(t);
+            allTracks.put(new Pair<>(city1,city2),t);
+
+        }
+        return trackList;
+    }
+
+    private List<DestinationCard> initializeDestCards(){
+        List<DestinationCard> destCardList = new ArrayList<>();
+        String pathName = "/destinations.txt";
+        Scanner destinations = new Scanner(getClass().getResourceAsStream(pathName));
+        for(int i = 0; i < SQLDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
+            String destination = destinations.nextLine();
+            String[] vars = destination.split(",");
+            City city1 = allCities.get(vars[0]);
+            City city2 = allCities.get(vars[1]);
+            int points = Integer.parseInt(vars[2]);
+            DestinationCard d = new DestinationCard(city1,city2,points);
+            destCardList.add(d);
+
+        }
+        return destCardList;
+    }
+
+    private List<TrainCard> initializeTrainCards(){
+        List<TrainCard> trainCardList = new ArrayList<>();
+        for (int i=0; i<12; i++){
+            trainCardList.add(new TrainCard(Color.BLACK));
+            trainCardList.add(new TrainCard(Color.BLUE));
+            trainCardList.add(new TrainCard(Color.PURPLE));
+            trainCardList.add(new TrainCard(Color.RED));
+            trainCardList.add(new TrainCard(Color.GREEN));
+            trainCardList.add(new TrainCard(Color.ORANGE));
+            trainCardList.add(new TrainCard(Color.YELLOW));
+            trainCardList.add(new TrainCard(Color.WHITE));
+            trainCardList.add(new TrainCard(Color.WILD));
+        }
+        trainCardList.add(new TrainCard(Color.WILD));
+        trainCardList.add(new TrainCard(Color.WILD));
+        return trainCardList;
     }
 
     @Override

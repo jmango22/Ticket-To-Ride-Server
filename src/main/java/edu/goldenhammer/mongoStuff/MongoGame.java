@@ -40,6 +40,10 @@ public class MongoGame implements Serializable {
         checkpointIndex = -1;
         players = new ArrayList<>();
         gameName = name;
+        destDeck = new ArrayList<>();
+        destDiscard = new ArrayList<>();
+        trainDeck = new ArrayList<>();
+        trainDiscard = new ArrayList<>();
     }
 
     public MongoGame(GameModel checkpoint, int checkpointIndex, List<Message> chatMessages, List<BaseCommand> commands, List<String> players) {
@@ -54,6 +58,50 @@ public class MongoGame implements Serializable {
         this.commands = commands;
         this.players = players;
         this.gameName = checkpoint.getName().toString();
+        destDeck = new ArrayList<>();
+        destDiscard = new ArrayList<>();
+        trainDeck = new ArrayList<>();
+        trainDiscard = new ArrayList<>();
+    }
+
+    public Map<String, Hand> getHands() {
+        return hands;
+    }
+
+    public void setHands(Map<String, Hand> hands) {
+        this.hands = hands;
+    }
+
+    public List<DestinationCard> getDestDeck() {
+        return destDeck;
+    }
+
+    public void setDestDeck(List<DestinationCard> destDeck) {
+        this.destDeck = destDeck;
+    }
+
+    public List<DestinationCard> getDestDiscard() {
+        return destDiscard;
+    }
+
+    public void setDestDiscard(List<DestinationCard> destDiscard) {
+        this.destDiscard = destDiscard;
+    }
+
+    public List<TrainCard> getTrainDeck() {
+        return trainDeck;
+    }
+
+    public void setTrainDeck(List<TrainCard> trainDeck) {
+        this.trainDeck = trainDeck;
+    }
+
+    public List<TrainCard> getTrainDiscard() {
+        return trainDiscard;
+    }
+
+    public void setTrainDiscard(List<TrainCard> trainDiscard) {
+        this.trainDiscard = trainDiscard;
     }
 
     public GameModel getCheckpoint() {

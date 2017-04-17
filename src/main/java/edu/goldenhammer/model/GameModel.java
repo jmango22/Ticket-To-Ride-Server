@@ -7,18 +7,14 @@ import java.util.List;
  */
 public class GameModel implements IGameModel {
     private List<PlayerOverview> players;
-    private List<DestinationCard> destinationDeck;
-    private List<TrainCard> trainCardDeck;
     private Map map;
     private GameName name;
     private List<Color> mBank;
     private int checkpointIndex;
     private int currentTurn;
 
-    public GameModel(List<PlayerOverview> players, List<DestinationCard> destinationDeck, List<TrainCard> trainCardDeck, Map map, GameName name, List<Color> mBank) {
+    public GameModel(List<PlayerOverview> players, Map map, GameName name, List<Color> mBank) {
         this.players = players;
-        this.destinationDeck = destinationDeck;
-        this.trainCardDeck = trainCardDeck;
         this.map = map;
         this.name = name;
         this.mBank = mBank;
@@ -47,22 +43,6 @@ public class GameModel implements IGameModel {
 
     public void setPlayers(List<PlayerOverview> players) {
         this.players = players;
-    }
-
-    public List<DestinationCard> getDestinationDeck() {
-        return destinationDeck;
-    }
-
-    public void setDestinationDeck(List<DestinationCard> destinationDeck) {
-        this.destinationDeck = destinationDeck;
-    }
-
-    public List<TrainCard> getTrainCardDeck() {
-        return trainCardDeck;
-    }
-
-    public void setTrainCardDeck(List<TrainCard> trainCardDeck) {
-        this.trainCardDeck = trainCardDeck;
     }
 
     public Map getMap() {
