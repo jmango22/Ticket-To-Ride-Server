@@ -262,18 +262,14 @@ public class MongoController implements IDatabaseController{
             java.util.Map<String, Hand> hands = mg.getHands();
             Hand playerHand = hands.get(playerName);
 
-            List<TrainCard> deck = mg.getTrainDeck();
-            if (deck.size() == 0) {
-                if (!shuffleTrainCards(gameName)) {
-                    return null;
-                }
+            TrainCard card = getTopTrainCard(mg);
+            if(card == null) {
+                return null;
             }
-            TrainCard card = deck.remove(deck.size() - 1);
             playerHand.addTrainCard(card);
 
             hands.put(playerName, playerHand);
             mg.setHands(hands);
-            mg.setTrainDeck(deck);
             return card;
         }
         return null;
@@ -285,31 +281,25 @@ public class MongoController implements IDatabaseController{
         if(mg != null) {
             GameModel checkpoint = mg.getCheckpoint();
             List<Color> bank = checkpoint.getBank();
-            List<TrainCard> deck = mg.getTrainDeck();
 
             Map<String, Hand> hands = mg.getHands();
             Hand hand = hands.get(player_name);
 
-            if(deck.size() == 0) {
-                if(!shuffleTrainCards(game_name)) {
-                    return null;
-                }
-            }
+            TrainCard replacementCard = getTopTrainCard(mg);
 
             Color selected = bank.get(slot);
-            if(selected == null) {
+            if(selected == null || replacementCard == null) {
                 return null;
             }
 
             TrainCard selectedCard = new TrainCard(selected);
-            TrainCard replacementCard = deck.remove(deck.size() - 1);
 
             hand.addTrainCard(selectedCard);
             bank.set(slot, replacementCard.getColor());
 
             hands.put(player_name, hand);
             mg.setHands(hands);
-            mg.setTrainDeck(deck);
+            checkpoint.setBank(bank);
             mg.setCheckpoint(checkpoint);
         }
         return null;
@@ -322,7 +312,31 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public void redealSlotCards(String game_name) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            List<Color> bank = checkpoint.getBank();
+            List<TrainCard> discardedCards = mg.getTrainDiscard();
 
+            for(int i = 0; i < bank.size(); i++) {
+                Color discarded = bank.get(i);
+                TrainCard newDiscardedCard = new TrainCard(discarded);
+                TrainCard newBankCard = getTopTrainCard(mg);
+                if(newBankCard == null) {
+                    mg.setTrainDiscard(discardedCards);
+                    checkpoint.setBank(bank);
+                    mg.setCheckpoint(checkpoint);
+                    return;
+                }
+                discardedCards.add(newDiscardedCard);
+                bank.set(i, newBankCard.getColor());
+
+            }
+
+            mg.setTrainDiscard(discardedCards);
+            checkpoint.setBank(bank);
+            mg.setCheckpoint(checkpoint);
+        }
     }
 
     @Override
@@ -572,8 +586,7 @@ public class MongoController implements IDatabaseController{
 
     }
 
-    private boolean shuffleTrainCards(String game_name) {
-        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+    private boolean shuffleTrainCards(MongoGame mg) {
         List<TrainCard> deck = mg.getTrainDeck();
         List<TrainCard> discard = mg.getTrainDiscard();
 
@@ -585,5 +598,17 @@ public class MongoController implements IDatabaseController{
         mg.setTrainDeck(deck);
         mg.setTrainDiscard(discard);
         return deck.size() > 0;
+    }
+
+    private TrainCard getTopTrainCard(MongoGame mg) {
+        List<TrainCard> deck = mg.getTrainDeck();
+        if (deck.size() == 0) {
+            if (!shuffleTrainCards(mg)) {
+                return null;
+            }
+        }
+        TrainCard card = deck.remove(deck.size() - 1);
+        mg.setTrainDeck(deck);
+        return card;
     }
 }
