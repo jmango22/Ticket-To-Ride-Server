@@ -40,7 +40,7 @@ public class MongoDriver {
         return getCollection("user");
     }
 
-    private boolean removeGame(String gameName) throws UnknownHostException {
+    public boolean removeGame(String gameName) throws UnknownHostException {
         DBCollection coll = getGameCollection();
         DBObject query = new BasicDBObject("gameName", gameName);
         return coll.remove(query).getN() == 1;

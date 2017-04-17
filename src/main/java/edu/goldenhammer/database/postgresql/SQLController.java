@@ -438,7 +438,7 @@ public class SQLController implements IDatabaseController {
         List<TrainCard> trainCardDeck = getTrainCards(game_name);
         Map map = getMap(game_name);
         GameName gameName = new GameName(game_name);
-        return new GameModel(players, destinationDeck, trainCardDeck, map, gameName, getSlotCardColors(game_name));
+        return new GameModel(players, map, gameName, getSlotCardColors(game_name));
     }
 
     @Override

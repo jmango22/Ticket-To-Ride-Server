@@ -24,10 +24,10 @@ public class LayTrackCommand extends BaseCommand {
         if(dbc.canClaimRoute(getGameName(), getPlayerName(), track.getRoute_number()) &&
                 dbc.claimRoute(getGameName(), getPlayerName(), track.getRoute_number())) {
             dbc.removeTrainsFromPlayer(getGameName(), getPlayerName(), track.getLength());
-            addToDatabase(true, true);
             for(Color card : cards) {
                 dbc.discardCard(getGameName(),getPlayerName(),card);
             }
+            addToDatabase();
         }
         return new Results();
     }
@@ -62,5 +62,10 @@ public class LayTrackCommand extends BaseCommand {
         IDatabaseController dbc = DatabaseController.getInstance();
         return dbc.numTrainsLeft(getGameName(),getPlayerName()) <= 2
                 && !dbc.alreadyLastRound(getGameName());
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, true);
     }
 }
