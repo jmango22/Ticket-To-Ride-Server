@@ -14,15 +14,9 @@ import sun.security.krb5.internal.crypto.Des;
 
 import java.net.UnknownHostException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.TreeMap;
-
-import java.util.*;
-
 import static java.util.Arrays.asList;
 
+import java.util.*;
 
 /**
  * Created by seanjib on 4/9/2017.
@@ -393,11 +387,51 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public TrainCard drawRandomTrainCard(String gameName, String playerName) {
+        MongoGame mg = (MongoGame) mongoGames.get(gameName);
+        if (mg != null) {
+            java.util.Map<String, Hand> hands = mg.getHands();
+            Hand playerHand = hands.get(playerName);
+
+            TrainCard card = getTopTrainCard(mg);
+            if(card == null) {
+                return null;
+            }
+            playerHand.addTrainCard(card);
+
+            hands.put(playerName, playerHand);
+            mg.setHands(hands);
+            return card;
+        }
         return null;
     }
 
     @Override
     public TrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            List<Color> bank = checkpoint.getBank();
+
+            java.util.Map<String, Hand> hands = mg.getHands();
+            Hand hand = hands.get(player_name);
+
+            TrainCard replacementCard = getTopTrainCard(mg);
+
+            Color selected = bank.get(slot);
+            if(selected == null || replacementCard == null) {
+                return null;
+            }
+
+            TrainCard selectedCard = new TrainCard(selected);
+
+            hand.addTrainCard(selectedCard);
+            bank.set(slot, replacementCard.getColor());
+
+            hands.put(player_name, hand);
+            mg.setHands(hands);
+            checkpoint.setBank(bank);
+            mg.setCheckpoint(checkpoint);
+        }
         return null;
     }
 
@@ -408,16 +442,53 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public void redealSlotCards(String game_name) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            List<Color> bank = checkpoint.getBank();
+            List<TrainCard> discardedCards = mg.getTrainDiscard();
 
+            for(int i = 0; i < bank.size(); i++) {
+                Color discarded = bank.get(i);
+                TrainCard newDiscardedCard = new TrainCard(discarded);
+                TrainCard newBankCard = getTopTrainCard(mg);
+                if(newBankCard == null) {
+                    mg.setTrainDiscard(discardedCards);
+                    checkpoint.setBank(bank);
+                    mg.setCheckpoint(checkpoint);
+                    return;
+                }
+                discardedCards.add(newDiscardedCard);
+                bank.set(i, newBankCard.getColor());
+            }
+            mg.setTrainDiscard(discardedCards);
+            checkpoint.setBank(bank);
+            mg.setCheckpoint(checkpoint);
+        }
     }
 
     @Override
     public boolean discardCard(String gameName, String playerName, Color color) {
+        MongoGame mg = (MongoGame)mongoGames.get(gameName);
+        if(mg != null) {
+            java.util.Map<String, Hand> hands = mg.getHands();
+            Hand hand = hands.get(playerName);
+            boolean success = hand.removeTrainCard(color);
+
+            hands.put(playerName, hand);
+            mg.setHands(hands);
+            return success;
+        }
         return false;
     }
 
     @Override
     public List<Color> getSlotCardColors(String game_name) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            return checkpoint.getBank();
+        }
         return null;
     }
 
@@ -719,5 +790,31 @@ public class MongoController implements IDatabaseController{
     public void updateCurrentPlayer(String game_name, int nextPlayer) {
         getGameModel(game_name).setCurrentTurn(nextPlayer);
 
+    }
+
+    private boolean shuffleTrainCards(MongoGame mg) {
+        List<TrainCard> deck = mg.getTrainDeck();
+        List<TrainCard> discard = mg.getTrainDiscard();
+
+        for(TrainCard card : discard) {
+            deck.add(card);
+        }
+
+        Collections.shuffle(deck, new Random(System.nanoTime()));
+        mg.setTrainDeck(deck);
+        mg.setTrainDiscard(discard);
+        return deck.size() > 0;
+    }
+
+    private TrainCard getTopTrainCard(MongoGame mg) {
+        List<TrainCard> deck = mg.getTrainDeck();
+        if (deck.size() == 0) {
+            if (!shuffleTrainCards(mg)) {
+                return null;
+            }
+        }
+        TrainCard card = deck.remove(0);
+        mg.setTrainDeck(deck);
+        return card;
     }
 }
