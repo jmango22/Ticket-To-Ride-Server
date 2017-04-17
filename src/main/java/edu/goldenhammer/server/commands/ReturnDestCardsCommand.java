@@ -19,18 +19,15 @@ public class ReturnDestCardsCommand extends BaseCommand {
         setName("ReturnDestCards");
     }
 
-    //TODO: make this synchronized for part 1. make sure it's the right command number. if not, change it.
     public  Results execute() {
         IDatabaseController dbc = DatabaseController.getInstance();
         Results results = new Results();
         try {
             if(toReturn.size() == 0 || dbc.returnDestCards(getGameName(), getPlayerName(), toReturn)) {
-                //TODO: do checking to make sure this adds. If it doesn't make sure it reverses what it did.
-                dbc.addCommand(this, true, false);
                 results.setResponseCode(200);
                 Serializer serializer = new Serializer();
                 results.setMessage(serializer.serialize(this));
-                addToDatabase(true, false);
+                addToDatabase();
             }
             else {
                 results.setResponseCode(400);
@@ -53,5 +50,10 @@ public class ReturnDestCardsCommand extends BaseCommand {
     public boolean endTurn() {
         IDatabaseController dbc = DatabaseController.getInstance();
         return dbc.allHandsInitialized(getGameName());
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, false);
     }
 }

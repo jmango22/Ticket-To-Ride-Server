@@ -26,7 +26,7 @@ public class DrawDestCardsCommand extends BaseCommand {
         if(cards.size() == 3) {
             results.setResponseCode(200);
             results.setMessage(Serializer.serialize(this));
-            addToDatabase(true,false);
+            addToDatabase();
         }
         else {
             results.setResponseCode(400);
@@ -48,5 +48,10 @@ public class DrawDestCardsCommand extends BaseCommand {
     @Override
     public boolean endTurn() {
         return false;
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, false);
     }
 }
