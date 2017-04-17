@@ -11,7 +11,6 @@ import edu.goldenhammer.server.commands.DrawTrainCardCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
 import edu.goldenhammer.server.commands.LastTurnCommand;
 import javafx.util.Pair;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.net.UnknownHostException;
 
@@ -468,7 +467,6 @@ public class MongoController implements IDatabaseController{
         try {
             MongoGame mg = driver.getGame(game_name);
             List<BaseCommand> commands = mg.getCommands();
-            BaseCommand lastEndTurnCommand;
             for(int i = commands.size() - 1; i >= 0; i--) {
                 if(commands.get(i) instanceof EndTurnCommand) {
                     return i;
