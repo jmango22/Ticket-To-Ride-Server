@@ -107,6 +107,8 @@ public class MongoGame implements Serializable {
     protected static class BaseCommandAdapter implements JsonDeserializer<BaseCommand>, JsonSerializer<BaseCommand> {
         @Override
         public BaseCommand deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return Serializer.deserializeCommand(json.toString(), "edu.goldenhammer.server.commands.");
+            /*
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(json.toString(), JsonObject.class);
             String commandName = jsonObject.get("name").getAsString();
@@ -128,6 +130,7 @@ public class MongoGame implements Serializable {
                 e.printStackTrace();
             }
             return basecmd;
+            */
         }
 
         @Override

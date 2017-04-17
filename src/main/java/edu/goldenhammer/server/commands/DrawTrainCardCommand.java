@@ -30,21 +30,25 @@ public class DrawTrainCardCommand extends BaseCommand {
                 dbc.redealSlotCards(getGameName());
                 bank = getSlotCards(getGameName());
             }
-            dbc.addCommand(this, true, false);
+            addToDatabase();
             results.setMessage(Serializer.serialize(this));
         } else if(slot == 5) {
             card = dbc.drawRandomTrainCard(getGameName(), getPlayerName());
             drawnCard = card.getColor();
             bank = getSlotCards(getGameName());
-            dbc.addCommand(this, true, false);
+            addToDatabase();
             results.setMessage(Serializer.serialize(this));
         } else {
             results.setResponseCode(400);
             results.setAndSerializeMessage("Error: an error occurred while drawing a card from slot " + slot);
         }
         drawnCard = card.getColor();
-        addToDatabase(true, false);
         return null;
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, false);
     }
 
     @Override

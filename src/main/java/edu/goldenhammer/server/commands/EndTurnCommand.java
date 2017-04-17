@@ -16,9 +16,7 @@ public class EndTurnCommand extends BaseCommand {
 
     @Override
     public Results execute() {
-        IDatabaseController dbc = DatabaseController.getInstance();
-        dbc.addCommand(this,true,true);
-        addToDatabase(true, true);
+        addToDatabase();
         return new Results();
     }
 
@@ -36,5 +34,9 @@ public class EndTurnCommand extends BaseCommand {
 
     public void setNextPlayer(int nextPlayer) {
         this.nextPlayer = nextPlayer;
+    }
+
+    protected void addToDatabase() {
+        super.addToDatabase(true, true);
     }
 }
