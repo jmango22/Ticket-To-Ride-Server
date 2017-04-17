@@ -478,6 +478,11 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public List<Color> getSlotCardColors(String game_name) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            return checkpoint.getBank();
+        }
         return null;
     }
 
