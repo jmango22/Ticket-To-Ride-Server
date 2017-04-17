@@ -80,4 +80,12 @@ public class GameModel implements IGameModel {
     public void setName(GameName name) {
         this.name = name;
     }
+
+    public List<Color> getBank() {
+        return mBank;
+    }
+
+    public void setBank(List<Color> mBank) {
+        this.mBank = mBank;
+    }
 }
