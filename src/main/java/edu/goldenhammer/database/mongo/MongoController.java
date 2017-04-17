@@ -473,6 +473,16 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean discardCard(String gameName, String playerName, Color color) {
+        MongoGame mg = (MongoGame)mongoGames.get(gameName);
+        if(mg != null) {
+            Map<String, Hand> hands = mg.getHands();
+            Hand hand = hands.get(playerName);
+            boolean success = hand.removeTrainCard(color);
+
+            hands.put(playerName, hand);
+            mg.setHands(hands);
+            return success;
+        }
         return false;
     }
 
@@ -807,7 +817,7 @@ public class MongoController implements IDatabaseController{
                 return null;
             }
         }
-        TrainCard card = deck.remove(deck.size() - 1);
+        TrainCard card = deck.remove(0);
         mg.setTrainDeck(deck);
         return card;
     }
