@@ -30,7 +30,6 @@ public class MongoGame implements Serializable {
     Map<String, Hand> hands = new TreeMap<>();
     List<DestinationCard> destDeck;
     List<DestinationCard> destDiscard;
-    //need trainSlots
     List<TrainCard> trainDeck;
     List<TrainCard> trainDiscard;
 

@@ -15,6 +15,7 @@ import sun.security.krb5.internal.crypto.Des;
 import java.net.UnknownHostException;
 
 import java.util.*;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 
@@ -388,31 +389,61 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public TrainCard drawRandomTrainCard(String gameName, String playerName) {
-        try{
-            MongoGame mg = driver.getGame(gameName);
-            if (mg != null){
-                java.util.Map<String, Hand> hands = mg.getHands();
-                Hand playerHand = hands.get(playerName);
+        MongoGame mg = (MongoGame) mongoGames.get(gameName);
+        if (mg != null) {
+            java.util.Map<String, Hand> hands = mg.getHands();
+            Hand playerHand = hands.get(playerName);
 
-                List<TrainCard> deck = mg.getTrainDeck();
-                Random random = new Random();
-                int randomCardIndex = random.nextInt() % deck.size();
-                TrainCard card = deck.remove(randomCardIndex);
-                playerHand.addTrainCard(card);
-
-                hands.put(playerName, playerHand);
-                mg.setHands(hands);
-                mg.setTrainDeck(deck);
-                driver.setGame(mg);
+            List<TrainCard> deck = mg.getTrainDeck();
+            if (deck.size() == 0) {
+                if (!shuffleTrainCards(gameName)) {
+                    return null;
+                }
             }
-        }catch(Exception e){
-            e.printStackTrace();
+            TrainCard card = deck.remove(deck.size() - 1);
+            playerHand.addTrainCard(card);
+
+            hands.put(playerName, playerHand);
+            mg.setHands(hands);
+            mg.setTrainDeck(deck);
+            return card;
         }
         return null;
     }
 
     @Override
     public TrainCard drawTrainCardFromSlot(String game_name, String player_name, int slot) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        if(mg != null) {
+            GameModel checkpoint = mg.getCheckpoint();
+            List<Color> bank = checkpoint.getBank();
+            List<TrainCard> deck = mg.getTrainDeck();
+
+            Map<String, Hand> hands = mg.getHands();
+            Hand hand = hands.get(player_name);
+
+            if(deck.size() == 0) {
+                if(!shuffleTrainCards(game_name)) {
+                    return null;
+                }
+            }
+
+            Color selected = bank.get(slot);
+            if(selected == null) {
+                return null;
+            }
+
+            TrainCard selectedCard = new TrainCard(selected);
+            TrainCard replacementCard = deck.remove(deck.size() - 1);
+
+            hand.addTrainCard(selectedCard);
+            bank.set(slot, replacementCard.getColor());
+
+            hands.put(player_name, hand);
+            mg.setHands(hands);
+            mg.setTrainDeck(deck);
+            mg.setCheckpoint(checkpoint);
+        }
         return null;
     }
 
@@ -734,5 +765,20 @@ public class MongoController implements IDatabaseController{
     public void updateCurrentPlayer(String game_name, int nextPlayer) {
         getGameModel(game_name).setCurrentTurn(nextPlayer);
 
+    }
+
+    private boolean shuffleTrainCards(String game_name) {
+        MongoGame mg = (MongoGame)mongoGames.get(game_name);
+        List<TrainCard> deck = mg.getTrainDeck();
+        List<TrainCard> discard = mg.getTrainDiscard();
+
+        for(TrainCard card : discard) {
+            deck.add(card);
+        }
+
+        Collections.shuffle(deck, new Random(System.nanoTime()));
+        mg.setTrainDeck(deck);
+        mg.setTrainDiscard(discard);
+        return deck.size() > 0;
     }
 }
