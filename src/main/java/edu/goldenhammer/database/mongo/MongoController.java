@@ -14,11 +14,9 @@ import sun.security.krb5.internal.crypto.Des;
 
 import java.net.UnknownHostException;
 
-import java.util.*;
-import java.util.Map;
-
 import static java.util.Arrays.asList;
 
+import java.util.*;
 
 /**
  * Created by seanjib on 4/9/2017.
@@ -414,7 +412,7 @@ public class MongoController implements IDatabaseController{
             GameModel checkpoint = mg.getCheckpoint();
             List<Color> bank = checkpoint.getBank();
 
-            Map<String, Hand> hands = mg.getHands();
+            java.util.Map<String, Hand> hands = mg.getHands();
             Hand hand = hands.get(player_name);
 
             TrainCard replacementCard = getTopTrainCard(mg);
@@ -462,9 +460,7 @@ public class MongoController implements IDatabaseController{
                 }
                 discardedCards.add(newDiscardedCard);
                 bank.set(i, newBankCard.getColor());
-
             }
-
             mg.setTrainDiscard(discardedCards);
             checkpoint.setBank(bank);
             mg.setCheckpoint(checkpoint);
@@ -475,7 +471,7 @@ public class MongoController implements IDatabaseController{
     public boolean discardCard(String gameName, String playerName, Color color) {
         MongoGame mg = (MongoGame)mongoGames.get(gameName);
         if(mg != null) {
-            Map<String, Hand> hands = mg.getHands();
+            java.util.Map<String, Hand> hands = mg.getHands();
             Hand hand = hands.get(playerName);
             boolean success = hand.removeTrainCard(color);
 
