@@ -8,7 +8,9 @@ import edu.goldenhammer.mongoStuff.MongoDriver;
 import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.mongoStuff.MongoUser;
 import edu.goldenhammer.server.commands.BaseCommand;
+import edu.goldenhammer.server.commands.DrawTrainCardCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.LastTurnCommand;
 import javafx.util.Pair;
 import sun.security.krb5.internal.crypto.Des;
 
@@ -437,7 +439,44 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean hasDrawnTwoTrainCards(String game_name, String player_name) {
-        return false;
+        try {
+            MongoGame mg = driver.getGame(game_name);
+            List<BaseCommand> commands = mg.getCommands();
+            int lastEndTurnIndex = getLastEndTurnCommandIndex(game_name);
+            BaseCommand lastCommand = commands.get(lastEndTurnIndex);
+            if(lastCommand instanceof LastTurnCommand) {
+                if(!lastCommand.getPlayerName().equals(player_name)) {
+                    return true;
+                }
+            }
+
+            int drawTrainCommandCount = 0;
+            for(int i = lastEndTurnIndex; i < commands.size(); i++) {
+                if(commands.get(i) instanceof DrawTrainCardCommand) {
+                    ++drawTrainCommandCount;
+                }
+            }
+            return drawTrainCommandCount >= 2;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    private int getLastEndTurnCommandIndex(String game_name) {
+        try {
+            MongoGame mg = driver.getGame(game_name);
+            List<BaseCommand> commands = mg.getCommands();
+            BaseCommand lastEndTurnCommand;
+            for(int i = commands.size() - 1; i >= 0; i--) {
+                if(commands.get(i) instanceof EndTurnCommand) {
+                    return i;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     @Override
