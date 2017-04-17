@@ -1,7 +1,6 @@
 package edu.goldenhammer.database.mongo;
 
 import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.postgresql.data_types.SQLDestinationCard;
 import edu.goldenhammer.model.*;
 import edu.goldenhammer.model.Map;
 import edu.goldenhammer.mongoStuff.MongoDriver;
@@ -29,6 +28,8 @@ public class MongoController implements IDatabaseController{
     private TreeMap<Pair<City,City>,Track> allTracks;
     public static final int ROUTE_COUNT = 101;
     public static final int CITY_COUNT = 35;
+    public static final int MAX_DESTINATION_CARDS = 76;
+
 
     private int betweenCheckpoint;
 
@@ -49,7 +50,7 @@ public class MongoController implements IDatabaseController{
         driver = new MongoDriver();
         mongoGames = new TreeMap<String, GameModel>();
 
-        allCities = new TreeMap<String,City>();
+        allCities = new TreeMap<>();
 
         betweenCheckpoint = 5;
 
@@ -349,7 +350,7 @@ public class MongoController implements IDatabaseController{
         List<DestinationCard> destCardList = new ArrayList<>();
         String pathName = "/destinations.txt";
         Scanner destinations = new Scanner(getClass().getResourceAsStream(pathName));
-        for(int i = 0; i < SQLDestinationCard.MAX_DESTINATION_CARDS * 4; i += 4) {
+        for(int i = 0; i < MAX_DESTINATION_CARDS * 4; i += 4) {
             String destination = destinations.nextLine();
             String[] vars = destination.split(",");
             City city1 = allCities.get(vars[0]);
