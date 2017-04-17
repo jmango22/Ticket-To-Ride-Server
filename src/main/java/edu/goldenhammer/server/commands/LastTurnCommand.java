@@ -16,7 +16,12 @@ public class LastTurnCommand extends BaseCommand {
     public Results execute() {
         IDatabaseController dbc = DatabaseController.getInstance();
         dbc.addCommand(this,true,true);
-        addToDatabase(true, true);
+        addToDatabase();
         return new Results();
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, true);
     }
 }

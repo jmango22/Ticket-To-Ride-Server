@@ -22,4 +22,28 @@ public class Hand implements Serializable{
         this.trainCards = new ArrayList<>();
         this.drawnDestinationCards = new DrawnDestinationCards(new ArrayList<>());
     }
+
+    public List<DestinationCard> getDestinationCards() {
+        return destinationCards;
+    }
+
+    public void setDestinationCards(List<DestinationCard> destinationCards) {
+        this.destinationCards = destinationCards;
+    }
+
+    public List<TrainCard> getTrainCards() {
+        return trainCards;
+    }
+
+    public void setTrainCards(List<TrainCard> trainCards) {
+        this.trainCards = trainCards;
+    }
+
+    public DrawnDestinationCards getDrawnDestinationCards() {
+        return drawnDestinationCards;
+    }
+
+    public void setDrawnDestinationCards(DrawnDestinationCards drawnDestinationCards) {
+        this.drawnDestinationCards = drawnDestinationCards;
+    }
 }

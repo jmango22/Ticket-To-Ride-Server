@@ -71,8 +71,10 @@ public abstract class BaseCommand implements Serializable {
         this.gameName = gameName;
     }
 
-    protected void addToDatabase(boolean visibleToSelf, boolean visibleToAll) {
+    protected final void addToDatabase(boolean visibleToSelf, boolean visibleToAll) {
         IDatabaseController dbc = DatabaseController.getInstance();
         dbc.addCommand(this, visibleToSelf, visibleToAll);
     }
+
+    protected abstract void addToDatabase();
 }

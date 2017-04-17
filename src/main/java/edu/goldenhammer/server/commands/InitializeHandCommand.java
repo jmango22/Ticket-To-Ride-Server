@@ -36,7 +36,7 @@ public class InitializeHandCommand extends BaseCommand {
                 results.setResponseCode(200);
                 Serializer serializer = new Serializer();
                 results.setMessage(serializer.serialize(this));
-                addToDatabase(true, false);
+                addToDatabase();
             }
             else {
                 results.setResponseCode(400);
@@ -75,5 +75,10 @@ public class InitializeHandCommand extends BaseCommand {
     @Override
     public boolean endTurn() {
         return false;
+    }
+
+    @Override
+    protected void addToDatabase() {
+        super.addToDatabase(true, false);
     }
 }
