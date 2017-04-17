@@ -3,6 +3,7 @@ package edu.goldenhammer.database.mongo;
 import edu.goldenhammer.database.IDatabaseController;
 import edu.goldenhammer.database.postgresql.data_types.SQLDestinationCard;
 import edu.goldenhammer.model.*;
+import edu.goldenhammer.model.Map;
 import edu.goldenhammer.mongoStuff.MongoDriver;
 import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.mongoStuff.MongoUser;
@@ -282,8 +283,8 @@ public class MongoController implements IDatabaseController{
                 List<PlayerOverview> leaderboard = new ArrayList<>();
                 List<TrainCard> trainCardDeck = initializeTrainCards();
                 List<DestinationCard> destCardDeck = initializeDestCards();
-                //TrainCard[] bankCards = new TrainCard[5];
                 List<Color> bank = new ArrayList<>();
+
                 for (int i=0; i<5; i++){
                     bank.add((trainCardDeck.get(0).getColor()));
                     trainCardDeck.remove(0);
