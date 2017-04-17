@@ -17,6 +17,11 @@ public class Hand implements Serializable{
         this.trainCards = trainCards;
         this.drawnDestinationCards = drawnDestinationCards;
     }
+
+    public void addTrainCard(TrainCard card) {
+        trainCards.add(card);
+    }
+
     public Hand(){
         this.destinationCards = new ArrayList<>();
         this.trainCards = new ArrayList<>();
