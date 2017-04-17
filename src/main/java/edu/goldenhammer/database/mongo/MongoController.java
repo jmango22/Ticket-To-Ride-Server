@@ -303,12 +303,22 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public boolean postMessage(String game_name, String player_name, String message) {
-        return false;
+        MongoGame game = getGame(game_name);
+        game.getChatMessages().add(new Message(player_name,message));
+        try {
+            MongoGame oldgame = driver.getGame(game_name);
+            oldgame.getChatMessages().add(new Message(player_name, message));
+            driver.setGame(oldgame);
+        }catch (UnknownHostException e){
+            return false;
+        }
+        return true;
     }
 
     @Override
     public List<Message> getMessages(String game_name) {
-        return null;
+        MongoGame game = getGame(game_name);
+        return game.getChatMessages();
     }
 
     @Override
