@@ -14,11 +14,6 @@ import sun.security.krb5.internal.crypto.Des;
 
 import java.net.UnknownHostException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.TreeMap;
-
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -393,6 +388,26 @@ public class MongoController implements IDatabaseController{
 
     @Override
     public TrainCard drawRandomTrainCard(String gameName, String playerName) {
+        try{
+            MongoGame mg = driver.getGame(gameName);
+            if (mg != null){
+                java.util.Map<String, Hand> hands = mg.getHands();
+                Hand playerHand = hands.get(playerName);
+
+                List<TrainCard> deck = mg.getTrainDeck();
+                Random random = new Random();
+                int randomCardIndex = random.nextInt() % deck.size();
+                TrainCard card = deck.remove(randomCardIndex);
+                playerHand.addTrainCard(card);
+
+                hands.put(playerName, playerHand);
+                mg.setHands(hands);
+                mg.setTrainDeck(deck);
+                driver.setGame(mg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 

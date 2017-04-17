@@ -30,6 +30,7 @@ public class MongoGame implements Serializable {
     Map<String, Hand> hands = new TreeMap<>();
     List<DestinationCard> destDeck;
     List<DestinationCard> destDiscard;
+    //need trainSlots
     List<TrainCard> trainDeck;
     List<TrainCard> trainDiscard;
 
@@ -151,7 +152,6 @@ public class MongoGame implements Serializable {
     public void setGameName(String gameName) {
         this.gameName = gameName;
     }
-
 
     protected static class BaseCommandAdapter implements JsonDeserializer<BaseCommand>, JsonSerializer<BaseCommand> {
         @Override
