@@ -17,39 +17,10 @@ import java.util.TreeMap;
  */
 
 public class MongoUserDAO implements IUserDAO{
-    private int MAX_TRAIN;
     private MongoDriver driver;
 
-    private TreeMap<String, City> allCities;
-    private TreeMap<Pair<City,City>,Track> allTracks;
-    public static final int ROUTE_COUNT = 101;
-    public static final int CITY_COUNT = 35;
-    public static final int MAX_DESTINATION_CARDS = 76;
-
-
-    private int betweenCheckpoint;
-
-
-    private TreeMap mongoGames;
-
-    public MongoUserDAO(int maxTrain, int betweenCheckpoint) {
-        MAX_TRAIN=maxTrain;
-        driver = new MongoDriver();
-        mongoGames = new TreeMap<String, GameModel>();
-
-        this.betweenCheckpoint = betweenCheckpoint;
-
-    }
-
     public MongoUserDAO(){
-        MAX_TRAIN=45;
         driver = new MongoDriver();
-        mongoGames = new TreeMap<String, GameModel>();
-
-        allCities = new TreeMap<>();
-
-        betweenCheckpoint = 5;
-
     }
     @Override
     public Player getPlayerInfo(String player) {
@@ -76,22 +47,6 @@ public class MongoUserDAO implements IUserDAO{
         }catch(Exception e){
             e.printStackTrace();
             return false;
-        }
-    }
-
-    @Override
-    public List<String> getPlayers(String gameID) {
-        try{
-            MongoGame mg = driver.getGame(gameID);
-            if (mg == null){
-                return null;
-            }
-            else{
-                return mg.getPlayers();
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-            return null;
         }
     }
 
