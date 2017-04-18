@@ -5,9 +5,7 @@ import java.net.*;
 import java.util.List;
 
 import com.sun.net.httpserver.*;
-import edu.goldenhammer.database.DatabaseController;
-import edu.goldenhammer.database.IDatabaseController;
-import edu.goldenhammer.database.IGameDAO;
+import edu.goldenhammer.database.*;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.handlers.*;
 
@@ -40,7 +38,7 @@ public class ServerCommunicator {
         server.start();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
 //        DatabaseController c = DatabaseController.getInstance();
 //        c.joinGame("dk","ghteam");
@@ -56,6 +54,36 @@ public class ServerCommunicator {
             portNumber = args[0];
         if(args.length > 1)
             numTrains = Integer.parseInt(args[1]);
+        String persistenceType = "";
+        String clearOrCheckpointLength = "";
+        if (args.length >2)
+            persistenceType = args[2];
+        if (args.length > 3)
+            clearOrCheckpointLength = args[3];
+
+        AbstractFactory factory;
+        if (persistenceType == "mongo"){
+            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.MongoFactory", AbstractFactory.class);
+        }
+        else {
+            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.SQLFactory", AbstractFactory.class);
+        }
+
+
+
+        IGameDAO gameDAO = factory.getGameDAO();
+        IUserDAO userDAO = factory.getUserDAO();
+
+        if (clearOrCheckpointLength == "clear"){
+            gameDAO.clear();
+            userDAO.clear();
+        }
+        else{
+            int checkpointLength = Integer.parseInt(clearOrCheckpointLength);
+            gameDAO.setCheckpointLength(checkpointLength);
+        }
 //        DatabaseController.setFirstInstance(numTrains);
         System.out.println("Running on port: " + portNumber);
         new ServerCommunicator().run(portNumber);
