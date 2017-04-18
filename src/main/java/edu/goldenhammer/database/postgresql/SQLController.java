@@ -522,7 +522,7 @@ public class SQLController implements IDatabaseController {
         return null;
     }
 
-    public int getDestinationCardCount(String player_name) {
+    private int getDestinationCardCount(String player_name) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = (SELECT %3$s FROM %4$s WHERE %5$s = ?)",
                     SQLDestinationCard.TABLE_NAME,
@@ -544,7 +544,7 @@ public class SQLController implements IDatabaseController {
         return -1;
     }
 
-    public int getDestinationCardCount(int player_id) {
+    private int getDestinationCardCount(int player_id) {
         try (Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT count(*) FROM %1$s WHERE %2$s = ?",
                     SQLDestinationCard.TABLE_NAME,
@@ -618,7 +618,7 @@ public class SQLController implements IDatabaseController {
         return null;
     }
 
-    public List<TrainCard> getTrainCards(String game_name) {
+    private List<TrainCard> getTrainCards(String game_name) {
         try(Connection connection = session.getConnection()) {
             String sqlString = String.format("SELECT %1$s FROM %2$s \n" +
                             "WHERE %3$s IS NULL\n" +
