@@ -225,6 +225,7 @@ public class MongoGameDAO implements IGameDAO{
             else{
                 List<PlayerOverview> leaderboard = new ArrayList<>();
                 List<TrainCard> trainCardDeck = initializeTrainCards();
+                shuffleTrainCards(mg);
                 List<DestinationCard> destCardDeck = initializeDestCards();
                 List<Color> bank = new ArrayList<>();
 
@@ -238,15 +239,29 @@ public class MongoGameDAO implements IGameDAO{
                 GameModel model = new GameModel(leaderboard,map,g,bank);
 
                 mg.setCheckpoint(model);
-                mg.setCheckpointIndex(-1); //TODO should this be -1 or 0
+                mg.setCheckpointIndex(-1);
                 mg.setDestDeck(destCardDeck);
                 mg.setTrainDeck(trainCardDeck);
 
+                if(!allHandsInitialized(gameID)){
+                    initializeHands(gameID);
+                }
+                
                 return model;
             }
         }catch(Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void initializeHands(String gameID){
+        MongoGame game = getGame(gameID);
+        for(int i = 0; i < game.getPlayers().size();i++) {
+            InitializeHandCommand newHand = new InitializeHandCommand();
+            newHand.setGameName(gameID);
+            newHand.setPlayerName(game.getPlayers().get(i));
+            newHand.execute();
         }
     }
 
