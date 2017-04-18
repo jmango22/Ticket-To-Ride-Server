@@ -483,6 +483,13 @@ public class MongoGameDAO implements IGameDAO{
     public DestinationCard drawRandomDestinationCard(String gameName, String playerName) {
         // Need to pull it out of the cards and put it into limbo...
         MongoGame currentGame = getGame(gameName);
+
+        // Make sure there are still cards to draw, otherwise refill it with discarded cards
+        if(currentGame.getDestDeck().size() == 0) {
+            currentGame.setDestDeck(currentGame.getDestDiscard());
+            currentGame.setDestDiscard(new ArrayList<DestinationCard>());
+        }
+
         Random rand = new Random();
         int n = rand.nextInt(currentGame.getDestDeck().size());
         DestinationCard randomCard = currentGame.getDestDeck().get(n);
