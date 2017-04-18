@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 import edu.goldenhammer.server.commands.BaseCommand;
@@ -26,7 +27,7 @@ public class GetCommandsHandler extends HandlerBase {
                 results = getNotInGameResults();
             }
             else {
-                IDatabaseController dbc = DatabaseController.getInstance();
+                IGameDAO dbc = DatabaseController.getGameDAO();
                 List<BaseCommand> commandList;
 
                 Map<String, String> parameters = queryToMap(exchange.getRequestURI().getQuery());

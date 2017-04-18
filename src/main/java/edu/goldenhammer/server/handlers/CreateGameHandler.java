@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
+import edu.goldenhammer.database.IUserDAO;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
 
@@ -15,7 +17,8 @@ public class CreateGameHandler extends HandlerBase {
         try {
             String requestBody = readRequestBody(exchange);
 
-            IDatabaseController dbc = DatabaseController.getInstance();
+//            IDatabaseController dbc = DatabaseController.getInstance();
+            IGameDAO dbc = DatabaseController.getGameDAO();
             Results results = new Results();
 
             //verify username and access token
