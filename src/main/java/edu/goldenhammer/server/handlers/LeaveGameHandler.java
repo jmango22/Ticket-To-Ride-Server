@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.server.Results;
 
 /**
@@ -13,7 +14,7 @@ import edu.goldenhammer.server.Results;
 public class LeaveGameHandler extends HandlerBase {
     public void handle(HttpExchange exchange) {
         try {
-            IDatabaseController dbc = DatabaseController.getInstance();
+            IGameDAO dbc = DatabaseController.getGameDAO();
             Results results = new Results();
 
             //verify username and access token

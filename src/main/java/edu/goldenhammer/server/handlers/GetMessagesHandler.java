@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.model.Message;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
@@ -18,7 +19,7 @@ public class GetMessagesHandler extends HandlerBase{
         Results results = new Results();
         try {
             String requestBody = readRequestBody(exchange);
-            IDatabaseController dbc = DatabaseController.getInstance();
+            IGameDAO dbc = DatabaseController.getGameDAO();
 
             if (!isAuthorized(exchange)) {
                 results = getInvalidAuthorizationResults();

@@ -7,6 +7,7 @@ import javax.xml.crypto.Data;
 
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.database.Lock;
 import edu.goldenhammer.server.commands.*;
 
@@ -28,7 +29,7 @@ public class CommandManager {
 
     public List<BaseCommand> addCommand(BaseCommand command) {
         synchronized (Lock.getInstance().getLock(command.getGameName())) {
-            IDatabaseController dbc = DatabaseController.getInstance();
+            IGameDAO dbc = DatabaseController.getGameDAO();
             List<BaseCommand> executed = new ArrayList<>();
             int currentPlayer = currentPlayerTurn(command.getGameName(), command.getPlayerName());
 
@@ -67,7 +68,7 @@ public class CommandManager {
     }
 
     private int currentPlayerTurn(String game_name, String playerName) {
-        IDatabaseController dbc = DatabaseController.getInstance();
+        IGameDAO dbc = DatabaseController.getGameDAO();
         //-1 means that the not everyone has initialized their hands
         List<BaseCommand> commands = dbc.getCommandsSinceLastCommand(game_name, playerName, 0);
         int current_player = -1;

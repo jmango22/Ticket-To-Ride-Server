@@ -53,7 +53,7 @@ public class ServerCommunicator {
             portNumber = args[0];
         if(args.length > 1)
             numTrains = Integer.parseInt(args[1]);
-        DatabaseController.setFirstInstance(numTrains);
+//        DatabaseController.setFirstInstance(numTrains);
         System.out.println("Running on port: " + portNumber);
         new ServerCommunicator().run(portNumber);
 //        SQLConnectionFactory factory = SQLConnectionFactory.getInstance();

@@ -3,6 +3,7 @@ package edu.goldenhammer.server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import edu.goldenhammer.database.DatabaseController;
 import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.model.IGameModel;
 import edu.goldenhammer.server.Results;
 import edu.goldenhammer.server.Serializer;
@@ -13,7 +14,7 @@ import edu.goldenhammer.server.Serializer;
 public class PlayGameHandler extends HandlerBase {
     public synchronized void handle(HttpExchange exchange) {
         try {
-            IDatabaseController dbc = DatabaseController.getInstance();
+            IGameDAO dbc = DatabaseController.getGameDAO();
             Results results = new Results();
 
             //verify username and access token
