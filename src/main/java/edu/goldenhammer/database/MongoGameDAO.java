@@ -6,6 +6,7 @@ import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.DrawTrainCardCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 import edu.goldenhammer.server.commands.LastTurnCommand;
 import javafx.util.Pair;
 
@@ -331,6 +332,16 @@ public class MongoGameDAO implements IGameDAO{
 
     @Override
     public boolean allHandsInitialized(String gameName) {
+        int initializedHands = 0;
+        List<BaseCommand> commands = getGame(gameName).getCommands();
+        for(BaseCommand cmd: commands){
+            if(cmd instanceof InitializeHandCommand){
+                initializedHands++;
+            }
+        }
+        if(initializedHands == getGame(gameName).getPlayers().size()){
+            return true;
+        }
         return false;
     }
 
