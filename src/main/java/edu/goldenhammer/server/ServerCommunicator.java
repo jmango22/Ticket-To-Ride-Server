@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.sun.net.httpserver.*;
 import edu.goldenhammer.database.DatabaseController;
+import edu.goldenhammer.database.IDatabaseController;
+import edu.goldenhammer.database.IGameDAO;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.handlers.*;
 
@@ -47,6 +49,7 @@ public class ServerCommunicator {
 //        List<BaseCommand> commandList;
 //        commandList = dbc.getCommandsSinceLastCommand("just", "devon1", 0);
 //        dbc.getTracks("aaaa");
+        printClasspath();
         int numTrains = 45;
         String portNumber = "8082";//args[0];
         if(args.length > 0)
@@ -80,5 +83,25 @@ public class ServerCommunicator {
         server.createContext("/getcommands", new GetCommandsHandler());
         server.createContext("/getmessages", new GetMessagesHandler());
         server.createContext("/postmessage", new PostMessageHandler());
+    }
+
+    public static void printClasspath() {
+        try {
+            ExtensionLoader<IGameDAO> loader = new ExtensionLoader<>();
+            IGameDAO controller = loader.LoadClass("/plugins", "edu.goldenhammer.database.MongoGameDAO", IGameDAO.class);
+            System.out.println(controller.getGames());
+        }catch(ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        // Get the System Classloader
+        ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
+
+        // Get the URLs
+        URL[] urls = ((URLClassLoader) sysClassLoader).getURLs();
+        System.out.println(urls.length);
+        for (int i = 0; i < urls.length; i++) {
+            System.err.println(urls[i].getFile());
+        }
+
     }
 }
