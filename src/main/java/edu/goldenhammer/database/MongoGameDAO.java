@@ -6,6 +6,7 @@ import edu.goldenhammer.mongoStuff.MongoGame;
 import edu.goldenhammer.server.commands.BaseCommand;
 import edu.goldenhammer.server.commands.DrawTrainCardCommand;
 import edu.goldenhammer.server.commands.EndTurnCommand;
+import edu.goldenhammer.server.commands.InitializeHandCommand;
 import edu.goldenhammer.server.commands.LastTurnCommand;
 import javafx.util.Pair;
 
@@ -224,6 +225,7 @@ public class MongoGameDAO implements IGameDAO{
             else{
                 List<PlayerOverview> leaderboard = new ArrayList<>();
                 List<TrainCard> trainCardDeck = initializeTrainCards();
+                shuffleTrainCards(mg);
                 List<DestinationCard> destCardDeck = initializeDestCards();
                 List<Color> bank = new ArrayList<>();
 
@@ -237,15 +239,29 @@ public class MongoGameDAO implements IGameDAO{
                 GameModel model = new GameModel(leaderboard,map,g,bank);
 
                 mg.setCheckpoint(model);
-                mg.setCheckpointIndex(-1); //TODO should this be -1 or 0
+                mg.setCheckpointIndex(-1);
                 mg.setDestDeck(destCardDeck);
                 mg.setTrainDeck(trainCardDeck);
 
+                if(!allHandsInitialized(gameID)){
+                    initializeHands(gameID);
+                }
+                
                 return model;
             }
         }catch(Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void initializeHands(String gameID){
+        MongoGame game = getGame(gameID);
+        for(int i = 0; i < game.getPlayers().size();i++) {
+            InitializeHandCommand newHand = new InitializeHandCommand();
+            newHand.setGameName(gameID);
+            newHand.setPlayerName(game.getPlayers().get(i));
+            newHand.execute();
         }
     }
 
@@ -331,6 +347,16 @@ public class MongoGameDAO implements IGameDAO{
 
     @Override
     public boolean allHandsInitialized(String gameName) {
+        int initializedHands = 0;
+        List<BaseCommand> commands = getGame(gameName).getCommands();
+        for(BaseCommand cmd: commands){
+            if(cmd instanceof InitializeHandCommand){
+                initializedHands++;
+            }
+        }
+        if(initializedHands == getGame(gameName).getPlayers().size()){
+            return true;
+        }
         return false;
     }
 
