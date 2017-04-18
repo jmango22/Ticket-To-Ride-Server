@@ -246,7 +246,7 @@ public class MongoGameDAO implements IGameDAO{
                 if(!allHandsInitialized(gameID)){
                     initializeHands(gameID);
                 }
-                
+
                 return model;
             }
         }catch(Exception e){
