@@ -60,7 +60,7 @@ public class ServerCommunicator {
             persistenceType = args[2];
         if (args.length > 3)
             clearOrCheckpointLength = args[3];
-        persistenceType = "mongo";
+        persistenceType = "sql";
         AbstractFactory factory;
 //        if (persistenceType.equals("mongo")){
 //            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
@@ -80,7 +80,7 @@ public class ServerCommunicator {
 
         DatabaseController.setGameDAO(gameDAO);
         DatabaseController.setUserDAO(userDAO);
-//        gameDAO.clear();
+        gameDAO.clear();
         if (clearOrCheckpointLength == "cleaar"){
             gameDAO.clear();
             userDAO.clear();
