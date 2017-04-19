@@ -47,7 +47,7 @@ public class ServerCommunicator {
 //        List<BaseCommand> commandList;
 //        commandList = dbc.getCommandsSinceLastCommand("just", "devon1", 0);
 //        dbc.getTracks("aaaa");
-        printClasspath();
+//        printClasspath();
         int numTrains = 45;
         String persistenceType = "";
         String clearOrCheckpointLength = "5";
@@ -62,15 +62,15 @@ public class ServerCommunicator {
             clearOrCheckpointLength = args[3];
         persistenceType = "mongo";
         AbstractFactory factory;
-        if (persistenceType.equals("mongo")){
-            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
-            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.MongoFactory", AbstractFactory.class);
-        }
-        else {
-            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
-            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.SQLFactory", AbstractFactory.class);
-        }
-
+//        if (persistenceType.equals("mongo")){
+//            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+//            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.MongoFactory", AbstractFactory.class);
+//        }
+//        else {
+//            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+//            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.SQLFactory", AbstractFactory.class);
+//        }
+        factory = new MongoFactory();
 
 
         IGameDAO gameDAO = factory.getGameDAO();
@@ -80,8 +80,8 @@ public class ServerCommunicator {
 
         DatabaseController.setGameDAO(gameDAO);
         DatabaseController.setUserDAO(userDAO);
-
-        if (clearOrCheckpointLength == "clear"){
+//        gameDAO.clear();
+        if (clearOrCheckpointLength == "cleaar"){
             gameDAO.clear();
             userDAO.clear();
         }

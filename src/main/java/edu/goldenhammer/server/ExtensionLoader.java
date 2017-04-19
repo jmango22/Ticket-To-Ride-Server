@@ -11,9 +11,9 @@ public class ExtensionLoader<C> {
 
     public C LoadClass(String directory, String classpath, Class<C> parentClass) throws ClassNotFoundException {
         File pluginsDir = new File(System.getProperty("user.dir") + directory);
-        System.out.println(pluginsDir.toString());
+//        System.out.println(pluginsDir.toString());
         for (File jar : pluginsDir.listFiles()) {
-            System.out.println(jar.toString());
+//            System.out.println(jar.toString());
             try {
                 ClassLoader loader = URLClassLoader.newInstance(
                         new URL[] { jar.toURL() },
