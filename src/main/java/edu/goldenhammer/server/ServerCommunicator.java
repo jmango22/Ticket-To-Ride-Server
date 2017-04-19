@@ -76,6 +76,9 @@ public class ServerCommunicator {
         IGameDAO gameDAO = factory.getGameDAO();
         IUserDAO userDAO = factory.getUserDAO();
 
+        DatabaseController.setGameDAO(gameDAO);
+        DatabaseController.setUserDAO(userDAO);
+
         if (clearOrCheckpointLength == "clear"){
             gameDAO.clear();
             userDAO.clear();
