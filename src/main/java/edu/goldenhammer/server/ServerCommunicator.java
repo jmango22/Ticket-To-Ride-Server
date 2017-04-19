@@ -52,25 +52,24 @@ public class ServerCommunicator {
         String persistenceType = "";
         String clearOrCheckpointLength = "5";
         String portNumber = "8082";//args[0];
-        if(args.length > 0)
+        if (args.length > 0)
             portNumber = args[0];
-        if(args.length > 1)
+        if (args.length > 1)
             numTrains = Integer.parseInt(args[1]);
-        if (args.length >2)
+        if (args.length > 2)
             persistenceType = args[2];
         if (args.length > 3)
             clearOrCheckpointLength = args[3];
-        persistenceType = "sql";
+
         AbstractFactory factory;
-//        if (persistenceType.equals("mongo")){
-//            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
-//            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.MongoFactory", AbstractFactory.class);
-//        }
-//        else {
-//            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
-//            factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.SQLFactory", AbstractFactory.class);
-//        }
-        factory = new MongoFactory();
+        if (persistenceType.equals("mongo")){
+            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+            factory = new MongoFactory();
+        }
+        else {
+            ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
+            factory = new SQLFactory();
+        }
 
 
         IGameDAO gameDAO = factory.getGameDAO();
@@ -80,8 +79,8 @@ public class ServerCommunicator {
 
         DatabaseController.setGameDAO(gameDAO);
         DatabaseController.setUserDAO(userDAO);
-        gameDAO.clear();
-        if (clearOrCheckpointLength == "cleaar"){
+
+        if (clearOrCheckpointLength.equals("clear")){
             gameDAO.clear();
             userDAO.clear();
         }
