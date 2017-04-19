@@ -60,9 +60,9 @@ public class ServerCommunicator {
             persistenceType = args[2];
         if (args.length > 3)
             clearOrCheckpointLength = args[3];
-
+        persistenceType = "mongo";
         AbstractFactory factory;
-        if (persistenceType == "mongo"){
+        if (persistenceType.equals("mongo")){
             ExtensionLoader<AbstractFactory> factoryLoader = new ExtensionLoader<>();
             factory =factoryLoader.LoadClass("/plugins", "edu.goldenhammer.database.MongoFactory", AbstractFactory.class);
         }
