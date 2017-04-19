@@ -49,13 +49,13 @@ public class ServerCommunicator {
 //        dbc.getTracks("aaaa");
         printClasspath();
         int numTrains = 45;
+        String persistenceType = "";
+        String clearOrCheckpointLength = "5";
         String portNumber = "8082";//args[0];
         if(args.length > 0)
             portNumber = args[0];
         if(args.length > 1)
             numTrains = Integer.parseInt(args[1]);
-        String persistenceType = "";
-        String clearOrCheckpointLength = "";
         if (args.length >2)
             persistenceType = args[2];
         if (args.length > 3)
@@ -75,6 +75,8 @@ public class ServerCommunicator {
 
         IGameDAO gameDAO = factory.getGameDAO();
         IUserDAO userDAO = factory.getUserDAO();
+
+        gameDAO.setMaxTrains(numTrains);
 
         DatabaseController.setGameDAO(gameDAO);
         DatabaseController.setUserDAO(userDAO);
